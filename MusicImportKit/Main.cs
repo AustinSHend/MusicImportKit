@@ -343,7 +343,7 @@ namespace MusicImportKit
                 }
                 else if (currentFile != toPath + curFileInfo.Name)
                 {
-                    if(File.Exists(curFileInfo.FullName))
+                    if (File.Exists(curFileInfo.FullName))
                         File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
                 }
             }
@@ -931,7 +931,8 @@ namespace MusicImportKit
                         else if (pendingTagNames[i].ToLower() == "year" || pendingTagNames[i].ToLower() == "date")
                             outputTagFile.Tag.Year = Convert.ToUInt32(pendingTagData[i]);
                         // if none of the above match, it's a custom field
-                        else {
+                        else
+                        {
                             // Add the custom tag data to a special string array (required to be able to set it to tFrame.Text)
                             String[] customTagText = { pendingTagData[i] };
 
@@ -970,7 +971,7 @@ namespace MusicImportKit
                 {
                     string parsedFolderSyntax = "";
                     string parsedFileSyntax = "";
-                    
+
                     // Save common calls to a variable to save cycles
                     parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true);
                     parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false);
@@ -1699,7 +1700,7 @@ namespace MusicImportKit
 
             // Logic for handling whether a directory should be skipped based on if it's a restricted system folder (root folders are allowed even though "system")
             inputFlacs.AddRange(GetFilesSafe(TempPathBox.Text, "*.flac"));
-            
+
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
                 return;
