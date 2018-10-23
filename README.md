@@ -10,7 +10,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Proper dithering and downsampling of 24-bit to 16-bit FLAC using SoX (with a VHQ triangular dither filter, guarding, and 44/48 sample-rate detection).
 
-* Genuine LAME header info is preserved by exporting all tags from a .flac, converting to .wav (destroying all tags in the process), putting the .wav through LAME, and reapplying original tags to the .mp3 (including preserving unlimited custom tags through TXXX frame manipulation).
+* Genuine LAME header info is preserved by exporting all tags from a .flac, decoding to .wav (destroying all tags in the process), encoding the .wav to .mp3 through LAME, and reapplying original tags to the .mp3 (including preserving unlimited custom tags through TXXX frame manipulation).
 
 * MetaFLAC-powered ReplayGain on all formats.
 
@@ -25,5 +25,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 * Copy files from the input folder (and nested folders) into the output folder, with full regex+wildcards support.
 
 * Strip metadata from images as you copy, reducing filesize and bloat.
+
+* Impossible to make bad (Lossy->Lossless, Lossy->Lossy) transcodes, ensuring that data stays artifact-free.
 
 * Uses TagLib# to assist with tag reading.
