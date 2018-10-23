@@ -557,13 +557,13 @@ namespace MusicImportKit
 
             // Gets albumartist (or artist if albumartist is missing) and album off of first file and store in a string for later use
             if (tempTagMap.GetFirstField("albumartist") != null)
-                artist = tempTagMap.GetFirstField("albumartist");
+                artist = CleanString(tempTagMap.GetFirstField("albumartist"));
             else if (tempTagMap.GetFirstField("album artist") != null)
-                artist = tempTagMap.GetFirstField("album artist");
+                artist = CleanString(tempTagMap.GetFirstField("album artist"));
             else if (tempTagMap.GetFirstField("artist") != null)
-                artist = tempTagMap.GetFirstField("artist");
+                artist = CleanString(tempTagMap.GetFirstField("artist"));
             if (tempTagMap.GetFirstField("album") != null)
-                album = tempTagMap.GetFirstField("album");
+                album = CleanString(tempTagMap.GetFirstField("album"));
 
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
             List<string> outputFiles = new List<string>();
