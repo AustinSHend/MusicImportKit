@@ -263,6 +263,46 @@ namespace MusicImportKit
             return path.EndsWith("\\") ? path : path + "\\";
         }
 
+        private string[] GetDirectoriesSafe(string initialPath)
+        {
+            List<string> outputDirectories = new List<string>();
+
+            foreach (string currentDir in Directory.GetDirectories(initialPath))
+            {
+                try
+                {
+                    DirectoryInfo currentDirInfo = new DirectoryInfo(currentDir);
+                    if (currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName) || !currentDirInfo.Attributes.HasFlag(FileAttributes.System))
+                    {
+                        outputDirectories.AddRange(GetDirectoriesSafe(currentDir));
+                    }
+                }
+                catch { }
+            }
+
+            if (outputDirectories.Count == 0)
+            {
+                outputDirectories.Add(initialPath);
+            }
+
+            return outputDirectories.ToArray();
+        }
+
+        private string[] GetFilesSafe(string initialPath, string searchPattern = "*.*")
+        {
+            List<string> files = new List<string>();
+            List<string> directories = new List<string>();
+
+            directories.AddRange(GetDirectoriesSafe(initialPath));
+
+            foreach (string currentDir in directories)
+            {
+                files.AddRange(Directory.GetFiles(currentDir, searchPattern));
+            }
+
+            return files.ToArray();
+        }
+
         // Recursively copy a folder's contents into another folder. Selectively copies certain files if 3rd parameter is specified
         private void RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "", bool renameLogCue = false)
         {
@@ -288,6 +328,7 @@ namespace MusicImportKit
             Directory.CreateDirectory(toPath);
 
             // Copy each file in the fromPath
+
             foreach (string currentFile in Directory.GetFiles(fromPath))
             {
                 FileInfo curFileInfo = new FileInfo(currentFile);
@@ -503,7 +544,7 @@ namespace MusicImportKit
 
             // List of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(tempPath, "*.flac", SearchOption.AllDirectories));
+            inputFlacs.AddRange(GetFilesSafe(tempPath, "*.flac"));
 
             if (inputFlacs.Count() == 0)
             {
@@ -973,9 +1014,9 @@ namespace MusicImportKit
             {
                 // Create lists of the .logs and .cues in the outputFolder
                 List<string> logList = new List<string>();
-                logList.AddRange(Directory.GetFiles(outputFolder, "*.log", SearchOption.AllDirectories));
+                logList.AddRange(GetFilesSafe(outputFolder, "*.log"));
                 List<string> cueList = new List<string>();
-                cueList.AddRange(Directory.GetFiles(outputFolder, "*.cue", SearchOption.AllDirectories));
+                cueList.AddRange(GetFilesSafe(outputFolder, "*.cue"));
 
                 // If there are 2 or more .cues in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
                 if (cueList.Count() >= 2)
@@ -1018,10 +1059,10 @@ namespace MusicImportKit
             {
                 // Add all image files in outputFolder to a list
                 List<string> imageFiles = new List<string>();
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.bmp", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.gif", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.jpg", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.png", SearchOption.AllDirectories));
+                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.bmp"));
+                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.gif"));
+                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.jpg"));
+                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.png"));
 
                 // Parallel strip files (exiftool on windows is sluggish compared to linux; run in parallel and don't wait for completion)
                 Parallel.ForEach(imageFiles, (currentImage) =>
@@ -1611,7 +1652,7 @@ namespace MusicImportKit
 
             // String array of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
+            inputFlacs.AddRange(GetFilesSafe(TempPathBox.Text, "*.flac"));
 
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
@@ -1653,10 +1694,12 @@ namespace MusicImportKit
             if (!Directory.Exists(TempPathBox.Text))
                 return;
 
-            // Add input flacs into a list
+            // List for future input flacs
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
 
+            // Logic for handling whether a directory should be skipped based on if it's a restricted system folder (root folders are allowed even though "system")
+            inputFlacs.AddRange(GetFilesSafe(TempPathBox.Text, "*.flac"));
+            
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
                 return;
@@ -1746,7 +1789,7 @@ namespace MusicImportKit
             {
                 // List of input wavs that can be converted
                 List<string> inputWavs = new List<string>();
-                inputWavs.AddRange(Directory.GetFiles(outputPath, "*.wav", SearchOption.AllDirectories));
+                inputWavs.AddRange(GetFilesSafe(outputPath, "*.wav"));
 
                 // Parallel convert files
                 Parallel.ForEach(inputWavs, (currentWav) =>
