@@ -1787,6 +1787,8 @@ namespace MusicImportKit
 
             // Set TempPathBox to the folder we copied to
             TempPathBox.Text = outputPath;
+
+            GuessButton.PerformClick();
         }
 
         private void SettingsButton_Click(object sender, EventArgs e)
