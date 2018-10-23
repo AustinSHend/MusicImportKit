@@ -929,11 +929,12 @@ namespace MusicImportKit
                 {
                     string parsedFolderSyntax = "";
                     string parsedFileSyntax = "";
-
+                    
+                    // Save common calls to a variable to save cycles
                     parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true);
                     parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false);
                     // Output Path+Name of future file
-                    string outputOpus = outputPath + ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false) + ".opus";
+                    string outputOpus = outputPath + parsedFileSyntax + ".opus";
 
                     // Create directory (automatically checks if it exists or not)
                     Directory.CreateDirectory(outputPath + parsedFolderSyntax);
