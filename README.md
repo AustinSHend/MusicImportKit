@@ -1,4 +1,4 @@
-![Main window](https://i.imgur.com/IW4Mjd3.png)
+![Main window](https://i.imgur.com/OWxjlGJ.png)
 
 # MusicImportKit
 
@@ -22,8 +22,8 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Full custom parsing syntax, able to read any tag enclosed by "%" and several audio properties (codec, bitrate, sample-rate, bit-depth, etc). Includes several popular default syntaxes.
 
-* Uses TagLib# to assist with tag reading.
-
 * Copy files from the input folder (and nested folders) into the output folder, with full regex+wildcards support.
 
 * Strip metadata from images as you copy, reducing filesize and bloat.
+
+* Uses TagLib# to assist with tag reading.
