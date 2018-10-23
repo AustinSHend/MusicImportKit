@@ -1249,6 +1249,9 @@ namespace MusicImportKit
                 TempPathBox.Text = fbd.FileName;
                 TempPathBox.ForeColor = Color.Black;
             }
+
+            // Perform a metadata guess
+            GuessButton.PerformClick();
         }
 
         private void TempExplorerButton_Click(object sender, EventArgs e)
@@ -1789,6 +1792,7 @@ namespace MusicImportKit
             // Set TempPathBox to the folder we copied to
             TempPathBox.Text = outputPath;
 
+            // Perform a metadata guess
             GuessButton.PerformClick();
         }
 
@@ -1910,6 +1914,16 @@ namespace MusicImportKit
             DirectoryInfo parentFolder = Directory.GetParent(Directory.GetParent(NormalizePath(OutputPathTextBox.Text)).FullName);
             if (parentFolder != null && Directory.Exists(parentFolder.FullName))
                 OutputPathTextBox.Text = Directory.GetParent(Directory.GetParent(NormalizePath(OutputPathTextBox.Text)).FullName).FullName;
+        }
+
+        private void TempPathBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // If user presses Enter in the tempbox, perform a metadata guess
+            if (e.KeyCode == Keys.Return)
+            {
+                e.SuppressKeyPress = true;
+                GuessButton.PerformClick();
+            }
         }
     }
 }

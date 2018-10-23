@@ -73,9 +73,9 @@
             this.TempPathUpOneButton = new System.Windows.Forms.Button();
             this.OutputPathUpOneButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            //
+            // 
             // InputPathBox
-            //
+            // 
             this.InputPathBox.AllowDrop = true;
             this.InputPathBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.InputPathBox.Location = new System.Drawing.Point(12, 12);
@@ -87,9 +87,9 @@
             this.InputPathBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.InputPathBox_DragEnter);
             this.InputPathBox.Enter += new System.EventHandler(this.InputPathBox_Enter);
             this.InputPathBox.Leave += new System.EventHandler(this.InputPathBox_Leave);
-            //
+            // 
             // InputPathButton
-            //
+            // 
             this.InputPathButton.Location = new System.Drawing.Point(438, 11);
             this.InputPathButton.Name = "InputPathButton";
             this.InputPathButton.Size = new System.Drawing.Size(93, 22);
@@ -97,9 +97,9 @@
             this.InputPathButton.Text = "Ch&oose Folder";
             this.InputPathButton.UseVisualStyleBackColor = true;
             this.InputPathButton.Click += new System.EventHandler(this.InputPathButton_Click);
-            //
+            // 
             // InputExplorerButton
-            //
+            // 
             this.InputExplorerButton.Location = new System.Drawing.Point(536, 11);
             this.InputExplorerButton.Name = "InputExplorerButton";
             this.InputExplorerButton.Size = new System.Drawing.Size(93, 22);
@@ -107,9 +107,9 @@
             this.InputExplorerButton.Text = "Open in Explorer";
             this.InputExplorerButton.UseVisualStyleBackColor = true;
             this.InputExplorerButton.Click += new System.EventHandler(this.InputExplorerButton_Click);
-            //
+            // 
             // TempExplorerButton
-            //
+            // 
             this.TempExplorerButton.Location = new System.Drawing.Point(536, 66);
             this.TempExplorerButton.Name = "TempExplorerButton";
             this.TempExplorerButton.Size = new System.Drawing.Size(93, 22);
@@ -117,9 +117,9 @@
             this.TempExplorerButton.Text = "Open in Explorer";
             this.TempExplorerButton.UseVisualStyleBackColor = true;
             this.TempExplorerButton.Click += new System.EventHandler(this.TempExplorerButton_Click);
-            //
+            // 
             // TempPathButton
-            //
+            // 
             this.TempPathButton.Location = new System.Drawing.Point(438, 66);
             this.TempPathButton.Name = "TempPathButton";
             this.TempPathButton.Size = new System.Drawing.Size(93, 22);
@@ -127,9 +127,9 @@
             this.TempPathButton.Text = "Choose Folder";
             this.TempPathButton.UseVisualStyleBackColor = true;
             this.TempPathButton.Click += new System.EventHandler(this.TempPathButton_Click);
-            //
+            // 
             // TempPathBox
-            //
+            // 
             this.TempPathBox.AllowDrop = true;
             this.TempPathBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.TempPathBox.Location = new System.Drawing.Point(12, 67);
@@ -140,10 +140,11 @@
             this.TempPathBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.TempPathBox_DragDrop);
             this.TempPathBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.TempPathBox_DragEnter);
             this.TempPathBox.Enter += new System.EventHandler(this.TempPathBox_Enter);
+            this.TempPathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempPathBox_KeyDown);
             this.TempPathBox.Leave += new System.EventHandler(this.TempPathBox_Leave);
-            //
+            // 
             // ArtistTextBox
-            //
+            // 
             this.ArtistTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.ArtistTextBox.Location = new System.Drawing.Point(12, 93);
             this.ArtistTextBox.Name = "ArtistTextBox";
@@ -152,9 +153,9 @@
             this.ArtistTextBox.Text = "Artist";
             this.ArtistTextBox.Enter += new System.EventHandler(this.ArtistTextBox_Enter);
             this.ArtistTextBox.Leave += new System.EventHandler(this.ArtistTextBox_Leave);
-            //
+            // 
             // AlbumTextBox
-            //
+            // 
             this.AlbumTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.AlbumTextBox.Location = new System.Drawing.Point(12, 119);
             this.AlbumTextBox.Name = "AlbumTextBox";
@@ -163,9 +164,9 @@
             this.AlbumTextBox.Text = "Album";
             this.AlbumTextBox.Enter += new System.EventHandler(this.AlbumTextBox_Enter);
             this.AlbumTextBox.Leave += new System.EventHandler(this.AlbumTextBox_Leave);
-            //
+            // 
             // DiscogsButton
-            //
+            // 
             this.DiscogsButton.Location = new System.Drawing.Point(12, 145);
             this.DiscogsButton.Name = "DiscogsButton";
             this.DiscogsButton.Size = new System.Drawing.Size(74, 22);
@@ -173,9 +174,9 @@
             this.DiscogsButton.Text = "Discogs";
             this.DiscogsButton.UseVisualStyleBackColor = true;
             this.DiscogsButton.Click += new System.EventHandler(this.DiscogsButton_Click);
-            //
+            // 
             // MusicBrainzButton
-            //
+            // 
             this.MusicBrainzButton.Location = new System.Drawing.Point(92, 145);
             this.MusicBrainzButton.Name = "MusicBrainzButton";
             this.MusicBrainzButton.Size = new System.Drawing.Size(74, 22);
@@ -183,9 +184,9 @@
             this.MusicBrainzButton.Text = "MusicBrainz";
             this.MusicBrainzButton.UseVisualStyleBackColor = true;
             this.MusicBrainzButton.Click += new System.EventHandler(this.MusicBrainzButton_Click);
-            //
+            // 
             // AADButton
-            //
+            // 
             this.AADButton.Enabled = false;
             this.AADButton.Location = new System.Drawing.Point(12, 174);
             this.AADButton.Name = "AADButton";
@@ -194,9 +195,9 @@
             this.AADButton.Text = "AlbumArtDownloader";
             this.AADButton.UseVisualStyleBackColor = true;
             this.AADButton.Click += new System.EventHandler(this.AADButton_Click);
-            //
+            // 
             // Mp3tagButton
-            //
+            // 
             this.Mp3tagButton.Enabled = false;
             this.Mp3tagButton.Location = new System.Drawing.Point(132, 174);
             this.Mp3tagButton.Name = "Mp3tagButton";
@@ -205,9 +206,9 @@
             this.Mp3tagButton.Text = "Mp3Tag";
             this.Mp3tagButton.UseVisualStyleBackColor = true;
             this.Mp3tagButton.Click += new System.EventHandler(this.Mp3tagButton_Click);
-            //
+            // 
             // ConvertToComboBox
-            //
+            // 
             this.ConvertToComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ConvertToComboBox.ForeColor = System.Drawing.SystemColors.ControlText;
             this.ConvertToComboBox.FormattingEnabled = true;
@@ -222,9 +223,9 @@
             this.ConvertToComboBox.Size = new System.Drawing.Size(171, 21);
             this.ConvertToComboBox.TabIndex = 35;
             this.ConvertToComboBox.SelectedIndexChanged += new System.EventHandler(this.ConvertToComboBox_SelectedIndexChanged);
-            //
+            // 
             // ConvertButton
-            //
+            // 
             this.ConvertButton.Location = new System.Drawing.Point(189, 419);
             this.ConvertButton.Name = "ConvertButton";
             this.ConvertButton.Size = new System.Drawing.Size(76, 23);
@@ -232,9 +233,9 @@
             this.ConvertButton.Text = "Convert";
             this.ConvertButton.UseVisualStyleBackColor = true;
             this.ConvertButton.Click += new System.EventHandler(this.ConvertButton_Click);
-            //
+            // 
             // OutputNamingSyntaxTextBox
-            //
+            // 
             this.OutputNamingSyntaxTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.OutputNamingSyntaxTextBox.FormattingEnabled = true;
             this.OutputNamingSyntaxTextBox.Items.AddRange(new object[] {
@@ -256,9 +257,9 @@
             this.OutputNamingSyntaxTooltip.SetToolTip(this.OutputNamingSyntaxTextBox, resources.GetString("OutputNamingSyntaxTextBox.ToolTip"));
             this.OutputNamingSyntaxTextBox.Enter += new System.EventHandler(this.OutputNamingSyntaxTextBox_Enter);
             this.OutputNamingSyntaxTextBox.Leave += new System.EventHandler(this.OutputNamingSyntaxTextBox_Leave);
-            //
+            // 
             // OutputPathTextBox
-            //
+            // 
             this.OutputPathTextBox.AllowDrop = true;
             this.OutputPathTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.OutputPathTextBox.Location = new System.Drawing.Point(12, 202);
@@ -270,9 +271,9 @@
             this.OutputPathTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.OutputPathTextBox_DragEnter);
             this.OutputPathTextBox.Enter += new System.EventHandler(this.OutputPathTextBox_Enter);
             this.OutputPathTextBox.Leave += new System.EventHandler(this.OutputPathTextBox_Leave);
-            //
+            // 
             // CopyFileTypesTextBox
-            //
+            // 
             this.CopyFileTypesTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.CopyFileTypesTextBox.Location = new System.Drawing.Point(148, 280);
             this.CopyFileTypesTextBox.Name = "CopyFileTypesTextBox";
@@ -282,16 +283,16 @@
             this.CopyFileTypesTooltip.SetToolTip(this.CopyFileTypesTextBox, "Separate with \";\"\r\nRegex and wildcards (*, ?) accepted");
             this.CopyFileTypesTextBox.Enter += new System.EventHandler(this.CopyFileTypesTextBox_Enter);
             this.CopyFileTypesTextBox.Leave += new System.EventHandler(this.CopyFileTypesTextBox_Leave);
-            //
+            // 
             // ConvertBackgroundWorker
-            //
+            // 
             this.ConvertBackgroundWorker.WorkerReportsProgress = true;
             this.ConvertBackgroundWorker.WorkerSupportsCancellation = true;
             this.ConvertBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ConvertBackgroundWorker_DoWork);
             this.ConvertBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ConvertBackgroundWorker_RunWorkerCompleted);
-            //
+            // 
             // ReplayGainCheckbox
-            //
+            // 
             this.ReplayGainCheckbox.AutoSize = true;
             this.ReplayGainCheckbox.Enabled = false;
             this.ReplayGainCheckbox.Location = new System.Drawing.Point(12, 259);
@@ -300,9 +301,9 @@
             this.ReplayGainCheckbox.TabIndex = 25;
             this.ReplayGainCheckbox.Text = "Apply ReplayGain";
             this.ReplayGainCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // CopyContentsCheckbox
-            //
+            // 
             this.CopyContentsCheckbox.AutoSize = true;
             this.CopyContentsCheckbox.Location = new System.Drawing.Point(12, 282);
             this.CopyContentsCheckbox.Name = "CopyContentsCheckbox";
@@ -311,9 +312,9 @@
             this.CopyContentsCheckbox.Text = "Copy specific filetypes";
             this.CopyContentsCheckbox.UseVisualStyleBackColor = true;
             this.CopyContentsCheckbox.CheckedChanged += new System.EventHandler(this.CopyContentsCheckbox_CheckedChanged);
-            //
+            // 
             // ConvertOpenFolderCheckbox
-            //
+            // 
             this.ConvertOpenFolderCheckbox.AutoSize = true;
             this.ConvertOpenFolderCheckbox.Location = new System.Drawing.Point(12, 397);
             this.ConvertOpenFolderCheckbox.Name = "ConvertOpenFolderCheckbox";
@@ -321,9 +322,9 @@
             this.ConvertOpenFolderCheckbox.TabIndex = 34;
             this.ConvertOpenFolderCheckbox.Text = "Open folder when done";
             this.ConvertOpenFolderCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // SpectrogramsButton
-            //
+            // 
             this.SpectrogramsButton.Enabled = false;
             this.SpectrogramsButton.Location = new System.Drawing.Point(252, 174);
             this.SpectrogramsButton.Name = "SpectrogramsButton";
@@ -332,9 +333,9 @@
             this.SpectrogramsButton.Text = "Spek";
             this.SpectrogramsButton.UseVisualStyleBackColor = true;
             this.SpectrogramsButton.Click += new System.EventHandler(this.SpectrogramsButton_Click);
-            //
+            // 
             // GuessButton
-            //
+            // 
             this.GuessButton.Location = new System.Drawing.Point(292, 105);
             this.GuessButton.Name = "GuessButton";
             this.GuessButton.Size = new System.Drawing.Size(105, 22);
@@ -342,9 +343,9 @@
             this.GuessButton.Text = "Guess Artist/Album";
             this.GuessButton.UseVisualStyleBackColor = true;
             this.GuessButton.Click += new System.EventHandler(this.GuessButton_Click);
-            //
+            // 
             // CopyButton
-            //
+            // 
             this.CopyButton.Location = new System.Drawing.Point(12, 38);
             this.CopyButton.Name = "CopyButton";
             this.CopyButton.Size = new System.Drawing.Size(179, 23);
@@ -352,9 +353,9 @@
             this.CopyButton.Text = "↓ Copy input folder to temp folder ↓";
             this.CopyButton.UseVisualStyleBackColor = true;
             this.CopyButton.Click += new System.EventHandler(this.CopyButton_Click);
-            //
+            // 
             // SettingsButton
-            //
+            // 
             this.SettingsButton.Location = new System.Drawing.Point(740, 11);
             this.SettingsButton.Name = "SettingsButton";
             this.SettingsButton.Size = new System.Drawing.Size(53, 22);
@@ -362,16 +363,16 @@
             this.SettingsButton.Text = "Settings";
             this.SettingsButton.UseVisualStyleBackColor = true;
             this.SettingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
-            //
+            // 
             // CopyBackgroundWorker
-            //
+            // 
             this.CopyBackgroundWorker.WorkerReportsProgress = true;
             this.CopyBackgroundWorker.WorkerSupportsCancellation = true;
             this.CopyBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CopyBackgroundWorker_DoWork);
             this.CopyBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CopyBackgroundWorker_RunWorkerCompleted);
-            //
+            // 
             // DeleteTempFolderCheckbox
-            //
+            // 
             this.DeleteTempFolderCheckbox.AutoSize = true;
             this.DeleteTempFolderCheckbox.Location = new System.Drawing.Point(12, 374);
             this.DeleteTempFolderCheckbox.Name = "DeleteTempFolderCheckbox";
@@ -379,9 +380,9 @@
             this.DeleteTempFolderCheckbox.TabIndex = 33;
             this.DeleteTempFolderCheckbox.Text = "Delete source temp folder";
             this.DeleteTempFolderCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // RedactedButton
-            //
+            // 
             this.RedactedButton.Location = new System.Drawing.Point(172, 145);
             this.RedactedButton.Name = "RedactedButton";
             this.RedactedButton.Size = new System.Drawing.Size(74, 22);
@@ -390,9 +391,9 @@
             this.RedactedButton.UseVisualStyleBackColor = true;
             this.RedactedButton.Visible = false;
             this.RedactedButton.Click += new System.EventHandler(this.RedactedButton_Click);
-            //
+            // 
             // RenameLogCueCheckbox
-            //
+            // 
             this.RenameLogCueCheckbox.AutoSize = true;
             this.RenameLogCueCheckbox.Location = new System.Drawing.Point(28, 305);
             this.RenameLogCueCheckbox.Name = "RenameLogCueCheckbox";
@@ -400,9 +401,9 @@
             this.RenameLogCueCheckbox.TabIndex = 28;
             this.RenameLogCueCheckbox.Text = "Rename .log and .cue to %albumartist% - %album%.log and %album%.cue";
             this.RenameLogCueCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // StripImageMetadataCheckbox
-            //
+            // 
             this.StripImageMetadataCheckbox.AutoSize = true;
             this.StripImageMetadataCheckbox.Location = new System.Drawing.Point(28, 328);
             this.StripImageMetadataCheckbox.Name = "StripImageMetadataCheckbox";
@@ -410,9 +411,9 @@
             this.StripImageMetadataCheckbox.TabIndex = 29;
             this.StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png)";
             this.StripImageMetadataCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // OutputExplorerButton
-            //
+            // 
             this.OutputExplorerButton.Location = new System.Drawing.Point(537, 201);
             this.OutputExplorerButton.Name = "OutputExplorerButton";
             this.OutputExplorerButton.Size = new System.Drawing.Size(93, 22);
@@ -420,9 +421,9 @@
             this.OutputExplorerButton.Text = "Open in Explorer";
             this.OutputExplorerButton.UseVisualStyleBackColor = true;
             this.OutputExplorerButton.Click += new System.EventHandler(this.OutputExplorerButton_Click);
-            //
+            // 
             // OutputPathButton
-            //
+            // 
             this.OutputPathButton.Location = new System.Drawing.Point(438, 201);
             this.OutputPathButton.Name = "OutputPathButton";
             this.OutputPathButton.Size = new System.Drawing.Size(93, 22);
@@ -430,9 +431,9 @@
             this.OutputPathButton.Text = "Choose Folder";
             this.OutputPathButton.UseVisualStyleBackColor = true;
             this.OutputPathButton.Click += new System.EventHandler(this.OutputPathButton_Click);
-            //
+            // 
             // AutoWavConvertCheckbox
-            //
+            // 
             this.AutoWavConvertCheckbox.AutoSize = true;
             this.AutoWavConvertCheckbox.Location = new System.Drawing.Point(197, 42);
             this.AutoWavConvertCheckbox.Name = "AutoWavConvertCheckbox";
@@ -440,9 +441,9 @@
             this.AutoWavConvertCheckbox.TabIndex = 5;
             this.AutoWavConvertCheckbox.Text = "Convert input .wav files to .flac";
             this.AutoWavConvertCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // ResetPathsButton
-            //
+            // 
             this.ResetPathsButton.Location = new System.Drawing.Point(497, 38);
             this.ResetPathsButton.Name = "ResetPathsButton";
             this.ResetPathsButton.Size = new System.Drawing.Size(73, 23);
@@ -450,9 +451,9 @@
             this.ResetPathsButton.Text = "Reset Paths";
             this.ResetPathsButton.UseVisualStyleBackColor = true;
             this.ResetPathsButton.Click += new System.EventHandler(this.ResetPathsButton_Click);
-            //
+            // 
             // ExcelExportCheckbox
-            //
+            // 
             this.ExcelExportCheckbox.AutoSize = true;
             this.ExcelExportCheckbox.Location = new System.Drawing.Point(12, 351);
             this.ExcelExportCheckbox.Name = "ExcelExportCheckbox";
@@ -460,9 +461,9 @@
             this.ExcelExportCheckbox.TabIndex = 30;
             this.ExcelExportCheckbox.Text = "Append parsed data to Excel sheet";
             this.ExcelExportCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // ExcelLogScoreTextBox
-            //
+            // 
             this.ExcelLogScoreTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.ExcelLogScoreTextBox.Location = new System.Drawing.Point(210, 349);
             this.ExcelLogScoreTextBox.Name = "ExcelLogScoreTextBox";
@@ -471,9 +472,9 @@
             this.ExcelLogScoreTextBox.Text = "Log score";
             this.ExcelLogScoreTextBox.Enter += new System.EventHandler(this.ExcelLogScoreTextBox_Enter);
             this.ExcelLogScoreTextBox.Leave += new System.EventHandler(this.ExcelLogScoreTextBox_Leave);
-            //
+            // 
             // ExcelNotesTextBox
-            //
+            // 
             this.ExcelNotesTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.ExcelNotesTextBox.Location = new System.Drawing.Point(292, 349);
             this.ExcelNotesTextBox.Name = "ExcelNotesTextBox";
@@ -482,9 +483,9 @@
             this.ExcelNotesTextBox.Text = "Notes";
             this.ExcelNotesTextBox.Enter += new System.EventHandler(this.ExcelNotesTextBox_Enter);
             this.ExcelNotesTextBox.Leave += new System.EventHandler(this.ExcelNotesTextBox_Leave);
-            //
+            // 
             // InputPathUpOneButton
-            //
+            // 
             this.InputPathUpOneButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InputPathUpOneButton.Location = new System.Drawing.Point(410, 11);
             this.InputPathUpOneButton.Name = "InputPathUpOneButton";
@@ -493,9 +494,9 @@
             this.InputPathUpOneButton.Text = "↑";
             this.InputPathUpOneButton.UseVisualStyleBackColor = true;
             this.InputPathUpOneButton.Click += new System.EventHandler(this.InputPathUpOneButton_Click);
-            //
+            // 
             // TempPathUpOneButton
-            //
+            // 
             this.TempPathUpOneButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TempPathUpOneButton.Location = new System.Drawing.Point(410, 66);
             this.TempPathUpOneButton.Name = "TempPathUpOneButton";
@@ -504,9 +505,9 @@
             this.TempPathUpOneButton.Text = "↑";
             this.TempPathUpOneButton.UseVisualStyleBackColor = true;
             this.TempPathUpOneButton.Click += new System.EventHandler(this.TempPathUpOneButton_Click);
-            //
+            // 
             // OutputPathUpOneButton
-            //
+            // 
             this.OutputPathUpOneButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.OutputPathUpOneButton.Location = new System.Drawing.Point(410, 201);
             this.OutputPathUpOneButton.Name = "OutputPathUpOneButton";
@@ -515,9 +516,9 @@
             this.OutputPathUpOneButton.Text = "↑";
             this.OutputPathUpOneButton.UseVisualStyleBackColor = true;
             this.OutputPathUpOneButton.Click += new System.EventHandler(this.OutputPathUpOneButton_Click);
-            //
+            // 
             // Main
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(805, 453);
