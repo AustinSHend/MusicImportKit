@@ -287,8 +287,16 @@ namespace MusicImportKit
             // Creates a directory of toPath + lastFolder, inherently checks if it exists before creation
             Directory.CreateDirectory(toPath);
 
+            List<string> inputFiles = new List<string>();
+            // Swallow access denied errors
+            try
+            {
+                inputFiles.AddRange(Directory.GetFiles(fromPath));
+            }
+            catch (UnauthorizedAccessException) { };
+
             // Copy each file in the fromPath
-            foreach (string currentFile in Directory.GetFiles(fromPath))
+            foreach (string currentFile in inputFiles)
             {
                 FileInfo curFileInfo = new FileInfo(currentFile);
                 if (specificFiletypeText != "" && currentFile != toPath + curFileInfo.Name)
@@ -308,7 +316,7 @@ namespace MusicImportKit
             }
 
             // Recurse each folder in the fromPath into this function again, so that they may create new folders and copy
-            foreach (string currentFolder in Directory.GetDirectories(fromPath))
+            foreach (string currentFolder in inputFiles)
             {
                 DirectoryInfo curFolderInfo = new DirectoryInfo(currentFolder);
                 RecursiveFolderCopy(currentFolder, toPath + curFolderInfo.Name, originalFiletypeText);
@@ -503,7 +511,12 @@ namespace MusicImportKit
 
             // List of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(tempPath, "*.flac", SearchOption.AllDirectories));
+            // Swallow access denied errors
+            try
+            {
+                inputFlacs.AddRange(Directory.GetFiles(tempPath, "*.flac", SearchOption.AllDirectories));
+            }
+            catch (UnauthorizedAccessException) { };
 
             if (inputFlacs.Count() == 0)
             {
@@ -973,9 +986,15 @@ namespace MusicImportKit
             {
                 // Create lists of the .logs and .cues in the outputFolder
                 List<string> logList = new List<string>();
-                logList.AddRange(Directory.GetFiles(outputFolder, "*.log", SearchOption.AllDirectories));
                 List<string> cueList = new List<string>();
-                cueList.AddRange(Directory.GetFiles(outputFolder, "*.cue", SearchOption.AllDirectories));
+
+                // Swallow access denied errors
+                try
+                {
+                    logList.AddRange(Directory.GetFiles(outputFolder, "*.log", SearchOption.AllDirectories));
+                    cueList.AddRange(Directory.GetFiles(outputFolder, "*.cue", SearchOption.AllDirectories));
+                }
+                catch (UnauthorizedAccessException) { };
 
                 // If there are 2 or more .cues in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
                 if (cueList.Count() >= 2)
@@ -1018,10 +1037,16 @@ namespace MusicImportKit
             {
                 // Add all image files in outputFolder to a list
                 List<string> imageFiles = new List<string>();
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.bmp", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.gif", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.jpg", SearchOption.AllDirectories));
-                imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.png", SearchOption.AllDirectories));
+
+                // Swallow access denied errors
+                try
+                {
+                    imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.bmp", SearchOption.AllDirectories));
+                    imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.gif", SearchOption.AllDirectories));
+                    imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.jpg", SearchOption.AllDirectories));
+                    imageFiles.AddRange(Directory.GetFiles(outputFolder, "*.png", SearchOption.AllDirectories));
+                }
+                catch (UnauthorizedAccessException) { };
 
                 // Parallel strip files (exiftool on windows is sluggish compared to linux; run in parallel and don't wait for completion)
                 Parallel.ForEach(imageFiles, (currentImage) =>
@@ -1611,7 +1636,14 @@ namespace MusicImportKit
 
             // String array of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
+
+            // Swallow access denied errors
+            try
+            {
+                // Add input flacs into a list
+                inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
+            }
+            catch (UnauthorizedAccessException) { };
 
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
@@ -1653,9 +1685,16 @@ namespace MusicImportKit
             if (!Directory.Exists(TempPathBox.Text))
                 return;
 
-            // Add input flacs into a list
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
+
+            // Swallow access denied errors
+            try
+            {
+                // Add input flacs into a list
+                inputFlacs.AddRange(Directory.GetFiles(TempPathBox.Text, "*.flac", SearchOption.AllDirectories));
+            }
+            catch (UnauthorizedAccessException) { }; 
+            
 
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
@@ -1746,7 +1785,14 @@ namespace MusicImportKit
             {
                 // List of input wavs that can be converted
                 List<string> inputWavs = new List<string>();
-                inputWavs.AddRange(Directory.GetFiles(outputPath, "*.wav", SearchOption.AllDirectories));
+
+                // Swallow access denied errors
+                try
+                {
+                    // Add input wavs into a list
+                    inputWavs.AddRange(Directory.GetFiles(outputPath, "*.wav", SearchOption.AllDirectories));
+                }
+                catch (UnauthorizedAccessException) { };
 
                 // Parallel convert files
                 Parallel.ForEach(inputWavs, (currentWav) =>
