@@ -263,7 +263,7 @@ namespace MusicImportKit
             return path.EndsWith("\\") ? path : path + "\\";
         }
 
-        private string[] GetDirectoriesSafe(string initialPath)
+        private string[] GetRecursiveDirectoriesSafe(string initialPath)
         {
             List<string> outputDirectories = new List<string>();
 
@@ -274,26 +274,23 @@ namespace MusicImportKit
                     DirectoryInfo currentDirInfo = new DirectoryInfo(currentDir);
                     if (currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName) || !currentDirInfo.Attributes.HasFlag(FileAttributes.System))
                     {
-                        outputDirectories.AddRange(GetDirectoriesSafe(currentDir));
+                        outputDirectories.AddRange(GetRecursiveDirectoriesSafe(currentDir));
                     }
                 }
                 catch { }
             }
 
-            if (outputDirectories.Count == 0)
-            {
-                outputDirectories.Add(initialPath);
-            }
+            outputDirectories.Add(initialPath);
 
             return outputDirectories.ToArray();
         }
 
-        private string[] GetFilesSafe(string initialPath, string searchPattern = "*.*")
+        private string[] GetRecursiveFilesSafe(string initialPath, string searchPattern = "*.*")
         {
             List<string> files = new List<string>();
             List<string> directories = new List<string>();
 
-            directories.AddRange(GetDirectoriesSafe(initialPath));
+            directories.AddRange(GetRecursiveDirectoriesSafe(initialPath));
 
             foreach (string currentDir in directories)
             {
@@ -544,7 +541,7 @@ namespace MusicImportKit
 
             // List of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(GetFilesSafe(tempPath, "*.flac"));
+            inputFlacs.AddRange(GetRecursiveFilesSafe(tempPath, "*.flac"));
 
             if (inputFlacs.Count() == 0)
             {
@@ -1015,9 +1012,9 @@ namespace MusicImportKit
             {
                 // Create lists of the .logs and .cues in the outputFolder
                 List<string> logList = new List<string>();
-                logList.AddRange(GetFilesSafe(outputFolder, "*.log"));
+                logList.AddRange(GetRecursiveFilesSafe(outputFolder, "*.log"));
                 List<string> cueList = new List<string>();
-                cueList.AddRange(GetFilesSafe(outputFolder, "*.cue"));
+                cueList.AddRange(GetRecursiveFilesSafe(outputFolder, "*.cue"));
 
                 // If there are 2 or more .cues in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
                 if (cueList.Count() >= 2)
@@ -1060,10 +1057,10 @@ namespace MusicImportKit
             {
                 // Add all image files in outputFolder to a list
                 List<string> imageFiles = new List<string>();
-                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.bmp"));
-                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.gif"));
-                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.jpg"));
-                imageFiles.AddRange(GetFilesSafe(outputFolder, "*.png"));
+                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.bmp"));
+                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.gif"));
+                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.jpg"));
+                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.png"));
 
                 // Parallel strip files (exiftool on windows is sluggish compared to linux; run in parallel and don't wait for completion)
                 Parallel.ForEach(imageFiles, (currentImage) =>
@@ -1653,7 +1650,7 @@ namespace MusicImportKit
 
             // String array of input files
             List<string> inputFlacs = new List<string>();
-            inputFlacs.AddRange(GetFilesSafe(TempPathBox.Text, "*.flac"));
+            inputFlacs.AddRange(GetRecursiveFilesSafe(TempPathBox.Text, "*.flac"));
 
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
@@ -1699,7 +1696,7 @@ namespace MusicImportKit
             List<string> inputFlacs = new List<string>();
 
             // Logic for handling whether a directory should be skipped based on if it's a restricted system folder (root folders are allowed even though "system")
-            inputFlacs.AddRange(GetFilesSafe(TempPathBox.Text, "*.flac"));
+            inputFlacs.AddRange(GetRecursiveFilesSafe(TempPathBox.Text, "*.flac"));
 
             // If no flacs are found, return
             if (inputFlacs.Count() == 0)
@@ -1790,7 +1787,7 @@ namespace MusicImportKit
             {
                 // List of input wavs that can be converted
                 List<string> inputWavs = new List<string>();
-                inputWavs.AddRange(GetFilesSafe(outputPath, "*.wav"));
+                inputWavs.AddRange(GetRecursiveFilesSafe(outputPath, "*.wav"));
 
                 // Parallel convert files
                 Parallel.ForEach(inputWavs, (currentWav) =>

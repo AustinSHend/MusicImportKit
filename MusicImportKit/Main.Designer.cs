@@ -72,6 +72,7 @@
             this.InputPathUpOneButton = new System.Windows.Forms.Button();
             this.TempPathUpOneButton = new System.Windows.Forms.Button();
             this.OutputPathUpOneButton = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // InputPathBox
@@ -614,6 +615,7 @@
         private System.Windows.Forms.Button InputPathUpOneButton;
         private System.Windows.Forms.Button TempPathUpOneButton;
         private System.Windows.Forms.Button OutputPathUpOneButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 
