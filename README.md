@@ -6,7 +6,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 ## Includes
 
-* Conversion to FLAC (-V8 re-FLACing), MP3, and Opus.
+* Parallel conversion to FLAC (-V8 re-FLACing), MP3, and Opus.
 
 * Proper dithering and downsampling of 24-bit to 16-bit FLAC using SoX (with a VHQ triangular dither filter, guarding, and 44/48 sample-rate detection).
 
@@ -20,7 +20,9 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Integration with AlbumArtDownloader (multi-source album art fetching), Mp3tag (powerful tagging software), and Spek (spectral analysis).
 
-* Full custom parsing syntax, able to read any tag enclosed by "%" and several audio properties (codec, bitrate, sample-rate, bit-depth, etc).
+* Full custom parsing syntax, able to read any tag enclosed by "%" and several audio properties (codec, bitrate, sample-rate, bit-depth, etc). Includes several popular default syntaxes.
+
+* Uses TagLib# to assist with tag reading.
 
 * Copy files from the input folder (and nested folders) into the output folder, with full regex+wildcards support.
 
