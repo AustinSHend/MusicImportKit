@@ -536,8 +536,6 @@ namespace MusicImportKit
             // Used for disambiguation
             string outputFolder = "";
             string lastFolder = "";
-            // Uses the last folder written to in order to feed data to excel
-            string parsedFolderStringForExcel = "";
 
             // List of input files
             List<string> inputFlacs = new List<string>();
@@ -564,6 +562,24 @@ namespace MusicImportKit
                 artist = CleanString(tempTagMap.GetFirstField("artist"));
             if (tempTagMap.GetFirstField("album") != null)
                 album = CleanString(tempTagMap.GetFirstField("album"));
+
+            // Disambiguate folder names later on, putting lower samplerates and lower BPS into higher folders
+            int highestSampleRate = 0;
+            int highestBPS = 0;
+            foreach (string currentFlac in inputFlacs)
+            {
+                TagLib.File tempLoopTagFile = TagLib.File.Create(currentFlac);
+                var tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                if(tempLoopTagFile.Properties.AudioSampleRate > highestSampleRate)
+                {
+                    highestSampleRate = tempLoopTagFile.Properties.AudioSampleRate;
+                }
+                if (tempLoopTagFile.Properties.BitsPerSample > highestBPS)
+                {
+                    highestBPS = tempLoopTagFile.Properties.BitsPerSample;
+                }
+            }
 
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
             List<string> outputFiles = new List<string>();
@@ -659,7 +675,7 @@ namespace MusicImportKit
                     var tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
 
                     // If resampling is selected and the file actually needs to be resampled
-                    if (convertToInput == "FLAC (resample to 16-bit (SoX))" && tagFile.Properties.BitsPerSample == 24)
+                    if (convertToInput == "FLAC (resample to 16-bit (SoX))" && (tagFile.Properties.BitsPerSample == 24 || tagFile.Properties.AudioSampleRate != 44100 || tagFile.Properties.AudioSampleRate != 48000))
                     {
                         // Call sox.exe and convert to the output+parsed syntax location, using V8 compression.
                         System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
@@ -731,8 +747,8 @@ namespace MusicImportKit
                     else
                     {
                         // String to hold the parsed syntax so we don't need to calculate it over and over
-                        parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true);
-                        parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false);
+                        parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, highestBPS, highestSampleRate);
+                        parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, highestBPS, highestSampleRate);
                         // System Temp Path+Name of future file
                         string outputFile = System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac";
 
@@ -759,25 +775,23 @@ namespace MusicImportKit
                         outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
                     }
 
-                    // Set Excel's folder data to this file's parsed syntax
-                    parsedFolderStringForExcel = parsedFolderSyntax;
+                    // Set lastFolder to the last folder in the output file's path
+                    lastFolder = parsedFolderSyntax;
                 });
-
+                
                 // Move encoded files out of system temp folder into output folder
                 foreach (string currentFlac in outputTempFiles)
                 {
-                    string ParsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false);
-                    if (File.Exists(outputPath + ParsedFileSyntax + ".flac"))
-                        File.Delete(outputPath + ParsedFileSyntax + ".flac");
+                    if (File.Exists(outputPath + lastFolder + "\\" + Path.GetFileName(currentFlac)))
+                        File.Delete(outputPath + lastFolder + "\\" + Path.GetFileName(currentFlac));
                     if (File.Exists(currentFlac))
-                        File.Move(currentFlac, outputPath + ParsedFileSyntax + ".flac");
+                        File.Move(currentFlac, outputPath + lastFolder + "\\" + Path.GetFileName(currentFlac));
                 }
                 // Delete any temp folders
                 foreach (string currentFlac in outputFiles)
                 {
-                    string ParsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true);
-                    if (Directory.Exists(System.IO.Path.GetTempPath() + ParsedFolderSyntax))
-                        Directory.Delete(System.IO.Path.GetTempPath() + ParsedFolderSyntax);
+                    if (Directory.Exists(System.IO.Path.GetTempPath() + lastFolder))
+                        Directory.Delete(System.IO.Path.GetTempPath() + lastFolder);
                 }
             }
             // MP3 Conversion
@@ -806,7 +820,7 @@ namespace MusicImportKit
                     outputFolder = NormalizePath(outputFolder);
 
                     // Ending folder of the path
-                    lastFolder = new DirectoryInfo(outputFolder).Name;
+                    lastFolder = parsedFolderSyntax;
 
                     // Get all tags from input .flac and store them
                     List<string> pendingTagNames = new List<string>();
@@ -956,9 +970,6 @@ namespace MusicImportKit
 
                     // Save tags to file
                     outputTagFile.Save();
-
-                    // Set Excel's folder data to this file's parsed syntax
-                    parsedFolderStringForExcel = parsedFolderSyntax;
                 });
             }
             // Opus Conversion
@@ -997,8 +1008,8 @@ namespace MusicImportKit
                     // Add resultant file to output file list
                     outputFiles.Add(outputPath + parsedFileSyntax + ".opus");
 
-                    // Set Excel's folder data to this file's parsed syntax
-                    parsedFolderStringForExcel = parsedFolderSyntax;
+                    // Set lastFolder to the last folder in the output file's path
+                    lastFolder = parsedFolderSyntax;
                 });
             }
 
@@ -1095,7 +1106,7 @@ namespace MusicImportKit
                 int numRows = usedRange.Rows.Count;
 
                 // Insert output folder name, log score, and notes in columns 1, 2, and 3 respectively
-                currentWorksheet.Cells[numRows + 1, 1] = parsedFolderStringForExcel;
+                currentWorksheet.Cells[numRows + 1, 1] = lastFolder;
 
                 // Check if log score and notes are empty before writing
                 if (excelLogScore != "Log score" && excelLogScore != "")
