@@ -564,21 +564,19 @@ namespace MusicImportKit
                 album = CleanString(tempTagMap.GetFirstField("album"));
 
             // Disambiguate folder names later on, putting lower samplerates and lower BPS into higher folders
-            int highestSampleRate = 0;
-            int highestBPS = 0;
+            // Also used to determine if files need upsampling for ReplayGain scanning
+            int highestSampleRate = tempTagFile.Properties.AudioSampleRate;
+            int highestBPS = tempTagFile.Properties.BitsPerSample;
+
             foreach (string currentFlac in inputFlacs)
             {
                 TagLib.File tempLoopTagFile = TagLib.File.Create(currentFlac);
                 var tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
 
                 if(tempLoopTagFile.Properties.AudioSampleRate > highestSampleRate)
-                {
                     highestSampleRate = tempLoopTagFile.Properties.AudioSampleRate;
-                }
                 if (tempLoopTagFile.Properties.BitsPerSample > highestBPS)
-                {
                     highestBPS = tempLoopTagFile.Properties.BitsPerSample;
-                }
             }
 
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
@@ -603,59 +601,163 @@ namespace MusicImportKit
             // Add ReplayGain if checkbox is checked
             if (RGEnabled == true)
             {
-                // Add each input file onto the --add-replay-gain command
-                replayGainProcess.StartInfo.Arguments = "--add-replay-gain";
+                // Check if any files need to be upsampled in order to be ReplayGained (metaflac doesn't accept different samplerate/BPS, so we temporarily upsample to get tag data)
+                // Upsampling is transparent and doesn't affect sound data, and consequently gives accurate ReplayGain readings which will be transferred back to the original file
+                bool needsUpsample = false;
                 foreach (string currentFlac in inputFlacs)
-                    replayGainProcess.StartInfo.Arguments += " \"" + currentFlac + "\"";
-
-                replayGainProcess.Start();
-                replayGainProcess.WaitForExit();
-
-                /* Fully working snippet that applies ReplayGain to albums based on their tags, but other program functions do not work well with multiple album inputs, so pointless
-                if (RGType == "Scan as albums (by tags)")
                 {
-                    // List to eventually track which albums we will be scanning for
-                    List<string> pendingAlbumNames = new List<string>();
+                    TagLib.File tempLoopTagFile = TagLib.File.Create(currentFlac);
+                    var tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
 
-                    // Check every converted file's album tag
-                    foreach (string currentFlac in inputFlacs)
+                    if (tempLoopTagFile.Properties.BitsPerSample < highestBPS || tempLoopTagFile.Properties.AudioSampleRate < highestSampleRate)
+                        needsUpsample = true;
+                }
+
+                // If any of the files indicated they need to be upsampled
+                if (needsUpsample == true)
+                {
+                    // Check if the user has SoX installed; SoX is required to properly upsample
+                    if (Settings.Default.SoXLocation != "")
                     {
-                        TagLib.File tagFile = TagLib.File.Create(currentFlac);
-                        var tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
+                        // Folder to hold our work as we upsample
+                        string tempUpsampleFolder = System.IO.Path.GetTempPath() + ParseNamingSyntax(syntaxInput, "FLAC", inputFlacs[0], true, highestBPS, highestSampleRate);
+                        // List to hold our temp upsample files
+                        List<string> tempUpsampleFiles = new List<string>();
 
-                        // If we aren't tracking the album name yet, add it to the list
-                        if (!pendingAlbumNames.Contains(tagMap.GetFirstField("album")))
-                            pendingAlbumNames.Add(tagMap.GetFirstField("album"));
-                    }
+                        // Copy FLACs from incoming temp folder to upsample folder
+                        RecursiveFolderCopy(tempPath, tempUpsampleFolder, "*.flac");
+                        // Add FLACs in upsample folder to our temporary list
+                        tempUpsampleFiles.AddRange(GetRecursiveFilesSafe(tempUpsampleFolder, "*.flac"));
 
-                    Parallel.ForEach(pendingAlbumNames, (currentAlbum) =>
-                    {
-                        System.Diagnostics.Process replayGainProcessParallel = new System.Diagnostics.Process();
-                        // Uses metaflac from user-settings location
-                        replayGainProcessParallel.StartInfo.FileName = Settings.Default.MetaFLACLocation;
-                        replayGainProcessParallel.StartInfo.Arguments = "--add-replay-gain";
-                        replayGainProcessParallel.StartInfo.UseShellExecute = false;
-                        replayGainProcessParallel.StartInfo.CreateNoWindow = true;
-
-                        foreach (string currentFile in outputFiles)
+                        // Parallel upsample files
+                        Parallel.ForEach(tempUpsampleFiles, (currentFlac) =>
                         {
-                            TagLib.File tagFile = TagLib.File.Create(currentFile);
+                            TagLib.File tempLoopTagFile = TagLib.File.Create(currentFlac);
+                            var tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                            // If file requires upsampling
+                            if (tempLoopTagFile.Properties.BitsPerSample < highestBPS || tempLoopTagFile.Properties.AudioSampleRate < highestSampleRate)
+                            {
+                                // Call sox.exe and convert to the output+parsed syntax location
+                                System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
+                                // Uses sox from user-settings location
+                                soxProcess.StartInfo.FileName = Settings.Default.SoXLocation;
+                                soxProcess.StartInfo.UseShellExecute = false;
+                                soxProcess.StartInfo.CreateNoWindow = true;
+                                // Add arguments to SoX
+                                soxProcess.StartInfo.Arguments = "\"" + currentFlac + "\" -G -b " + highestBPS + " \"" + Path.GetDirectoryName(currentFlac) +
+                                            "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac" + "\" rate -v -L " + highestSampleRate;
+                                // Start SoX process
+                                soxProcess.Start();
+                                    soxProcess.WaitForExit();
+
+                                // Remove non-upsampled temp file
+                                if (File.Exists(currentFlac))
+                                        File.Delete(currentFlac);
+                                // Move upsample file to original temp's location
+                                if (File.Exists(Path.GetDirectoryName(currentFlac) + "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac"))
+                                        File.Move(Path.GetDirectoryName(currentFlac) + "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac", currentFlac);
+                            }
+                        });
+
+                        // Add each temp file onto the --add-replay-gain command
+                        replayGainProcess.StartInfo.Arguments = "--add-replay-gain";
+                        foreach (string currentFlac in tempUpsampleFiles)
+                            replayGainProcess.StartInfo.Arguments += " \"" + currentFlac + "\"";
+
+                        replayGainProcess.Start();
+                        replayGainProcess.WaitForExit();
+
+                        // Transfer the ReplayGain tags back to the original files
+                        for (int i = 0; i < inputFlacs.Count(); i++)
+                        {
+                            // Set up tag files/maps for both the original and upsampled files
+                            TagLib.File inputFlacTagFile = TagLib.File.Create(inputFlacs[i]);
+                            var inputFlacTagMap = (TagLib.Ogg.XiphComment)inputFlacTagFile.GetTag(TagLib.TagTypes.Xiph);
+                            TagLib.File tempFlacTagFile = TagLib.File.Create(tempUpsampleFolder + "\\" + Path.GetFileName(inputFlacs[i]));
+                            var tempFlacTagMap = (TagLib.Ogg.XiphComment)tempFlacTagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                            // Transfer ReplayGain data from the upsample files to the original files
+                            inputFlacTagMap.SetField("REPLAYGAIN_ALBUM_GAIN", tempFlacTagMap.GetFirstField("REPLAYGAIN_ALBUM_GAIN"));
+                            inputFlacTagMap.SetField("REPLAYGAIN_ALBUM_PEAK", tempFlacTagMap.GetFirstField("REPLAYGAIN_ALBUM_PEAK"));
+                            inputFlacTagMap.SetField("REPLAYGAIN_REFERENCE_LOUDNESS", tempFlacTagMap.GetFirstField("REPLAYGAIN_REFERENCE_LOUDNESS"));
+                            inputFlacTagMap.SetField("REPLAYGAIN_TRACK_GAIN", tempFlacTagMap.GetFirstField("REPLAYGAIN_TRACK_GAIN"));
+                            inputFlacTagMap.SetField("REPLAYGAIN_TRACK_PEAK", tempFlacTagMap.GetFirstField("REPLAYGAIN_TRACK_PEAK"));
+
+                            // Save changes to original
+                            inputFlacTagFile.Save();
+
+                            // Remove upsampled temp file
+                            if (File.Exists(tempUpsampleFolder + "\\" + Path.GetFileName(inputFlacs[i])))
+                                File.Delete(tempUpsampleFolder + "\\" + Path.GetFileName(inputFlacs[i]));
+                        }
+                        // Delete upsample temp folder
+                        if (Directory.Exists(tempUpsampleFolder))
+                            Directory.Delete(tempUpsampleFolder);
+                    }
+                    // If user doesn't have SoX but files indicate they need it for proper ReplayGain
+                    else
+                    {
+                        MessageBox.Show("One or more input files doesn't match the others' bit-depth and/or sample rate. SoX is required to properly perform ReplayGain on these files.");
+                    }
+                }
+                // If files don't need upsampling, ReplayGain as normal
+                else {
+
+                    // Add each input file onto the --add-replay-gain command
+                    replayGainProcess.StartInfo.Arguments = "--add-replay-gain";
+                    foreach (string currentFlac in inputFlacs)
+                        replayGainProcess.StartInfo.Arguments += " \"" + currentFlac + "\"";
+
+                    replayGainProcess.Start();
+                    replayGainProcess.WaitForExit();
+
+                    /* Fully working snippet that applies ReplayGain to albums based on their tags, but other program functions do not work well with multiple album inputs, so pointless
+                    if (RGType == "Scan as albums (by tags)")
+                    {
+                        // List to eventually track which albums we will be scanning for
+                        List<string> pendingAlbumNames = new List<string>();
+
+                        // Check every converted file's album tag
+                        foreach (string currentFlac in inputFlacs)
+                        {
+                            TagLib.File tagFile = TagLib.File.Create(currentFlac);
                             var tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
 
-                            // If currentFile's album matches the album that we're looking for
-                            if (tagMap.GetFirstField("album") == currentAlbum)
-                            {
-                                // Add each output file onto the --add-replay-gain command
-                                replayGainProcessParallel.StartInfo.Arguments += " \"" + currentFile + "\"";
-                            }
+                            // If we aren't tracking the album name yet, add it to the list
+                            if (!pendingAlbumNames.Contains(tagMap.GetFirstField("album")))
+                                pendingAlbumNames.Add(tagMap.GetFirstField("album"));
                         }
 
-                        // Start ReplayGain Process
-                        replayGainProcessParallel.Start();
-                        replayGainProcessParallel.WaitForExit();
-                    });
+                        Parallel.ForEach(pendingAlbumNames, (currentAlbum) =>
+                        {
+                            System.Diagnostics.Process replayGainProcessParallel = new System.Diagnostics.Process();
+                            // Uses metaflac from user-settings location
+                            replayGainProcessParallel.StartInfo.FileName = Settings.Default.MetaFLACLocation;
+                            replayGainProcessParallel.StartInfo.Arguments = "--add-replay-gain";
+                            replayGainProcessParallel.StartInfo.UseShellExecute = false;
+                            replayGainProcessParallel.StartInfo.CreateNoWindow = true;
 
-                } */
+                            foreach (string currentFile in outputFiles)
+                            {
+                                TagLib.File tagFile = TagLib.File.Create(currentFile);
+                                var tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                                // If currentFile's album matches the album that we're looking for
+                                if (tagMap.GetFirstField("album") == currentAlbum)
+                                {
+                                    // Add each output file onto the --add-replay-gain command
+                                    replayGainProcessParallel.StartInfo.Arguments += " \"" + currentFile + "\"";
+                                }
+                            }
+
+                            // Start ReplayGain Process
+                            replayGainProcessParallel.Start();
+                            replayGainProcessParallel.WaitForExit();
+                        });
+
+                    } */
+                }
             }
 
             // FLAC Conversion
@@ -677,7 +779,7 @@ namespace MusicImportKit
                     // If resampling is selected and the file actually needs to be resampled
                     if (convertToInput == "FLAC (resample to 16-bit (SoX))" && (tagFile.Properties.BitsPerSample == 24 || tagFile.Properties.AudioSampleRate != 44100 || tagFile.Properties.AudioSampleRate != 48000))
                     {
-                        // Call sox.exe and convert to the output+parsed syntax location, using V8 compression.
+                        // Call sox.exe and convert to the output+parsed syntax location
                         System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
                         // Uses sox from user-settings location
                         soxProcess.StartInfo.FileName = Settings.Default.SoXLocation;
