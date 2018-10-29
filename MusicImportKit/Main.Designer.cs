@@ -564,8 +564,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.ShowIcon = false;
-            this.Text = "MusicImportKit";
+            this.Text = "MusicImportKit v1.07";
             this.ResumeLayout(false);
             this.PerformLayout();
 
