@@ -579,6 +579,17 @@ namespace MusicImportKit
                     highestBPS = tempLoopTagFile.Properties.BitsPerSample;
             }
 
+            // Holds the base sample rate for disambiguating folder names later on
+            int highestBaseSampleRate = 0;
+            if (highestSampleRate % 44100 == 0)
+            {
+                highestBaseSampleRate = 44100;
+            }
+            else if (highestSampleRate % 48000 == 0)
+            {
+                highestBaseSampleRate = 48000;
+            }
+
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
             List<string> outputFiles = new List<string>();
 
@@ -620,7 +631,7 @@ namespace MusicImportKit
                     if (Settings.Default.SoXLocation != "")
                     {
                         // Folder to hold our work as we upsample
-                        string tempUpsampleFolder = System.IO.Path.GetTempPath() + ParseNamingSyntax(syntaxInput, "FLAC", inputFlacs[0], true, highestBPS, highestSampleRate);
+                        string tempUpsampleFolder = Path.GetTempPath() + ParseNamingSyntax(syntaxInput, "FLAC", inputFlacs[0], true, highestBPS, highestSampleRate);
                         // List to hold our temp upsample files
                         List<string> tempUpsampleFiles = new List<string>();
 
@@ -638,6 +649,13 @@ namespace MusicImportKit
                             // If file requires upsampling
                             if (tempLoopTagFile.Properties.BitsPerSample < highestBPS || tempLoopTagFile.Properties.AudioSampleRate < highestSampleRate)
                             {
+                                // Used so SoX doesn't throw errors at wacky filenames
+                                string soxSafeName = Path.GetTempPath() + Guid.NewGuid().ToString() + ".flac";
+
+                                // Rename file to a safer filename for SoX
+                                if (File.Exists(currentFlac))
+                                    File.Move(currentFlac, soxSafeName);
+
                                 // Call sox.exe and convert to the output+parsed syntax location
                                 System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
                                 // Uses sox from user-settings location
@@ -645,15 +663,19 @@ namespace MusicImportKit
                                 soxProcess.StartInfo.UseShellExecute = false;
                                 soxProcess.StartInfo.CreateNoWindow = true;
                                 // Add arguments to SoX
-                                soxProcess.StartInfo.Arguments = "\"" + currentFlac + "\" -G -b " + highestBPS + " \"" + Path.GetDirectoryName(currentFlac) +
-                                            "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac" + "\" rate -v -L " + highestSampleRate;
+                                soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G -b " + highestBPS + " \"" + Path.GetDirectoryName(soxSafeName) +
+                                            "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "upsample" + ".flac" + "\" rate -v -L " + highestSampleRate;
                                 // Start SoX process
                                 soxProcess.Start();
-                                    soxProcess.WaitForExit();
+                                soxProcess.WaitForExit();
+
+                                // Rename SoX output file to its original name
+                                if (File.Exists(Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "upsample" + ".flac"))
+                                    File.Move(Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "upsample" + ".flac", Path.GetDirectoryName(currentFlac) + "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac");
 
                                 // Remove non-upsampled temp file
-                                if (File.Exists(currentFlac))
-                                        File.Delete(currentFlac);
+                                if (File.Exists(soxSafeName))
+                                        File.Delete(soxSafeName);
                                 // Move upsample file to original temp's location
                                 if (File.Exists(Path.GetDirectoryName(currentFlac) + "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac"))
                                         File.Move(Path.GetDirectoryName(currentFlac) + "\\" + Path.GetFileNameWithoutExtension(currentFlac) + "upsample" + ".flac", currentFlac);
@@ -779,6 +801,11 @@ namespace MusicImportKit
                     // If resampling is selected and the file actually needs to be resampled
                     if (convertToInput == "FLAC (resample to 16-bit (SoX))" && (tagFile.Properties.BitsPerSample == 24 || (tagFile.Properties.AudioSampleRate != 44100 && tagFile.Properties.AudioSampleRate != 48000)))
                     {
+                        // Used so Sox doesn't throw errors at wacky filenames
+                        string soxSafeName = Path.GetTempPath() + Guid.NewGuid().ToString() + ".flac";
+                        if (File.Exists(currentFlac))
+                            File.Copy(currentFlac, soxSafeName);
+
                         // Call sox.exe and convert to the output+parsed syntax location
                         System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
                         // Uses sox from user-settings location
@@ -792,19 +819,11 @@ namespace MusicImportKit
                             // String to hold the parsed syntax so we don't need to calculate it over and over
                             parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, 16, 44100);
                             parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, 16, 44100);
-                            // System Temp Path+Name of future file
-                            string outputFlac = System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac";
-
-                            // Create directory (automatically checks if it exists or not)
-                            Directory.CreateDirectory(System.IO.Path.GetTempPath() + parsedFolderSyntax);
-                            Directory.CreateDirectory(outputPath + parsedFolderSyntax);
-                            outputFolder = outputPath + parsedFolderSyntax;
-
-                            // If the output folder doesn't end with "\", add "\" to it
-                            outputFolder = NormalizePath(outputFolder);
+                            Directory.CreateDirectory(Path.GetTempPath() + parsedFolderSyntax);
 
                             // Add arguments to SoX
-                            soxProcess.StartInfo.Arguments = "\"" + currentFlac + "\" -G -b 16 \"" + outputFlac + "\" rate -v -L 44100 dither";
+                            soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G -b 16 \"" + Path.GetDirectoryName(soxSafeName) +
+                                            "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsample" + ".flac" + "\" rate -v -L 44100 dither";
                         }
                         // If sample rate is a multiple of 48000 kHz, dither to 48000
                         else if (tagFile.Properties.AudioSampleRate % 48000 == 0)
@@ -812,50 +831,50 @@ namespace MusicImportKit
                             // String to hold the parsed syntax so we don't need to calculate it over and over
                             parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, 16, 48000);
                             parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, 16, 48000);
-                            // System Temp Path+Name of future file
-                            string outputFlac = System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac";
-
-                            // Create directory (automatically checks if it exists or not)
-                            Directory.CreateDirectory(System.IO.Path.GetTempPath() + parsedFolderSyntax);
-                            Directory.CreateDirectory(outputPath + parsedFolderSyntax);
-                            outputFolder = outputPath + parsedFolderSyntax;
-
-                            // If the output folder doesn't end with "\", add "\" to it
-                            outputFolder = NormalizePath(outputFolder);
+                            Directory.CreateDirectory(Path.GetTempPath() + parsedFolderSyntax);
 
                             // Add arguments to SoX
-                            soxProcess.StartInfo.Arguments = currentFlac + " -b 16 \"" + outputFlac + "\" rate -v -L 48000 dither";
+                            soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G -b 16 \"" + Path.GetDirectoryName(soxSafeName) +
+                                            "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsample" + ".flac" + "\" rate -v -L 48000 dither";
                         }
 
                         // Start SoX process
                         soxProcess.Start();
                         soxProcess.WaitForExit();
 
-                        if (tagFile.Properties.AudioSampleRate % 44100 == 0)
-                        {
-                            // Add resultant file to output file list, mimicking the BPS and samplerate of the future file
-                            outputTempFiles.Add(System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac");
-                            outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
-                        }
-                        // If sample rate is a multiple of 48000 kHz, dither to 48000
-                        else if (tagFile.Properties.AudioSampleRate % 48000 == 0)
-                        {
-                            // Add resultant file to output file list, mimicking the BPS and samplerate of the future file
-                            outputTempFiles.Add(System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac");
-                            outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
-                        }
+                        // Rename SoX output file to its original name
+                        if (File.Exists(Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsample" + ".flac"))
+                            File.Move(Path.GetDirectoryName(soxSafeName) +
+                                            "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsample" + ".flac", Path.GetTempPath() + parsedFileSyntax + ".flac");
+                        // Remove non-downsampled temp file
+                        if (File.Exists(soxSafeName))
+                            File.Delete(soxSafeName);
+
+                        // Add resultant file to output file list
+                        outputTempFiles.Add(Path.GetTempPath() + parsedFileSyntax + ".flac");
+                        outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
                     }
                     // If resampling isn't needed or not selected: plain FLAC re-encoding
                     else
                     {
-                        // String to hold the parsed syntax so we don't need to calculate it over and over
-                        parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, highestBPS, highestSampleRate);
-                        parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, highestBPS, highestSampleRate);
+                        // if resampling, use 16-bit names and future sample rates
+                        if (convertToInput == "FLAC (resample to 16-bit (SoX))")
+                        {
+                            // String to hold the parsed syntax so we don't need to calculate it over and over
+                            parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, 16, highestBaseSampleRate);
+                            parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, 16, highestBaseSampleRate);
+                        }
+                        else
+                        {
+                            // String to hold the parsed syntax so we don't need to calculate it over and over
+                            parsedFolderSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, true, highestBPS, highestSampleRate);
+                            parsedFileSyntax = ParseNamingSyntax(syntaxInput, convertToInput, currentFlac, false, highestBPS, highestSampleRate);
+                        }
                         // System Temp Path+Name of future file
-                        string outputFile = System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac";
+                        string outputFile = Path.GetTempPath() + parsedFileSyntax + ".flac";
 
                         // Create directory (automatically checks if it exists or not)
-                        Directory.CreateDirectory(System.IO.Path.GetTempPath() + parsedFolderSyntax);
+                        Directory.CreateDirectory(Path.GetTempPath() + parsedFolderSyntax);
                         Directory.CreateDirectory(outputPath + parsedFolderSyntax);
                         outputFolder = outputPath + parsedFolderSyntax;
 
@@ -873,7 +892,7 @@ namespace MusicImportKit
                         flacProcess.WaitForExit();
 
                         // Add resultant file to output file list
-                        outputTempFiles.Add(System.IO.Path.GetTempPath() + parsedFileSyntax + ".flac");
+                        outputTempFiles.Add(Path.GetTempPath() + parsedFileSyntax + ".flac");
                         outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
                     }
 
@@ -892,8 +911,8 @@ namespace MusicImportKit
                 // Delete any temp folders
                 foreach (string currentFlac in outputFiles)
                 {
-                    if (Directory.Exists(System.IO.Path.GetTempPath() + lastFolder))
-                        Directory.Delete(System.IO.Path.GetTempPath() + lastFolder);
+                    if (Directory.Exists(Path.GetTempPath() + lastFolder))
+                        Directory.Delete(Path.GetTempPath() + lastFolder);
                 }
             }
             // MP3 Conversion
