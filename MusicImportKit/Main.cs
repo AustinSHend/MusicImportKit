@@ -777,7 +777,7 @@ namespace MusicImportKit
                     var tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
 
                     // If resampling is selected and the file actually needs to be resampled
-                    if (convertToInput == "FLAC (resample to 16-bit (SoX))" && (tagFile.Properties.BitsPerSample == 24 || tagFile.Properties.AudioSampleRate != 44100 || tagFile.Properties.AudioSampleRate != 48000))
+                    if (convertToInput == "FLAC (resample to 16-bit (SoX))" && (tagFile.Properties.BitsPerSample == 24 || (tagFile.Properties.AudioSampleRate != 44100 && tagFile.Properties.AudioSampleRate != 48000)))
                     {
                         // Call sox.exe and convert to the output+parsed syntax location
                         System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
