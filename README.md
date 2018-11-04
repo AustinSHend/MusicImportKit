@@ -1,18 +1,18 @@
-![Main window](https://i.imgur.com/4Jf04Yi.png)
+![Main window](https://i.imgur.com/aMsQ9Cg.png)
 
 # MusicImportKit
 
-Designed for power users who take lineage and data integrity seriously. Integrates many powerful tools into a natural workflow, and takes extra measures to make sure conversions are done the right way. Created due to my frustration with using many programs and conversion scripts in a slow and disjointed workflow.
+Designed for power users who take lineage and data integrity seriously. Integrates many powerful tools into a natural workflow, and takes extra measures to make sure conversions are done the *right* way. Created due to my frustration with using many programs and conversion scripts in a slow and disjointed workflow.
 
 ## Includes
 
 * Parallel conversion to FLAC (-V8 re-FLACing), MP3, and Opus.
 
-* Proper dithering and downsampling of 24-bit to 16-bit FLAC using SoX (with a VHQ triangular dither filter, guarding, and 44/48 sample-rate detection).
+* Proper downsampling (e.g. 96kHz -> 48kHz) and bit-depth reduction (e.g. 24-bit -> 16-bit) using SoX (with a VHQ triangular dither filter, guarding, and 44.1/48 sample-rate detection).
 
 * Genuine LAME header info is preserved by exporting all tags from a .flac, decoding to .wav (destroying all tags in the process), encoding the .wav to .mp3 through LAME, and reapplying original tags to the .mp3 (including preserving unlimited custom tags through TXXX frame manipulation).
 
-* MetaFLAC-powered ReplayGain on all formats, including proper ReplayGain calculation on albums with varying bit-depths and sample-rates.
+* MetaFLAC-powered ReplayGain on all formats, including proper ReplayGain calculation on albums with varying bit-depths and sample-rates, and those that have been resampled or had their bit-depth reduced.
 
 * Custom Excel exports for database keeping.
 
@@ -28,6 +28,6 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Impossible to make bad (Lossy->Lossless, Lossy->Lossy) transcodes, ensuring that data stays artifact-free.
 
-* Robust codebase, currently tested on **84** albums of all shapes and sizes (including a few [witch.house](https://i.imgur.com/lBUJZfz.png) albums for good measure). All features have been double and triple-checked against proper traditional methods to make sure the output files match.
+* Robust codebase, currently tested on **113** albums of all shapes and sizes (including a few [witch.house](https://i.imgur.com/lBUJZfz.png) albums for good measure). All features have been double and triple-checked against proper traditional methods to make sure the output files match.
 
 * Uses TagLib# to assist with tag reading.
