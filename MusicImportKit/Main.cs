@@ -71,7 +71,7 @@ namespace MusicImportKit {
                 CopyFileTypesTextBox.ForeColor = Color.Black;
             }
             else {
-                CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf (copy all if empty)";
+                CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf";
                 CopyFileTypesTextBox.ForeColor = SystemColors.GrayText;
             }
 
@@ -309,11 +309,7 @@ namespace MusicImportKit {
                 if (specificFiletypeText != "" && currentFile != toPath + curFileInfo.Name) {
                     foreach (string currentFileType in pendingFileTypes) {
                         Match match = Regex.Match("^" + curFileInfo.Name + "$", currentFileType);
-                        if (match.Success && File.Exists(curFileInfo.FullName) &&
-                            !Path.GetFileName(currentFile).Contains(".flac") &&
-                            !Path.GetFileName(currentFile).Contains(".mp3") &&
-                            !Path.GetFileName(currentFile).Contains(".opus") &&
-                            !Path.GetFileName(currentFile).Contains(".wav")) {
+                        if (match.Success && File.Exists(curFileInfo.FullName)) {
                             File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
                         }
                     }
@@ -1197,11 +1193,13 @@ namespace MusicImportKit {
             }
 
             if (copyFileTypesEnabled == true) {
-                if (copyFileTypes == "" || copyFileTypes == "e.g. *.jpg; *.log; *.cue; *.pdf (copy all if empty)") {
-                    copyFileTypes = "*.*";
+                if (copyFileTypes != "e.g. *.jpg; *.log; *.cue; *.pdf" && copyFileTypes != "") {
+                    // Begin recursive copy function
+                    RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes);
                 }
-                // Begin recursive copy function
-                RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes);
+                else {
+                    MessageBox.Show("Copy files enabled but no filetypes specified.");
+                }
             }
 
             if (renameLogCueEnabled == true) {
@@ -1767,7 +1765,7 @@ namespace MusicImportKit {
 
         private void CopyFileTypesTextBox_Enter(object sender, EventArgs e) {
             // Text watermarking
-            if (CopyFileTypesTextBox.Text == "e.g. *.jpg; *.log; *.cue; *.pdf (copy all if empty)") {
+            if (CopyFileTypesTextBox.Text == "e.g. *.jpg; *.log; *.cue; *.pdf") {
                 CopyFileTypesTextBox.Text = "";
                 CopyFileTypesTextBox.ForeColor = Color.Black;
             }
@@ -1776,7 +1774,7 @@ namespace MusicImportKit {
         private void CopyFileTypesTextBox_Leave(object sender, EventArgs e) {
             // Text watermarking
             if (CopyFileTypesTextBox.Text == "") {
-                CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf (copy all if empty)";
+                CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf";
                 CopyFileTypesTextBox.ForeColor = SystemColors.GrayText;
             }
         }
@@ -1911,7 +1909,7 @@ namespace MusicImportKit {
             string outputPath = tempPath + lastFolder;
 
             // Begin recursive copy function
-            RecursiveFolderCopy(inputPath, outputPath);
+            RecursiveFolderCopy(inputPath, outputPath, "*.*");
 
             // Convert .wavs to .flacs after copy
             if (convertWAVs == true) {
