@@ -1909,7 +1909,7 @@ namespace MusicImportKit {
             string outputPath = tempPath + lastFolder;
 
             // Begin recursive copy function
-            RecursiveFolderCopy(inputPath, outputPath, "*.*");
+            RecursiveFolderCopy(inputPath, outputPath);
 
             // Convert .wavs to .flacs after copy
             if (convertWAVs == true) {
