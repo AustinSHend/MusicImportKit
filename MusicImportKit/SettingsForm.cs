@@ -103,9 +103,14 @@ namespace MusicImportKit
                 DefaultSpecificFiletypeTextTextBox.ForeColor = Color.Black;
             }
 
-            if (Settings.Default.DefaultConvertType != "")
+            if (Settings.Default.DefaultConvertFormat != "")
             {
-                DefaultConvertToComboBox.Text = Settings.Default.DefaultConvertType;
+                DefaultConvertToComboBox.Text = Settings.Default.DefaultConvertFormat;
+            }
+
+            if (Settings.Default.DefaultConvertPreset != "")
+            {
+                DefaultPresetComboBox.Text = Settings.Default.DefaultConvertPreset;
             }
 
             if (Settings.Default.ExcelSheetLocation != "")
@@ -553,11 +558,20 @@ namespace MusicImportKit
 
             if (DefaultConvertToComboBox.Text != "")
             {
-                Settings.Default.DefaultConvertType = DefaultConvertToComboBox.Text;
+                Settings.Default.DefaultConvertFormat = DefaultConvertToComboBox.Text;
             }
             else
             {
-                Settings.Default.DefaultConvertType = "FLAC";
+                Settings.Default.DefaultConvertFormat = "FLAC";
+            }
+
+            if (DefaultPresetComboBox.Text != "")
+            {
+                Settings.Default.DefaultConvertPreset = DefaultPresetComboBox.Text;
+            }
+            else
+            {
+                Settings.Default.DefaultConvertPreset = "Standard";
             }
 
             if (DefaultSpecificFiletypeTextTextBox.Text != "Filetypes to copy" && DefaultSpecificFiletypeTextTextBox.Text != "")
@@ -830,6 +844,48 @@ namespace MusicImportKit
             {
                 DefaultExcelLocationTextBox.Text = ofd.FileName;
                 DefaultExcelLocationTextBox.ForeColor = Color.Black;
+            }
+        }
+
+        private void DefaultConvertToComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Clear presets
+            DefaultPresetComboBox.Items.Clear();
+
+            if (DefaultConvertToComboBox.Text == "FLAC")
+            {
+                DefaultPresetComboBox.Items.Add("Standard");
+                // SoX is required for proper downsampling and dithering
+                DefaultPresetComboBox.Items.Add("Force 16-bit");
+                DefaultPresetComboBox.Items.Add("Force 44.1kHz/48kHz");
+                DefaultPresetComboBox.Items.Add("Force 16-bit and 44.1/48kHz");
+            }
+            else if (DefaultConvertToComboBox.Text == "MP3")
+            {
+                DefaultPresetComboBox.Items.Add("245kBps VBR (V0)");
+                DefaultPresetComboBox.Items.Add("225kBps VBR (V1)");
+                DefaultPresetComboBox.Items.Add("190kBps VBR (V2)");
+                DefaultPresetComboBox.Items.Add("175kBps VBR (V3)");
+                DefaultPresetComboBox.Items.Add("165kBps VBR (V4)");
+                DefaultPresetComboBox.Items.Add("130kBps VBR (V5)");
+                DefaultPresetComboBox.Items.Add("115kBps VBR (V6)");
+                DefaultPresetComboBox.Items.Add("100kBps VBR (V7)");
+                DefaultPresetComboBox.Items.Add("85kBps VBR (V8)");
+                DefaultPresetComboBox.Items.Add("65kBps VBR (V9)");
+                DefaultPresetComboBox.Items.Add("320kBps CBR");
+                DefaultPresetComboBox.Items.Add("256kBps CBR");
+                DefaultPresetComboBox.Items.Add("192kBps CBR");
+                DefaultPresetComboBox.Items.Add("128kBps CBR");
+                DefaultPresetComboBox.Items.Add("64kBps CBR");
+            }
+            else if (DefaultConvertToComboBox.Text == "Opus")
+            {
+                DefaultPresetComboBox.Items.Add("192kBps VBR");
+                DefaultPresetComboBox.Items.Add("160kBps VBR");
+                DefaultPresetComboBox.Items.Add("128kBps VBR");
+                DefaultPresetComboBox.Items.Add("96kBps VBR");
+                DefaultPresetComboBox.Items.Add("64kBps VBR");
+                DefaultPresetComboBox.Items.Add("32kBps VBR");
             }
         }
     }

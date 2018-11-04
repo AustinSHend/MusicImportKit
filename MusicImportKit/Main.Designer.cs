@@ -73,6 +73,7 @@
             this.TempPathUpOneButton = new System.Windows.Forms.Button();
             this.OutputPathUpOneButton = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.PresetComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // InputPathBox
@@ -213,24 +214,18 @@
             this.ConvertToComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ConvertToComboBox.ForeColor = System.Drawing.SystemColors.ControlText;
             this.ConvertToComboBox.FormattingEnabled = true;
-            this.ConvertToComboBox.Items.AddRange(new object[] {
-            "AAC (256 kBps)",
-            "MP3 (V2)",
-            "MP3 (V0)",
-            "MP3 (320 kBps)",
-            "Opus (192 kBps)"});
             this.ConvertToComboBox.Location = new System.Drawing.Point(12, 420);
             this.ConvertToComboBox.Name = "ConvertToComboBox";
-            this.ConvertToComboBox.Size = new System.Drawing.Size(171, 21);
+            this.ConvertToComboBox.Size = new System.Drawing.Size(50, 21);
             this.ConvertToComboBox.TabIndex = 35;
             this.ConvertToComboBox.SelectedIndexChanged += new System.EventHandler(this.ConvertToComboBox_SelectedIndexChanged);
             // 
             // ConvertButton
             // 
-            this.ConvertButton.Location = new System.Drawing.Point(189, 419);
+            this.ConvertButton.Location = new System.Drawing.Point(235, 418);
             this.ConvertButton.Name = "ConvertButton";
             this.ConvertButton.Size = new System.Drawing.Size(76, 23);
-            this.ConvertButton.TabIndex = 36;
+            this.ConvertButton.TabIndex = 37;
             this.ConvertButton.Text = "Convert";
             this.ConvertButton.UseVisualStyleBackColor = true;
             this.ConvertButton.Click += new System.EventHandler(this.ConvertButton_Click);
@@ -360,7 +355,7 @@
             this.SettingsButton.Location = new System.Drawing.Point(740, 11);
             this.SettingsButton.Name = "SettingsButton";
             this.SettingsButton.Size = new System.Drawing.Size(53, 22);
-            this.SettingsButton.TabIndex = 37;
+            this.SettingsButton.TabIndex = 38;
             this.SettingsButton.Text = "Settings";
             this.SettingsButton.UseVisualStyleBackColor = true;
             this.SettingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
@@ -518,11 +513,22 @@
             this.OutputPathUpOneButton.UseVisualStyleBackColor = true;
             this.OutputPathUpOneButton.Click += new System.EventHandler(this.OutputPathUpOneButton_Click);
             // 
+            // PresetComboBox
+            // 
+            this.PresetComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.PresetComboBox.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.PresetComboBox.FormattingEnabled = true;
+            this.PresetComboBox.Location = new System.Drawing.Point(68, 420);
+            this.PresetComboBox.Name = "PresetComboBox";
+            this.PresetComboBox.Size = new System.Drawing.Size(161, 21);
+            this.PresetComboBox.TabIndex = 39;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(805, 453);
+            this.Controls.Add(this.PresetComboBox);
             this.Controls.Add(this.OutputPathUpOneButton);
             this.Controls.Add(this.TempPathUpOneButton);
             this.Controls.Add(this.InputPathUpOneButton);
@@ -564,7 +570,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "MusicImportKit v1.07";
+            this.Text = "MusicImportKit v2.0.0";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -615,6 +621,7 @@
         private System.Windows.Forms.Button TempPathUpOneButton;
         private System.Windows.Forms.Button OutputPathUpOneButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.ComboBox PresetComboBox;
     }
 }
 

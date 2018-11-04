@@ -44,7 +44,7 @@
     <Setting Name="DefaultSpecificFiletypeText" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="DefaultConvertType" Type="System.String" Scope="User">
+    <Setting Name="DefaultConvertFormat" Type="System.String" Scope="User">
       <Value Profile="(Default)">FLAC</Value>
     </Setting>
     <Setting Name="DefaultDeleteTemp" Type="System.Boolean" Scope="User">
@@ -76,6 +76,9 @@
     </Setting>
     <Setting Name="DefaultExcelExport" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DefaultConvertPreset" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Standard</Value>
     </Setting>
   </Settings>
 </SettingsFile>

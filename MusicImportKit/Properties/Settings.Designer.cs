@@ -194,12 +194,12 @@ namespace MusicImportKit.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("FLAC")]
-        public string DefaultConvertType {
+        public string DefaultConvertFormat {
             get {
-                return ((string)(this["DefaultConvertType"]));
+                return ((string)(this["DefaultConvertFormat"]));
             }
             set {
-                this["DefaultConvertType"] = value;
+                this["DefaultConvertFormat"] = value;
             }
         }
         
@@ -320,6 +320,18 @@ namespace MusicImportKit.Properties {
             }
             set {
                 this["DefaultExcelExport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Standard")]
+        public string DefaultConvertPreset {
+            get {
+                return ((string)(this["DefaultConvertPreset"]));
+            }
+            set {
+                this["DefaultConvertPreset"] = value;
             }
         }
     }
