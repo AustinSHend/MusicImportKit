@@ -210,8 +210,8 @@ namespace MusicImportKit {
                 // Opus converts the input FLAC's tags automatically (we metaflac the input FLACs before conversion if enabled)
                 // MP3 RG tags can be copied manually (we metaflac the input FLACs before conversion if enabled)
                 if (ConvertToComboBox.Text == "FLAC" || ConvertToComboBox.Text == "MP3" || ConvertToComboBox.Text == "Opus") {
-                    // If metaflac.exe is found, enable ReplayGain
-                    if (Settings.Default.MetaFLACLocation != "") {
+                    // If metaflac.exe and flac.exe are found, enable ReplayGain
+                    if (Settings.Default.MetaFLACLocation != "" && Settings.Default.FLACLocation != "") {
                         ReplayGainCheckbox.Enabled = true;
                         ReplayGainCheckbox.Checked = Settings.Default.DefaultRG;
                         ReplayGainCheckbox.Text = "Apply ReplayGain";
@@ -220,7 +220,7 @@ namespace MusicImportKit {
                     else {
                         ReplayGainCheckbox.Enabled = false;
                         ReplayGainCheckbox.Checked = false;
-                        ReplayGainCheckbox.Text = "Apply ReplayGain (requires metaflac.exe)";
+                        ReplayGainCheckbox.Text = "Apply ReplayGain (requires flac.exe and metaflac.exe)";
                     }
                 }
             }
@@ -2001,7 +2001,7 @@ namespace MusicImportKit {
             // MP3 RG tags can be copied manually (we metaflac the input FLACs before conversion if enabled)
             if (ConvertToComboBox.Text == "FLAC" || ConvertToComboBox.Text == "MP3" || ConvertToComboBox.Text == "Opus") {
                 // If metaflac.exe is found, enable ReplayGain
-                if (Settings.Default.MetaFLACLocation != "") {
+                if (Settings.Default.MetaFLACLocation != "" && Settings.Default.FLACLocation != "") {
                     ReplayGainCheckbox.Enabled = true;
                     ReplayGainCheckbox.Text = "Apply ReplayGain";
                 }
@@ -2009,7 +2009,7 @@ namespace MusicImportKit {
                 else {
                     ReplayGainCheckbox.Enabled = false;
                     ReplayGainCheckbox.Checked = false;
-                    ReplayGainCheckbox.Text = "Apply ReplayGain (requires metaflac.exe)";
+                    ReplayGainCheckbox.Text = "Apply ReplayGain (requires flac.exe and metaflac.exe)";
                 }
             }
 
