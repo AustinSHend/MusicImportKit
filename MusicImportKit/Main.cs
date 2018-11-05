@@ -168,8 +168,8 @@ namespace MusicImportKit {
                 AutoWavConvertCheckbox.Text = "Convert input .wav files to .flac (requires flac.exe)";
             }
 
-            // Add MP3 entries if lame.exe detected
-            if (Settings.Default.LAMELocation != "") {
+            // Add MP3 entries if lame.exe and flac.exe are detected
+            if (Settings.Default.LAMELocation != "" && Settings.Default.FLACLocation != "") {
                 ConvertToComboBox.Items.Add("MP3");
                 PresetComboBox.Items.Add("245kBps VBR (V0)");
                 PresetComboBox.Items.Add("225kBps VBR (V1)");
