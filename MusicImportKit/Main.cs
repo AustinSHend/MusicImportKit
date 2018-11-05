@@ -653,9 +653,9 @@ namespace MusicImportKit {
                         soxProcess.Start();
                         soxProcess.WaitForExit();
 
-                        MessageBox.Show("Check1");
-
                         // If SoX did not complete sucessfully, begin a workaround
+                        // This section copies the file into %temp% and uses a guid as a filename, creating a totally safe file path+name for SoX to use
+                        // SoX throws errors on both high ASCII filenames and filepaths, meaning even a containing folder with high ASCII will cause SoX to fail
                         if (!File.Exists(Path.GetDirectoryName(currentFLAC) + "\\" + Path.GetFileNameWithoutExtension(currentFLAC) + "downsampled" + ".flac")) {
                             // Used so Sox doesn't throw errors at wacky filenames
                             // Temp path + random guid string + .flac. Used to create a safe filename for SoX to use
@@ -701,8 +701,6 @@ namespace MusicImportKit {
                             // Start SoX process
                             soxProcess.Start();
                             soxProcess.WaitForExit();
-
-                            MessageBox.Show("Check2");
 
                             // Remove non-downsampled file
                             if (File.Exists(soxSafeName)) {
