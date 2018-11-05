@@ -610,16 +610,11 @@ namespace MusicImportKit {
                         string parsedFolderSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, true, futureBPS, futureSampleRate);
                         string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, false, futureBPS, futureSampleRate);
 
-                        // Used so Sox doesn't throw errors at wacky filenames
-                        // Temp path + random guid string + .flac. Used to create a safe filename for SoX to use
-                        string soxSafeName = Path.GetTempPath() + "SoXTemp\\" + Guid.NewGuid().ToString() + ".flac";
-                        // Directory for the new file
-                        Directory.CreateDirectory(Path.GetTempPath() + "SoXTemp\\");
+                        // In this section we initialize SoX and attempt to use it to reduce bit-depth/downsample.
+                        // If this fails (SoX throws errors on crazy ASCII filenames and filepaths), we will instead copy the file into %temp% with a randomly generated safe name for SoX to work with
 
-                        // Copy input FLAC into the soxSafeName position
-                        if (File.Exists(currentFLAC)) {
-                            File.Copy(currentFLAC, soxSafeName);
-                        }
+                        // Future output file name. Will be changed to the correct file if SoX throws errors and needs to be worked around.
+                        string outputFile = Path.GetDirectoryName(currentFLAC) + "\\" + Path.GetFileNameWithoutExtension(currentFLAC) + "downsampled" + ".flac";
 
                         // Initialize sox.exe
                         System.Diagnostics.Process soxProcess = new System.Diagnostics.Process();
@@ -628,15 +623,14 @@ namespace MusicImportKit {
                         soxProcess.StartInfo.CreateNoWindow = true;
 
                         // Add intial arguments to SoX (guarding)
-                        soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G";
+                        soxProcess.StartInfo.Arguments = "\"" + currentFLAC + "\" -G";
 
                         if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz") {
                             soxProcess.StartInfo.Arguments += " -b 16";
                         }
 
                         // Add output file information to SoX
-                        soxProcess.StartInfo.Arguments += " \"" + Path.GetDirectoryName(soxSafeName) +
-                                       "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsampled" + ".flac" + "\" rate -v -L";
+                        soxProcess.StartInfo.Arguments += " \"" + outputFile + "\" rate -v -L";
 
                         // Add resampling arguments to SoX, depending on their base sample rate
                         if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz") {
@@ -659,21 +653,73 @@ namespace MusicImportKit {
                         soxProcess.Start();
                         soxProcess.WaitForExit();
 
+                        MessageBox.Show("Check1");
+
+                        // If SoX did not complete sucessfully, begin a workaround
+                        if (!File.Exists(Path.GetDirectoryName(currentFLAC) + "\\" + Path.GetFileNameWithoutExtension(currentFLAC) + "downsampled" + ".flac")) {
+                            // Used so Sox doesn't throw errors at wacky filenames
+                            // Temp path + random guid string + .flac. Used to create a safe filename for SoX to use
+                            string soxSafeName = Path.GetTempPath() + "SoXTemp\\" + Guid.NewGuid().ToString() + ".flac";
+
+                            // Update the outputFile string to point to this new eventual "safe" file
+                            outputFile = Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsampled" + ".flac";
+                            // Directory for the new file
+                            Directory.CreateDirectory(Path.GetTempPath() + "SoXTemp\\");
+
+                            // Copy input FLAC into the soxSafeName position
+                            if (File.Exists(currentFLAC)) {
+                                File.Copy(currentFLAC, soxSafeName);
+                            }
+
+                            // Add intial arguments to SoX (guarding)
+                            soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G";
+
+                            if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz") {
+                                soxProcess.StartInfo.Arguments += " -b 16";
+                            }
+
+                            // Add output file information to SoX
+                            soxProcess.StartInfo.Arguments += " \"" + outputFile + "\" rate -v -L";
+
+                            // Add resampling arguments to SoX, depending on their base sample rate
+                            if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz") {
+                                if (tagFile.Properties.AudioSampleRate % 44100 == 0) {
+                                    soxProcess.StartInfo.Arguments += " 44100";
+                                }
+                                else if (tagFile.Properties.AudioSampleRate % 48000 == 0) {
+                                    soxProcess.StartInfo.Arguments += " 48000";
+                                }
+                            }
+                            // If we're only reducing bit depth, specify the audio sample rate to use
+                            else if (preset == "Force 16-bit") {
+                                soxProcess.StartInfo.Arguments += " " + tagFile.Properties.AudioSampleRate.ToString();
+                            }
+
+                            // Add dither to argument list
+                            soxProcess.StartInfo.Arguments += " dither";
+
+                            // Start SoX process
+                            soxProcess.Start();
+                            soxProcess.WaitForExit();
+
+                            MessageBox.Show("Check2");
+
+                            // Remove non-downsampled file
+                            if (File.Exists(soxSafeName)) {
+                                File.Delete(soxSafeName);
+                            }
+                        }
+
                         // Create a directory to move the file to
                         Directory.CreateDirectory(outputPath + parsedFolderSyntax);
                         // Move the output downsampled file to the standard output directory, renaming in the process
-                        if (File.Exists(Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsampled" + ".flac")) {
+                        if (File.Exists(outputFile)) {
                             // Delete file if it already exists. Combined with below command simulates an overwrite
                             if (File.Exists(outputPath + parsedFileSyntax + ".flac")) {
                                 File.Delete(outputPath + parsedFileSyntax + ".flac");
                             }
 
-                            File.Move(Path.GetDirectoryName(soxSafeName) + "\\" + Path.GetFileNameWithoutExtension(soxSafeName) + "downsampled" + ".flac", outputPath + parsedFileSyntax + ".flac");
-                        }
-
-                        // Remove non-downsampled file
-                        if (File.Exists(soxSafeName)) {
-                            File.Delete(soxSafeName);
+                            File.Move(outputFile, outputPath + parsedFileSyntax + ".flac");
                         }
 
                         // Remove temp directory if it exists and is empty
