@@ -378,16 +378,16 @@ namespace MusicImportKit {
                         preset = "320";
                         break;
                     case "256kBps CBR":
-                        preset = "320";
+                        preset = "256";
                         break;
                     case "192kBps CBR":
-                        preset = "320";
+                        preset = "192";
                         break;
                     case "128kBps CBR":
-                        preset = "320";
+                        preset = "128";
                         break;
                     case "64kBps CBR":
-                        preset = "320";
+                        preset = "64";
                         break;
                 }
             }
