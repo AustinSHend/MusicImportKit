@@ -31,3 +31,14 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 * Robust codebase, currently tested on **113** albums of all shapes and sizes (including a few [witch.house](https://i.imgur.com/lBUJZfz.png) albums for good measure). All features have been double and triple-checked against proper traditional methods to make sure the output files match.
 
 * Uses TagLib# to assist with tag reading.
+
+## Necessary Limitations/Quirks
+
+* Downsampling/Reducing Bit-Depth of FLACs:
+    * SoX does not handle crazy ASCII characters at all in a file's path or filename. Files are copied to %temp%/SoXTemp with a randomly generated name, fed into SoX, and moved back+renamed to their original name. This adds some disk usage that wouldn't otherwise be required.
+
+* MP3 Conversions: 
+    * Simpler methods of MP3 conversion (e.g. FFmpeg, which uses LAME as well) strip the LAME header info from the output MP3 and thus there is no (easy) way to tell if an unknown MP3 file that you find used LAME in its creation or an inferior tool. For being courteous to others (and our future selves), we take extra steps to preserve this data. Manual decoding to .wav and encoding to .mp3 is actually (~33%) faster than using an FFmpeg implementation, but destroys tags in the process so we handle that manually.
+
+* ReplayGain:
+    * MetaFLAC's ReplayGain implementation cannot be multithreaded and takes a large portion (~50%) of the conversion process time. Disable ReplayGain if you don't need it and speed is a priority.
