@@ -39,7 +39,6 @@
             this.DefaultTempFolderLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultInputFolderLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultOutputFolderLocationTextBox = new System.Windows.Forms.TextBox();
-            this.DefaultParseStyle = new System.Windows.Forms.TextBox();
             this.DefaultRGState = new System.Windows.Forms.CheckBox();
             this.DefaultCopyFiletypesState = new System.Windows.Forms.CheckBox();
             this.DefaultOpenFolderState = new System.Windows.Forms.CheckBox();
@@ -73,6 +72,7 @@
             this.DefaultExcelSheetPathButton = new System.Windows.Forms.Button();
             this.ParseSyntaxTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.DefaultPresetComboBox = new System.Windows.Forms.ComboBox();
+            this.DefaultParseStyle = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // Mp3tagLocationTextBox
@@ -173,18 +173,6 @@
             this.DefaultOutputFolderLocationTextBox.Text = "Default Output Folder (base path)";
             this.DefaultOutputFolderLocationTextBox.Enter += new System.EventHandler(this.DefaultOutputFolderLocationTextBox_Enter);
             this.DefaultOutputFolderLocationTextBox.Leave += new System.EventHandler(this.DefaultOutputFolderLocationTextBox_Leave);
-            // 
-            // DefaultParseStyle
-            // 
-            this.DefaultParseStyle.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.DefaultParseStyle.Location = new System.Drawing.Point(12, 90);
-            this.DefaultParseStyle.Name = "DefaultParseStyle";
-            this.DefaultParseStyle.Size = new System.Drawing.Size(373, 20);
-            this.DefaultParseStyle.TabIndex = 6;
-            this.DefaultParseStyle.Text = "Default Output Folder+File Name (syntax in tooltip)";
-            this.ParseSyntaxTooltip.SetToolTip(this.DefaultParseStyle, resources.GetString("DefaultParseStyle.ToolTip"));
-            this.DefaultParseStyle.Enter += new System.EventHandler(this.DefaultParseStyle_Enter);
-            this.DefaultParseStyle.Leave += new System.EventHandler(this.DefaultParseStyle_Leave);
             // 
             // DefaultRGState
             // 
@@ -515,11 +503,37 @@
             this.DefaultPresetComboBox.Size = new System.Drawing.Size(161, 21);
             this.DefaultPresetComboBox.TabIndex = 20;
             // 
+            // DefaultParseStyle
+            // 
+            this.DefaultParseStyle.DropDownWidth = 630;
+            this.DefaultParseStyle.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.DefaultParseStyle.FormattingEnabled = true;
+            this.DefaultParseStyle.Items.AddRange(new object[] {
+            "%AlbumArtist% - %Album% (%Date%) {%Edition%} [%Mediatype% &codec& - &smartbit&]\\&" +
+                "PaddedTrackNumber& - %Title%",
+            "%AlbumArtist% - %Album% (%Date%) [%Mediatype% &codec& - &smartbit&] {%Edition% %C" +
+                "atalog%}\\&PaddedTrackNumber& - %Title%",
+            "%AlbumArtist% - %Album% (%Date%) [%Mediatype% &codec& - &smartbit&] {%Edition%}\\&" +
+                "PaddedTrackNumber& - %Title%",
+            "%AlbumArtist% - %Album% (%Date%) [%Mediatype% &codec& - &smartbit&] {%Catalog%}\\&" +
+                "PaddedTrackNumber& - %Title%",
+            "%AlbumArtist% - %Date% - %Album% (%Edition%) [%Mediatype% &codec& - &smartbit&]\\&" +
+                "PaddedTrackNumber& - %Title%"});
+            this.DefaultParseStyle.Location = new System.Drawing.Point(12, 90);
+            this.DefaultParseStyle.Name = "DefaultParseStyle";
+            this.DefaultParseStyle.Size = new System.Drawing.Size(373, 21);
+            this.DefaultParseStyle.TabIndex = 6;
+            this.DefaultParseStyle.Text = "Default Output Folder+File Name (syntax in tooltip)";
+            this.ParseSyntaxTooltip.SetToolTip(this.DefaultParseStyle, resources.GetString("DefaultParseStyle.ToolTip"));
+            this.DefaultParseStyle.Enter += new System.EventHandler(this.DefaultParseStyle_Enter);
+            this.DefaultParseStyle.Leave += new System.EventHandler(this.DefaultParseStyle_Leave);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(953, 409);
+            this.Controls.Add(this.DefaultParseStyle);
             this.Controls.Add(this.DefaultPresetComboBox);
             this.Controls.Add(this.DefaultExcelSheetPathButton);
             this.Controls.Add(this.DefaultSpekPathButton);
@@ -552,7 +566,6 @@
             this.Controls.Add(this.DefaultOpenFolderState);
             this.Controls.Add(this.DefaultCopyFiletypesState);
             this.Controls.Add(this.DefaultRGState);
-            this.Controls.Add(this.DefaultParseStyle);
             this.Controls.Add(this.DefaultOutputFolderLocationTextBox);
             this.Controls.Add(this.DefaultInputFolderLocationTextBox);
             this.Controls.Add(this.DefaultTempFolderLocationTextBox);
@@ -584,7 +597,6 @@
         private System.Windows.Forms.TextBox DefaultTempFolderLocationTextBox;
         private System.Windows.Forms.TextBox DefaultInputFolderLocationTextBox;
         private System.Windows.Forms.TextBox DefaultOutputFolderLocationTextBox;
-        private System.Windows.Forms.TextBox DefaultParseStyle;
         private System.Windows.Forms.CheckBox DefaultRGState;
         private System.Windows.Forms.CheckBox DefaultCopyFiletypesState;
         private System.Windows.Forms.CheckBox DefaultOpenFolderState;
@@ -618,5 +630,6 @@
         private System.Windows.Forms.Button DefaultExcelSheetPathButton;
         private System.Windows.Forms.ToolTip ParseSyntaxTooltip;
         private System.Windows.Forms.ComboBox DefaultPresetComboBox;
+        private System.Windows.Forms.ComboBox DefaultParseStyle;
     }
 }
