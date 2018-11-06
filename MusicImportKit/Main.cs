@@ -48,6 +48,12 @@ namespace MusicImportKit {
                 RedactedButton.Visible = false;
             }
 
+            // Reset Artist/Album textboxes
+            ArtistTextBox.Text = "Artist";
+            ArtistTextBox.ForeColor = SystemColors.GrayText;
+            AlbumTextBox.Text = "Album";
+            AlbumTextBox.ForeColor = SystemColors.GrayText;
+
             if (Settings.Default.DefaultOutput != "") {
                 OutputPathTextBox.Text = Settings.Default.DefaultOutput;
                 OutputPathTextBox.ForeColor = Color.Black;
@@ -1494,10 +1500,11 @@ namespace MusicImportKit {
             if (fbd.ShowDialog() == CommonFileDialogResult.Ok) {
                 TempPathBox.Text = fbd.FileName;
                 TempPathBox.ForeColor = Color.Black;
+
+                // Perform a metadata guess
+                GuessButton.PerformClick();
             }
 
-            // Perform a metadata guess
-            GuessButton.PerformClick();
         }
 
         private void TempExplorerButton_Click(object sender, EventArgs e) {
