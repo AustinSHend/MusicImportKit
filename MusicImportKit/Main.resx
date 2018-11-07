@@ -141,6 +141,9 @@ Smart Bitrate/Depth/Sample: &amp;smartbit&amp; (16-44 for FLAC, V2 for MP3 V2)</
   <metadata name="CopyBackgroundWorker.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>593, 17</value>
   </metadata>
+  <metadata name="CopyFileTypesTooltip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>778, 17</value>
   </metadata>
