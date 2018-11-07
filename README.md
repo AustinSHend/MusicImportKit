@@ -1,4 +1,4 @@
-![Main window](https://i.imgur.com/cEWbmA5.png)
+![Main window](https://i.imgur.com/e1JeNvj.png)
 
 # MusicImportKit
 
