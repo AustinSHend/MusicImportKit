@@ -1259,9 +1259,9 @@ namespace MusicImportKit {
                 List<string> cueList = new List<string>();
                 cueList.AddRange(GetRecursiveFilesSafe(outputFolder, "*.cue"));
 
-                // If there are 2 or more .cues/logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
+                // If there are 2 or more .cues/.logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
                 if (cueList.Count() >= 2 || logList.Count() >= 2) {
-                    MessageBox.Show("More than one .cue/log file detected in output folder. Rename manually.");
+                    MessageBox.Show("More than one .cue/.log file detected in output folder. Rename manually.");
                     // Opens output path in explorer
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
                         FileName = outputFolder,

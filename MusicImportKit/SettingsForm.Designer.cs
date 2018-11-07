@@ -71,8 +71,8 @@
             this.DefaultSpekPathButton = new System.Windows.Forms.Button();
             this.DefaultExcelSheetPathButton = new System.Windows.Forms.Button();
             this.ParseSyntaxTooltip = new System.Windows.Forms.ToolTip(this.components);
-            this.DefaultPresetComboBox = new System.Windows.Forms.ComboBox();
             this.DefaultParseStyle = new System.Windows.Forms.ComboBox();
+            this.DefaultPresetComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // Mp3tagLocationTextBox
@@ -493,16 +493,6 @@
             this.DefaultExcelSheetPathButton.UseVisualStyleBackColor = true;
             this.DefaultExcelSheetPathButton.Click += new System.EventHandler(this.DefaultExcelSheetPathButton_Click);
             // 
-            // DefaultPresetComboBox
-            // 
-            this.DefaultPresetComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.DefaultPresetComboBox.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.DefaultPresetComboBox.FormattingEnabled = true;
-            this.DefaultPresetComboBox.Location = new System.Drawing.Point(68, 376);
-            this.DefaultPresetComboBox.Name = "DefaultPresetComboBox";
-            this.DefaultPresetComboBox.Size = new System.Drawing.Size(161, 21);
-            this.DefaultPresetComboBox.TabIndex = 20;
-            // 
             // DefaultParseStyle
             // 
             this.DefaultParseStyle.DropDownWidth = 630;
@@ -527,6 +517,16 @@
             this.ParseSyntaxTooltip.SetToolTip(this.DefaultParseStyle, resources.GetString("DefaultParseStyle.ToolTip"));
             this.DefaultParseStyle.Enter += new System.EventHandler(this.DefaultParseStyle_Enter);
             this.DefaultParseStyle.Leave += new System.EventHandler(this.DefaultParseStyle_Leave);
+            // 
+            // DefaultPresetComboBox
+            // 
+            this.DefaultPresetComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.DefaultPresetComboBox.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.DefaultPresetComboBox.FormattingEnabled = true;
+            this.DefaultPresetComboBox.Location = new System.Drawing.Point(68, 376);
+            this.DefaultPresetComboBox.Name = "DefaultPresetComboBox";
+            this.DefaultPresetComboBox.Size = new System.Drawing.Size(161, 21);
+            this.DefaultPresetComboBox.TabIndex = 20;
             // 
             // SettingsForm
             // 

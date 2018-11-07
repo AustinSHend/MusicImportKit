@@ -130,6 +130,6 @@ Codec: &amp;codec&amp; (FLAC)
 Padded Tracknumber: &amp;paddedtracknumber&amp; (07)
 Sample Rate: &amp;samplerate&amp; (44100)
 Short Sample Rate: &amp;short-samplerate&amp; (44)
-Smart Bitrate/Depth/Sample: &amp;smartbit&amp; (44-16 for FLAC, V2 for MP3 V2)</value>
+Smart Bitrate/Depth/Sample: &amp;smartbit&amp; (16-44 for FLAC, V2 for MP3 V2)</value>
   </data>
 </root>
