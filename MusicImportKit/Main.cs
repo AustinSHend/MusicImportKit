@@ -337,7 +337,7 @@ namespace MusicImportKit {
         }
 
         // Parses custom syntax (e.g. %tag% and &codec&) and returns a string based on the metadata/tags of a file
-        private string ParseNamingSyntax(string syntax, string codec, string preset, string filename, bool folderOnly, int futureBPS = -1, int futureSampleRate = -1) {
+        private string ParseNamingSyntax(string syntax, string codec, string preset, string filename, int futureBPS = -1, int futureSampleRate = -1) {
             string formattedString = "";
             string parsedString = "";
             int nextMarkerIndex = 0;
@@ -534,11 +534,6 @@ namespace MusicImportKit {
                         formattedString = formattedString.TrimEnd(' ', '.');
                     }
 
-                    // Stop when reaching a folder delimiter. This will "remove" the filename from the output path. Only activates when "folderOnly" is passed in as true.
-                    if (syntax.LastIndexOf('\\') == 0 && folderOnly) {
-                        return formattedString;
-                    }
-
                     // Pass non-matching characters into the formattedString
                     formattedString += syntax[0];
                     syntax = syntax.Remove(0, 1);
@@ -615,8 +610,12 @@ namespace MusicImportKit {
                     if ((preset == "Force 16-bit" || preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz")
                                     && (tagFile.Properties.BitsPerSample >= 24 || (tagFile.Properties.AudioSampleRate != 44100 && tagFile.Properties.AudioSampleRate != 48000))) {
                         // Set up parse strings, faking futureBPS and futureSampleRate to the function
-                        string parsedFolderSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, true, futureBPS, futureSampleRate);
-                        string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, false, futureBPS, futureSampleRate);
+                        string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, futureBPS, futureSampleRate);
+                        string parsedFolderSyntax = "";
+                        // If the path denotes there is a folder
+                        if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                            parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
+                        }
 
                         // In this section we initialize SoX and attempt to use it to reduce bit-depth/downsample.
                         // If this fails (SoX throws errors on crazy ASCII filenames and filepaths), we will instead copy the file into %temp% with a randomly generated safe name for SoX to work with
@@ -739,8 +738,12 @@ namespace MusicImportKit {
                     // Plain FLAC re-encoding if bit depth reduction/resampling is not selected or not needed
                     else {
                         // Set up parse strings, faking futureBPS and futureSampleRate to the function
-                        string parsedFolderSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, true, futureBPS, futureSampleRate);
-                        string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, false, futureBPS, futureSampleRate);
+                        string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, futureBPS, futureSampleRate);
+                        string parsedFolderSyntax = "";
+                        // If the path denotes there is a folder
+                        if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                            parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
+                        }
 
                         // Path+Name of future file
                         string outputFile = outputPath + parsedFileSyntax + ".flac";
@@ -773,8 +776,12 @@ namespace MusicImportKit {
                     TagLib.Ogg.XiphComment tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
 
                     // Set up parse strings, faking futureBPS and futureSampleRate to the function
-                    string parsedFolderSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, true);
-                    string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, false);
+                    string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC);
+                    string parsedFolderSyntax = "";
+                    // If the path denotes there is a folder
+                    if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                        parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
+                    }
 
                     // Path+Name of future file
                     string outputWAV = outputPath + parsedFileSyntax + ".wav";
@@ -1019,8 +1026,13 @@ namespace MusicImportKit {
             // Opus Conversion
             else if (codec == "Opus") {
                 Parallel.ForEach(inputFLACs, (currentFLAC) => {
-                    string parsedFolderSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, true);
-                    string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, false);
+                    string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC);
+                    string parsedFolderSyntax = "";
+                    // If the path denotes there is a folder
+                    if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                        parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
+                    }
+
                     // Output Path+Name of future file
                     string outputOpus = outputPath + parsedFileSyntax + ".opus";
                     // Create directory

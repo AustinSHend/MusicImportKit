@@ -571,7 +571,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "MusicImportKit v2.0.7";
+            this.Text = "MusicImportKit v2.0.8";
             this.ResumeLayout(false);
             this.PerformLayout();
 
