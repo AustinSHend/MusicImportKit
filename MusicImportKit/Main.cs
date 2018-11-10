@@ -423,7 +423,8 @@ namespace MusicImportKit {
 
             // Move through the input string, matching syntax, pushing its equivalent into a formatted string, then deleting the matched portion of the original and loop
             while (syntax.Length > 0) {
-                if (syntax[0] == '%') {
+                // If we are at a % and there is a matching %
+                if (syntax[0] == '%' && syntax.IndexOf('%') != syntax.LastIndexOf('%')) {
                     // Find the matching percent marker, e.g. %artist"%"
                     nextMarkerIndex = syntax.IndexOf('%', 1);
 
@@ -436,7 +437,8 @@ namespace MusicImportKit {
                     // Remove the matched portion from the input string
                     syntax = syntax.Remove(0, nextMarkerIndex + 1);
                 }
-                else if (syntax[0] == '&') {
+                // If we are at a & and there is a matching &
+                else if (syntax[0] == '&' && syntax.IndexOf('&') != syntax.LastIndexOf('&')) {
                     // Find the matching ampersand, e.g. &codec"&"
                     nextMarkerIndex = syntax.IndexOf('&', 1);
 
