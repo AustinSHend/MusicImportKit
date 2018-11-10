@@ -342,6 +342,9 @@ namespace MusicImportKit {
             string parsedString = "";
             int nextMarkerIndex = 0;
 
+            // Replace UNIX folder delimiters with Windows folder delimiters
+            syntax = syntax.Replace('/', '\\');
+
             // Get tags of (flac) file
             TagLib.File tagFile = TagLib.File.Create(filename);
             TagLib.Ogg.XiphComment tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
