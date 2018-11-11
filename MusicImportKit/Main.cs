@@ -344,7 +344,7 @@ namespace MusicImportKit {
                 }
                 oxiPngProcess.StartInfo.UseShellExecute = false;
                 oxiPngProcess.StartInfo.CreateNoWindow = true;
-                oxiPngProcess.StartInfo.Arguments = "-o 4 --strip all \"" + currentImage + "\"";
+                oxiPngProcess.StartInfo.Arguments = "-o 4 --strip safe \"" + currentImage + "\"";
 
                 // Start and wait
                 oxiPngProcess.Start();
