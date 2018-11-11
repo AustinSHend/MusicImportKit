@@ -403,9 +403,9 @@
             this.StripImageMetadataCheckbox.AutoSize = true;
             this.StripImageMetadataCheckbox.Location = new System.Drawing.Point(28, 328);
             this.StripImageMetadataCheckbox.Name = "StripImageMetadataCheckbox";
-            this.StripImageMetadataCheckbox.Size = new System.Drawing.Size(215, 17);
+            this.StripImageMetadataCheckbox.Size = new System.Drawing.Size(313, 17);
             this.StripImageMetadataCheckbox.TabIndex = 29;
-            this.StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png)";
+            this.StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png) and compress .pngs";
             this.StripImageMetadataCheckbox.UseVisualStyleBackColor = true;
             // 
             // OutputExplorerButton
@@ -571,7 +571,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "MusicImportKit v2.0.8";
+            this.Text = "MusicImportKit v2.1.0";
             this.ResumeLayout(false);
             this.PerformLayout();
 

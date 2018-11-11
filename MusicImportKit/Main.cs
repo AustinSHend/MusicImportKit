@@ -300,6 +300,164 @@ namespace MusicImportKit {
             inStream.Position -= 2;
         }
 
+        private void StripImages (List<string> inputFiles) {
+            // List that contains pending images to be stripped
+            List<string> pendingImages = new List<string>();
+            // Add .bmp and .gif formats to list
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".bmp")));
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".gif")));
+
+            // For every image in pendingImages
+            Parallel.ForEach(pendingImages, (currentImage) => {
+                Bitmap tempBitmap = new Bitmap(currentImage);
+                // For every property (metadata)
+                foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
+                    // Initialize a temporary property
+                    PropertyItem tempProperty = currentProperty;
+                    // Nullify temporary property
+                    tempProperty.Value = new byte[] { 0 };
+                    // Set original property to temporary property
+                    tempBitmap.SetPropertyItem(tempProperty);
+                }
+                // Save changed bitmap to original file
+                tempBitmap.Save(currentImage + ".tmp");
+                // Free resources
+                tempBitmap.Dispose();
+                // Delete original and rename .tmp file to original
+                File.Delete(currentImage);
+                File.Move(currentImage + ".tmp", currentImage);
+            });
+
+            // Clear image list and add pngs
+            pendingImages.Clear();
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".png")));
+
+            // For every image in pendingImages
+            Parallel.ForEach(pendingImages, (currentImage) => {
+                // Used so OptiPNG doesn't throw errors at wacky filenames
+                // Temp path + random guid string + .flac. Used to create a safe filename for OptiPNG to use
+                string optiPngSafeName = Path.GetTempPath() + "OptiPNGTemp\\" + Guid.NewGuid().ToString() + ".png";
+                // Directory for the new file
+                Directory.CreateDirectory(Path.GetTempPath() + "OptiPNGTemp\\");
+
+                // Copy input PNG into the optiPngSafeName position
+                if (File.Exists(currentImage)) {
+                    File.Copy(currentImage, optiPngSafeName);
+                }
+
+                // Initialize optipng.exe and compress in place, stripping metadata on the way
+                System.Diagnostics.Process optiPngProcess = new System.Diagnostics.Process();
+                optiPngProcess.StartInfo.FileName = "Redist\\optipng.exe";
+                optiPngProcess.StartInfo.UseShellExecute = false;
+                optiPngProcess.StartInfo.CreateNoWindow = true;
+                optiPngProcess.StartInfo.Arguments = "\"" + optiPngSafeName + "\" -strip all";
+
+                // Start and wait
+                optiPngProcess.Start();
+                optiPngProcess.WaitForExit();
+
+                // Move safe file back to its original spot, delete the original copy on the way
+                if (File.Exists(optiPngSafeName)) {
+                    if (File.Exists(currentImage)) {
+                        File.Delete(currentImage);
+                    }
+                    File.Move(optiPngSafeName, currentImage);
+                }
+
+                // Remove temp directory if it exists and is empty
+                if (Directory.Exists(Path.GetTempPath() + "OptiPNGTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "OptiPNGTemp\\").Count() == 0) {
+                    Directory.Delete(Path.GetTempPath() + "OptiPNGTemp\\");
+                }
+            });
+
+            // Clear image list and add jpegs
+            pendingImages.Clear();
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpg")));
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpeg")));
+
+            // For every image in pendingImages
+            Parallel.ForEach(pendingImages, (currentImage) => {
+                // Open input filestream (currentImage)
+                using (FileStream sourceJPGStream = File.Open(currentImage, FileMode.Open)) {
+                    // Open output filestream (currentImage + ".tmp")
+                    using (FileStream outputJPGStream = File.Open(currentImage + ".tmp", FileMode.Create)) {
+                        // Strip EXIF data from input filestream and feed it into output filestream
+                        StripExif(sourceJPGStream, outputJPGStream);
+                    }
+                }
+                // Delete original and rename .tmp file to original
+                File.Delete(currentImage);
+                File.Move(currentImage + ".tmp", currentImage);
+            });
+        }
+
+        private void AddToExcel(string lastFolder, string excelLogScore, string excelNotes) {
+            // Initialization for Excel functionality
+            Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+            Workbook currentWorkbook = excel.Workbooks.Open(Settings.Default.ExcelSheetLocation);
+            // Uses first worksheet by default
+            Worksheet currentWorksheet = excel.Worksheets[1];
+            Range usedRange = currentWorksheet.UsedRange;
+            int numRows = usedRange.Rows.Count;
+
+            // Insert output folder name, log score, and notes in columns 1, 2, and 3 respectively
+            currentWorksheet.Cells[numRows + 1, 1] = lastFolder;
+
+            // Check if log score and notes are empty before writing
+            if (excelLogScore != "Log score" && excelLogScore != "") {
+                currentWorksheet.Cells[numRows + 1, 2] = excelLogScore;
+            }
+
+            if (excelNotes != "Notes" && excelNotes != "") {
+                currentWorksheet.Cells[numRows + 1, 3] = excelNotes;
+            }
+
+            // Update the usedRange to account for new row
+            usedRange = currentWorksheet.UsedRange;
+
+            // Re-sort worksheet to account for new row
+            usedRange.Sort(usedRange.Columns[1], XlSortOrder.xlAscending, Type.Missing, Type.Missing, XlSortOrder.xlAscending, Type.Missing,
+                XlSortOrder.xlAscending, XlYesNoGuess.xlGuess,
+                Type.Missing, Type.Missing,
+                XlSortOrientation.xlSortColumns, XlSortMethod.xlPinYin);
+
+            // Save workbook and quit
+            currentWorkbook.Close(true);
+            excel.Quit();
+        }
+
+        private void RenameLogCue (List<string> inputFiles, string outputFolder, string artist, string album) {
+            // Find .logs and .cues that were copied
+            List<string> logList = new List<string>();
+            logList.AddRange(inputFiles.FindAll(x => x.EndsWith(".log")));
+            List<string> cueList = new List<string>();
+            cueList.AddRange(inputFiles.FindAll(x => x.EndsWith(".cue")));
+
+            // If there are 2 or more .cues/.logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
+            if (cueList.Count() >= 2 || logList.Count() >= 2) {
+                MessageBox.Show("More than one .cue/.log file detected in output folder. Rename manually.");
+                // Opens output path in explorer
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                    FileName = outputFolder,
+                    UseShellExecute = true,
+                });
+            }
+            else {
+                // If there's only one .cue, rename it (only if it's not already named properly)
+                if (cueList.Count() == 1 && !File.Exists(outputFolder + album + ".cue")) {
+                    if (File.Exists(cueList[0])) {
+                        File.Move(cueList[0], outputFolder + album + ".cue");
+                    }
+                }
+                // If there's only one .log, rename it (only if it's not already named properly)
+                if (logList.Count() == 1 && !File.Exists(outputFolder + artist + " - " + album + ".log")) {
+                    if (File.Exists(logList[0])) {
+                        File.Move(logList[0], outputFolder + artist + " - " + album + ".log");
+                    }
+                }
+            }
+        }
+
         // Adds a "\" to the end of a path if it doesn't already have one
         private string NormalizePath(string path) {
             return path.EndsWith("\\") ? path : path + "\\";
@@ -1342,126 +1500,12 @@ namespace MusicImportKit {
             }
 
             if (renameLogCueEnabled == true) {
-                // Find .logs and .cues that were copied
-                List<string> logList = new List<string>();
-                logList.AddRange(copiedFiles.FindAll(x => x.EndsWith(".log")));
-                List<string> cueList = new List<string>();
-                cueList.AddRange(copiedFiles.FindAll(x => x.EndsWith(".cue")));
-
-                // If there are 2 or more .cues/.logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
-                if (cueList.Count() >= 2 || logList.Count() >= 2) {
-                    MessageBox.Show("More than one .cue/.log file detected in output folder. Rename manually.");
-                    // Opens output path in explorer
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
-                        FileName = outputFolder,
-                        UseShellExecute = true,
-                    });
-                }
-                else {
-                    // If there's only one .cue, rename it (only if it's not already named properly)
-                    if (cueList.Count() == 1 && !File.Exists(outputFolder + album + ".cue")) {
-                        if (File.Exists(cueList[0])) {
-                            File.Move(cueList[0], outputFolder + album + ".cue");
-                        }
-                    }
-                    // If there's only one .log, rename it (only if it's not already named properly)
-                    if (logList.Count() == 1 && !File.Exists(outputFolder + artist + " - " + album + ".log")) {
-                        if (File.Exists(logList[0])) {
-                            File.Move(logList[0], outputFolder + artist + " - " + album + ".log");
-                        }
-                    }
-                }
+                RenameLogCue(copiedFiles, outputFolder, artist, album);
             }
 
             if (stripImagesEnabled == true) {
-                // List that contains pending images to be stripped
-                List<string> pendingImages = new List<string>();
-                // Add .bmp and .gif formats to list
-                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".bmp")));
-                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".gif")));
-
-                // For every image in pendingImages
-                Parallel.ForEach(pendingImages, (currentImage) => {
-                    Bitmap tempBitmap = new Bitmap(currentImage);
-                    // For every property (metadata)
-                    foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
-                        // Initialize a temporary property
-                        PropertyItem tempProperty = currentProperty;
-                        // Nullify temporary property
-                        tempProperty.Value = new byte[] { 0 };
-                        // Set original property to temporary property
-                        tempBitmap.SetPropertyItem(tempProperty);
-                    }
-                    // Save changed bitmap to original file
-                    tempBitmap.Save(currentImage + ".tmp");
-                    // Free resources
-                    tempBitmap.Dispose();
-                    // Delete original and rename .tmp file to original
-                    File.Delete(currentImage);
-                    File.Move(currentImage + ".tmp", currentImage);
-                });
-
-                // Clear image list and add pngs
-                pendingImages.Clear();
-                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".png")));
-
-                // For every image in pendingImages
-                Parallel.ForEach(pendingImages, (currentImage) => {
-                    // Used so OptiPNG doesn't throw errors at wacky filenames
-                    // Temp path + random guid string + .flac. Used to create a safe filename for OptiPNG to use
-                    string optiPngSafeName = Path.GetTempPath() + "OptiPNGTemp\\" + Guid.NewGuid().ToString() + ".png";
-                    // Directory for the new file
-                    Directory.CreateDirectory(Path.GetTempPath() + "OptiPNGTemp\\");
-
-                    // Copy input PNG into the optiPngSafeName position
-                    if (File.Exists(currentImage)) {
-                        File.Copy(currentImage, optiPngSafeName);
-                    }
-
-                    // Initialize optipng.exe and compress in place, stripping metadata on the way
-                    System.Diagnostics.Process optiPngProcess = new System.Diagnostics.Process();
-                    optiPngProcess.StartInfo.FileName = "Redist\\optipng.exe";
-                    optiPngProcess.StartInfo.UseShellExecute = false;
-                    optiPngProcess.StartInfo.CreateNoWindow = true;
-                    optiPngProcess.StartInfo.Arguments = "\"" + optiPngSafeName + "\" -strip all";
-
-                    // Start and wait
-                    optiPngProcess.Start();
-                    optiPngProcess.WaitForExit();
-
-                    // Move safe file back to its original spot, delete the original copy on the way
-                    if (File.Exists(optiPngSafeName)) {
-                        if (File.Exists(currentImage)) {
-                            File.Delete(currentImage);
-                        }
-                        File.Move(optiPngSafeName, currentImage);
-                    }
-
-                    // Remove temp directory if it exists and is empty
-                    if (Directory.Exists(Path.GetTempPath() + "OptiPNGTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "OptiPNGTemp\\").Count() == 0) {
-                        Directory.Delete(Path.GetTempPath() + "OptiPNGTemp\\");
-                    }
-                });
-
-                // Clear image list and add jpegs
-                pendingImages.Clear();
-                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".jpg")));
-                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".jpeg")));
-
-                // For every image in pendingImages
-                Parallel.ForEach(pendingImages, (currentImage) => {
-                    // Open input filestream (currentImage)
-                    using (FileStream sourceJPGStream = File.Open(currentImage, FileMode.Open)) {
-                        // Open output filestream (currentImage + ".tmp")
-                        using (FileStream outputJPGStream = File.Open(currentImage + ".tmp", FileMode.Create)) {
-                            // Strip EXIF data from input filestream and feed it into output filestream
-                            StripExif(sourceJPGStream, outputJPGStream);
-                        }
-                    }
-                    // Delete original and rename .tmp file to original
-                    File.Delete(currentImage);
-                    File.Move(currentImage + ".tmp", currentImage);
-                });
+                // Pass the copiedFiles list into the StripImages function
+                StripImages(copiedFiles);
             }
 
             if (deleteTempEnabled == true) {
@@ -1472,38 +1516,7 @@ namespace MusicImportKit {
             }
 
             if (addToExcel == true) {
-                // Initialization for Excel functionality
-                Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
-                Workbook currentWorkbook = excel.Workbooks.Open(Settings.Default.ExcelSheetLocation);
-                // Uses first worksheet by default
-                Worksheet currentWorksheet = excel.Worksheets[1];
-                Range usedRange = currentWorksheet.UsedRange;
-                int numRows = usedRange.Rows.Count;
-
-                // Insert output folder name, log score, and notes in columns 1, 2, and 3 respectively
-                currentWorksheet.Cells[numRows + 1, 1] = lastFolder;
-
-                // Check if log score and notes are empty before writing
-                if (excelLogScore != "Log score" && excelLogScore != "") {
-                    currentWorksheet.Cells[numRows + 1, 2] = excelLogScore;
-                }
-
-                if (excelNotes != "Notes" && excelNotes != "") {
-                    currentWorksheet.Cells[numRows + 1, 3] = excelNotes;
-                }
-
-                // Update the usedRange to account for new row
-                usedRange = currentWorksheet.UsedRange;
-
-                // Re-sort worksheet to account for new row
-                usedRange.Sort(usedRange.Columns[1], XlSortOrder.xlAscending, Type.Missing, Type.Missing, XlSortOrder.xlAscending, Type.Missing,
-                    XlSortOrder.xlAscending, XlYesNoGuess.xlGuess,
-                    Type.Missing, Type.Missing,
-                    XlSortOrientation.xlSortColumns, XlSortMethod.xlPinYin);
-
-                // Save workbook and quit
-                currentWorkbook.Close(true);
-                excel.Quit();
+                AddToExcel(lastFolder, excelLogScore, excelNotes);
             }
 
             if (openFolderEnabled == true) {
