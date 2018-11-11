@@ -51,7 +51,6 @@
             this.DefaultRedactedState = new System.Windows.Forms.CheckBox();
             this.DefaultRenameLogCueState = new System.Windows.Forms.CheckBox();
             this.DefaultStripImageMetadataState = new System.Windows.Forms.CheckBox();
-            this.ExifToolLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultInputPathButton = new System.Windows.Forms.Button();
             this.DefaultTempPathButton = new System.Windows.Forms.Button();
             this.DefaultOutputPathButton = new System.Windows.Forms.Button();
@@ -61,7 +60,6 @@
             this.DefaultExcelAppendState = new System.Windows.Forms.CheckBox();
             this.DefaultExcelLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultAADPathButton = new System.Windows.Forms.Button();
-            this.DefaultExifToolPathButton = new System.Windows.Forms.Button();
             this.DefaultFlacPathButton = new System.Windows.Forms.Button();
             this.DefaultLamePathButton = new System.Windows.Forms.Button();
             this.DefaultMetaFlacPathButton = new System.Windows.Forms.Button();
@@ -78,10 +76,10 @@
             // Mp3tagLocationTextBox
             // 
             this.Mp3tagLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.Mp3tagLocationTextBox.Location = new System.Drawing.Point(480, 142);
+            this.Mp3tagLocationTextBox.Location = new System.Drawing.Point(480, 116);
             this.Mp3tagLocationTextBox.Name = "Mp3tagLocationTextBox";
             this.Mp3tagLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.Mp3tagLocationTextBox.TabIndex = 32;
+            this.Mp3tagLocationTextBox.TabIndex = 30;
             this.Mp3tagLocationTextBox.Text = "Mp3tag.exe location";
             this.Mp3tagLocationTextBox.Enter += new System.EventHandler(this.Mp3tagLocationTextBox_Enter);
             this.Mp3tagLocationTextBox.Leave += new System.EventHandler(this.Mp3tagLocationTextBox_Leave);
@@ -100,10 +98,10 @@
             // SpekLocationTextBox
             // 
             this.SpekLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SpekLocationTextBox.Location = new System.Drawing.Point(480, 220);
+            this.SpekLocationTextBox.Location = new System.Drawing.Point(480, 194);
             this.SpekLocationTextBox.Name = "SpekLocationTextBox";
             this.SpekLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.SpekLocationTextBox.TabIndex = 38;
+            this.SpekLocationTextBox.TabIndex = 36;
             this.SpekLocationTextBox.Text = "spek.exe location";
             this.SpekLocationTextBox.Enter += new System.EventHandler(this.SpekLocationTextBox_Enter);
             this.SpekLocationTextBox.Leave += new System.EventHandler(this.SpekLocationTextBox_Leave);
@@ -111,10 +109,10 @@
             // FlacLocationTextBox
             // 
             this.FlacLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.FlacLocationTextBox.Location = new System.Drawing.Point(480, 64);
+            this.FlacLocationTextBox.Location = new System.Drawing.Point(480, 38);
             this.FlacLocationTextBox.Name = "FlacLocationTextBox";
             this.FlacLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.FlacLocationTextBox.TabIndex = 26;
+            this.FlacLocationTextBox.TabIndex = 24;
             this.FlacLocationTextBox.Text = "flac.exe location";
             this.FlacLocationTextBox.Enter += new System.EventHandler(this.FlacLocationTextBox_Enter);
             this.FlacLocationTextBox.Leave += new System.EventHandler(this.FlacLocationTextBox_Leave);
@@ -122,10 +120,10 @@
             // MetaFlacLocationTextBox
             // 
             this.MetaFlacLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.MetaFlacLocationTextBox.Location = new System.Drawing.Point(480, 116);
+            this.MetaFlacLocationTextBox.Location = new System.Drawing.Point(480, 90);
             this.MetaFlacLocationTextBox.Name = "MetaFlacLocationTextBox";
             this.MetaFlacLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.MetaFlacLocationTextBox.TabIndex = 30;
+            this.MetaFlacLocationTextBox.TabIndex = 28;
             this.MetaFlacLocationTextBox.Text = "metaflac.exe location";
             this.MetaFlacLocationTextBox.Enter += new System.EventHandler(this.MetaFlacLocationTextBox_Enter);
             this.MetaFlacLocationTextBox.Leave += new System.EventHandler(this.MetaFlacLocationTextBox_Leave);
@@ -133,10 +131,10 @@
             // SoxLocationTextBox
             // 
             this.SoxLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SoxLocationTextBox.Location = new System.Drawing.Point(480, 194);
+            this.SoxLocationTextBox.Location = new System.Drawing.Point(480, 168);
             this.SoxLocationTextBox.Name = "SoxLocationTextBox";
             this.SoxLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.SoxLocationTextBox.TabIndex = 36;
+            this.SoxLocationTextBox.TabIndex = 34;
             this.SoxLocationTextBox.Text = "sox.exe location";
             this.SoxLocationTextBox.Enter += new System.EventHandler(this.SoxLocationTextBox_Enter);
             this.SoxLocationTextBox.Leave += new System.EventHandler(this.SoxLocationTextBox_Leave);
@@ -233,7 +231,7 @@
             this.AcceptSettingsButton.Location = new System.Drawing.Point(399, 375);
             this.AcceptSettingsButton.Name = "AcceptSettingsButton";
             this.AcceptSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this.AcceptSettingsButton.TabIndex = 40;
+            this.AcceptSettingsButton.TabIndex = 38;
             this.AcceptSettingsButton.Text = "Accept";
             this.AcceptSettingsButton.UseVisualStyleBackColor = true;
             this.AcceptSettingsButton.Click += new System.EventHandler(this.AcceptSettingsButton_Click);
@@ -243,7 +241,7 @@
             this.CancelSettingsButton.Location = new System.Drawing.Point(480, 375);
             this.CancelSettingsButton.Name = "CancelSettingsButton";
             this.CancelSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelSettingsButton.TabIndex = 41;
+            this.CancelSettingsButton.TabIndex = 39;
             this.CancelSettingsButton.Text = "Cancel";
             this.CancelSettingsButton.UseVisualStyleBackColor = true;
             this.CancelSettingsButton.Click += new System.EventHandler(this.CancelSettingsButton_Click);
@@ -299,17 +297,6 @@
             this.DefaultStripImageMetadataState.Text = "Strip image metadata by default";
             this.DefaultStripImageMetadataState.UseVisualStyleBackColor = true;
             // 
-            // ExifToolLocationTextBox
-            // 
-            this.ExifToolLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.ExifToolLocationTextBox.Location = new System.Drawing.Point(480, 38);
-            this.ExifToolLocationTextBox.Name = "ExifToolLocationTextBox";
-            this.ExifToolLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.ExifToolLocationTextBox.TabIndex = 24;
-            this.ExifToolLocationTextBox.Text = "exiftool.exe location";
-            this.ExifToolLocationTextBox.Enter += new System.EventHandler(this.ExifToolLocationTextBox_Enter);
-            this.ExifToolLocationTextBox.Leave += new System.EventHandler(this.ExifToolLocationTextBox_Leave);
-            // 
             // DefaultInputPathButton
             // 
             this.DefaultInputPathButton.Location = new System.Drawing.Point(391, 11);
@@ -343,10 +330,10 @@
             // LameLocationTextBox
             // 
             this.LameLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.LameLocationTextBox.Location = new System.Drawing.Point(480, 90);
+            this.LameLocationTextBox.Location = new System.Drawing.Point(480, 64);
             this.LameLocationTextBox.Name = "LameLocationTextBox";
             this.LameLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.LameLocationTextBox.TabIndex = 28;
+            this.LameLocationTextBox.TabIndex = 26;
             this.LameLocationTextBox.Text = "lame.exe location";
             this.LameLocationTextBox.Enter += new System.EventHandler(this.LameLocationTextBox_Enter);
             this.LameLocationTextBox.Leave += new System.EventHandler(this.LameLocationTextBox_Leave);
@@ -354,10 +341,10 @@
             // OpusencLocationTextBox
             // 
             this.OpusencLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.OpusencLocationTextBox.Location = new System.Drawing.Point(480, 168);
+            this.OpusencLocationTextBox.Location = new System.Drawing.Point(480, 142);
             this.OpusencLocationTextBox.Name = "OpusencLocationTextBox";
             this.OpusencLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.OpusencLocationTextBox.TabIndex = 34;
+            this.OpusencLocationTextBox.TabIndex = 32;
             this.OpusencLocationTextBox.Text = "opusenc.exe location";
             this.OpusencLocationTextBox.Enter += new System.EventHandler(this.OpusencLocationTextBox_Enter);
             this.OpusencLocationTextBox.Leave += new System.EventHandler(this.OpusencLocationTextBox_Leave);
@@ -403,82 +390,72 @@
             this.DefaultAADPathButton.UseVisualStyleBackColor = true;
             this.DefaultAADPathButton.Click += new System.EventHandler(this.DefaultAADPathButton_Click);
             // 
-            // DefaultExifToolPathButton
-            // 
-            this.DefaultExifToolPathButton.Location = new System.Drawing.Point(859, 37);
-            this.DefaultExifToolPathButton.Name = "DefaultExifToolPathButton";
-            this.DefaultExifToolPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultExifToolPathButton.TabIndex = 25;
-            this.DefaultExifToolPathButton.Text = "Choose File";
-            this.DefaultExifToolPathButton.UseVisualStyleBackColor = true;
-            this.DefaultExifToolPathButton.Click += new System.EventHandler(this.DefaultExifToolPathButton_Click);
-            // 
             // DefaultFlacPathButton
             // 
-            this.DefaultFlacPathButton.Location = new System.Drawing.Point(859, 63);
+            this.DefaultFlacPathButton.Location = new System.Drawing.Point(859, 37);
             this.DefaultFlacPathButton.Name = "DefaultFlacPathButton";
             this.DefaultFlacPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultFlacPathButton.TabIndex = 27;
+            this.DefaultFlacPathButton.TabIndex = 25;
             this.DefaultFlacPathButton.Text = "Choose File";
             this.DefaultFlacPathButton.UseVisualStyleBackColor = true;
             this.DefaultFlacPathButton.Click += new System.EventHandler(this.DefaultFlacPathButton_Click);
             // 
             // DefaultLamePathButton
             // 
-            this.DefaultLamePathButton.Location = new System.Drawing.Point(859, 89);
+            this.DefaultLamePathButton.Location = new System.Drawing.Point(859, 63);
             this.DefaultLamePathButton.Name = "DefaultLamePathButton";
             this.DefaultLamePathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultLamePathButton.TabIndex = 29;
+            this.DefaultLamePathButton.TabIndex = 27;
             this.DefaultLamePathButton.Text = "Choose File";
             this.DefaultLamePathButton.UseVisualStyleBackColor = true;
             this.DefaultLamePathButton.Click += new System.EventHandler(this.DefaultLamePathButton_Click);
             // 
             // DefaultMetaFlacPathButton
             // 
-            this.DefaultMetaFlacPathButton.Location = new System.Drawing.Point(859, 115);
+            this.DefaultMetaFlacPathButton.Location = new System.Drawing.Point(859, 89);
             this.DefaultMetaFlacPathButton.Name = "DefaultMetaFlacPathButton";
             this.DefaultMetaFlacPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultMetaFlacPathButton.TabIndex = 31;
+            this.DefaultMetaFlacPathButton.TabIndex = 29;
             this.DefaultMetaFlacPathButton.Text = "Choose File";
             this.DefaultMetaFlacPathButton.UseVisualStyleBackColor = true;
             this.DefaultMetaFlacPathButton.Click += new System.EventHandler(this.DefaultMetaFlacPathButton_Click);
             // 
             // DefaultMp3tagPathButton
             // 
-            this.DefaultMp3tagPathButton.Location = new System.Drawing.Point(859, 141);
+            this.DefaultMp3tagPathButton.Location = new System.Drawing.Point(859, 115);
             this.DefaultMp3tagPathButton.Name = "DefaultMp3tagPathButton";
             this.DefaultMp3tagPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultMp3tagPathButton.TabIndex = 33;
+            this.DefaultMp3tagPathButton.TabIndex = 31;
             this.DefaultMp3tagPathButton.Text = "Choose File";
             this.DefaultMp3tagPathButton.UseVisualStyleBackColor = true;
             this.DefaultMp3tagPathButton.Click += new System.EventHandler(this.DefaultMp3tagPathButton_Click);
             // 
             // DefaultOpusPathButton
             // 
-            this.DefaultOpusPathButton.Location = new System.Drawing.Point(859, 167);
+            this.DefaultOpusPathButton.Location = new System.Drawing.Point(859, 141);
             this.DefaultOpusPathButton.Name = "DefaultOpusPathButton";
             this.DefaultOpusPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultOpusPathButton.TabIndex = 35;
+            this.DefaultOpusPathButton.TabIndex = 33;
             this.DefaultOpusPathButton.Text = "Choose File";
             this.DefaultOpusPathButton.UseVisualStyleBackColor = true;
             this.DefaultOpusPathButton.Click += new System.EventHandler(this.DefaultOpusPathButton_Click);
             // 
             // DefaultSoxPathButton
             // 
-            this.DefaultSoxPathButton.Location = new System.Drawing.Point(859, 193);
+            this.DefaultSoxPathButton.Location = new System.Drawing.Point(859, 167);
             this.DefaultSoxPathButton.Name = "DefaultSoxPathButton";
             this.DefaultSoxPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultSoxPathButton.TabIndex = 37;
+            this.DefaultSoxPathButton.TabIndex = 35;
             this.DefaultSoxPathButton.Text = "Choose File";
             this.DefaultSoxPathButton.UseVisualStyleBackColor = true;
             this.DefaultSoxPathButton.Click += new System.EventHandler(this.DefaultSoxPathButton_Click);
             // 
             // DefaultSpekPathButton
             // 
-            this.DefaultSpekPathButton.Location = new System.Drawing.Point(859, 219);
+            this.DefaultSpekPathButton.Location = new System.Drawing.Point(859, 193);
             this.DefaultSpekPathButton.Name = "DefaultSpekPathButton";
             this.DefaultSpekPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultSpekPathButton.TabIndex = 39;
+            this.DefaultSpekPathButton.TabIndex = 37;
             this.DefaultSpekPathButton.Text = "Choose File";
             this.DefaultSpekPathButton.UseVisualStyleBackColor = true;
             this.DefaultSpekPathButton.Click += new System.EventHandler(this.DefaultSpekPathButton_Click);
@@ -543,7 +520,6 @@
             this.Controls.Add(this.DefaultMetaFlacPathButton);
             this.Controls.Add(this.DefaultLamePathButton);
             this.Controls.Add(this.DefaultFlacPathButton);
-            this.Controls.Add(this.DefaultExifToolPathButton);
             this.Controls.Add(this.DefaultAADPathButton);
             this.Controls.Add(this.DefaultExcelLocationTextBox);
             this.Controls.Add(this.DefaultExcelAppendState);
@@ -553,7 +529,6 @@
             this.Controls.Add(this.DefaultOutputPathButton);
             this.Controls.Add(this.DefaultTempPathButton);
             this.Controls.Add(this.DefaultInputPathButton);
-            this.Controls.Add(this.ExifToolLocationTextBox);
             this.Controls.Add(this.DefaultStripImageMetadataState);
             this.Controls.Add(this.DefaultRenameLogCueState);
             this.Controls.Add(this.DefaultRedactedState);
@@ -609,7 +584,6 @@
         private System.Windows.Forms.CheckBox DefaultRedactedState;
         private System.Windows.Forms.CheckBox DefaultRenameLogCueState;
         private System.Windows.Forms.CheckBox DefaultStripImageMetadataState;
-        private System.Windows.Forms.TextBox ExifToolLocationTextBox;
         private System.Windows.Forms.Button DefaultInputPathButton;
         private System.Windows.Forms.Button DefaultTempPathButton;
         private System.Windows.Forms.Button DefaultOutputPathButton;
@@ -619,7 +593,6 @@
         private System.Windows.Forms.CheckBox DefaultExcelAppendState;
         private System.Windows.Forms.TextBox DefaultExcelLocationTextBox;
         private System.Windows.Forms.Button DefaultAADPathButton;
-        private System.Windows.Forms.Button DefaultExifToolPathButton;
         private System.Windows.Forms.Button DefaultFlacPathButton;
         private System.Windows.Forms.Button DefaultLamePathButton;
         private System.Windows.Forms.Button DefaultMetaFlacPathButton;

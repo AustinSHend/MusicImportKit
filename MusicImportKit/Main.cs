@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
 
 namespace MusicImportKit {
     public partial class Main : Form {
@@ -121,16 +122,10 @@ namespace MusicImportKit {
                 AADButton.Enabled = false;
             }
 
-            if (Settings.Default.ExifToolLocation != "") {
-                StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png)";
-                if (CopyContentsCheckbox.Checked == true) {
-                    StripImageMetadataCheckbox.Enabled = true;
-                    StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
-                }
-            }
-            else {
-                StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png) (requires exiftool.exe)";
-                StripImageMetadataCheckbox.Enabled = false;
+            StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png) and compress .pngs";
+            if (CopyContentsCheckbox.Checked == true) {
+                StripImageMetadataCheckbox.Enabled = true;
+                StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
             }
 
             if (Settings.Default.Mp3tagLocation != "") {
@@ -250,6 +245,61 @@ namespace MusicImportKit {
             return input;
         }
 
+        // Remove EXIF data from jpg/jpeg files
+        private Stream StripExif(Stream inStream, Stream outStream) {
+            // Read first 2 bytes into header (should be 0xff and 0xd8 aka magic jpeg header)
+            byte[] jpegHeader = new byte[2];
+            jpegHeader[0] = (byte)inStream.ReadByte();
+            jpegHeader[1] = (byte)inStream.ReadByte();
+
+            // If file has a magic jpeg header
+            if (jpegHeader[0] == 0xff && jpegHeader[1] == 0xd8) {
+                // Skip through its header section
+                SkipAppHeaders(inStream);
+            }
+            // Write manual magic jpeg header to the beginning of outStream
+            outStream.WriteByte(0xff);
+            outStream.WriteByte(0xd8);
+
+            // Copy the rest of the file's payload from inStream to outStream
+            int readCount;
+            byte[] readBuffer = new byte[4096];
+            while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
+                outStream.Write(readBuffer, 0, readCount);
+            }
+
+            return outStream;
+        }
+
+        private void SkipAppHeaders(Stream inStream) {
+            // Read next two bytes into header variable (should be 0xff and 0xe0 to denote the first (APP0) section)
+            byte[] header = new byte[2];
+            header[0] = (byte)inStream.ReadByte();
+            header[1] = (byte)inStream.ReadByte();
+
+            // While we're still in an APP section, skip forward until we're not (0xef denotes the last possible APP section)
+            while (header[0] == 0xff && header[1] >= 0xe0 && header[1] <= 0xef) {
+                // Read next byte into appLength (contains data for the length of the current APP section)
+                int appLength = inStream.ReadByte();
+
+                // Shift appLength 8 bits and inclusive or the next byte to it (ultimately reading two bytes into the int)
+                appLength <<= 8;
+                appLength |= inStream.ReadByte();
+                // Literal length data for current section is included in itself (and we've already read it) so subtract those 2 bytes
+                appLength -= 2;
+
+                // Move the stream forward by the calculated appLength
+                inStream.Seek(appLength, SeekOrigin.Current);
+
+                // Move next two bytes from inStream to header variable (should be 0xff and the next APP section marker)
+                header[0] = (byte)inStream.ReadByte();
+                header[1] = (byte)inStream.ReadByte();
+            }
+            // Skip back two bytes (these two bytes could have been an APP header but it was determined it was part of the payload instead,
+            // so back up 2 bytes and send control back to StripExif
+            inStream.Position -= 2;
+        }
+
         // Adds a "\" to the end of a path if it doesn't already have one
         private string NormalizePath(string path) {
             return path.EndsWith("\\") ? path : path + "\\";
@@ -287,9 +337,13 @@ namespace MusicImportKit {
         }
 
         // Recursively copy a folder's contents into another folder. Selectively copies certain files if 3rd parameter is specified
-        private void RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "*.*") {
+        private string[] RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "*.*", bool noFlac = false) {
             List<string> pendingFileTypes = new List<string>();
             string originalFiletypeText = specificFiletypeText;
+
+            // List to hold all files created by this function (for returning)
+            List<string> copiedFiles = new List<string>();
+
             if (specificFiletypeText != "") {
                 // Convert common wildcards into regex
                 specificFiletypeText = specificFiletypeText.Replace(@".", @"\.");
@@ -308,21 +362,36 @@ namespace MusicImportKit {
             // Creates a directory of toPath + lastFolder, inherently checks if it exists before creation
             Directory.CreateDirectory(toPath);
 
-            // Copy each file in the fromPath
+            // Create a list of pending files
+            List<string> pendingFiles = Directory.GetFiles(fromPath).ToList();
 
-            foreach (string currentFile in Directory.GetFiles(fromPath)) {
+            if (noFlac) {
+                // Remove all .flacs from the pending files (presumed to be converted)
+                pendingFiles.RemoveAll(str => str.EndsWith(".flac"));
+            }
+
+            // For each file in the pending files
+            foreach (string currentFile in pendingFiles) {
                 FileInfo curFileInfo = new FileInfo(currentFile);
+                // If file is not going to be copied to itself
                 if (specificFiletypeText != "" && currentFile != toPath + curFileInfo.Name) {
+                    // For every file type (e.g. *.jpg, *.png)
                     foreach (string currentFileType in pendingFileTypes) {
+                        // Check if the file matches this file type via Regex
                         Match match = Regex.Match("^" + curFileInfo.Name + "$", currentFileType);
                         if (match.Success && File.Exists(curFileInfo.FullName)) {
                             File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
+                            // Add copied file to outputFile list
+                            copiedFiles.Add(toPath + curFileInfo.Name);
                         }
                     }
                 }
+                // If file is not going to be copied to itself
                 else if (currentFile != toPath + curFileInfo.Name) {
                     if (File.Exists(curFileInfo.FullName)) {
                         File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
+                        // Add copied file to outputFile list
+                        copiedFiles.Add(toPath + curFileInfo.Name);
                     }
                 }
             }
@@ -330,10 +399,10 @@ namespace MusicImportKit {
             // Recurse each folder in the fromPath into this function again, so that they may create new folders and copy
             foreach (string currentFolder in Directory.GetDirectories(fromPath)) {
                 DirectoryInfo curFolderInfo = new DirectoryInfo(currentFolder);
-                RecursiveFolderCopy(currentFolder, toPath + curFolderInfo.Name, originalFiletypeText);
+                copiedFiles.AddRange(RecursiveFolderCopy(currentFolder, toPath + curFolderInfo.Name, originalFiletypeText, noFlac));
             }
 
-            return;
+            return copiedFiles.ToArray();
         }
 
         // Parses custom syntax (e.g. %tag% and &codec&) and returns a string based on the metadata/tags of a file
@@ -1206,6 +1275,9 @@ namespace MusicImportKit {
             // Future list of output files
             List<string> outputFiles = new List<string>();
 
+            // Future list of copied files (if enabled)
+            List<string> copiedFiles = new List<string>();
+
             if (inputFLACs.Count() == 0) {
                 MessageBox.Show("No valid files to convert.");
                 return;
@@ -1262,7 +1334,7 @@ namespace MusicImportKit {
             if (copyFileTypesEnabled == true) {
                 if (copyFileTypes != "e.g. *.jpg; *.log; *.cue; *.pdf" && copyFileTypes != "") {
                     // Begin recursive copy function
-                    RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes);
+                    copiedFiles.AddRange(RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes, true));
                 }
                 else {
                     MessageBox.Show("Copy files enabled but no filetypes specified.");
@@ -1270,11 +1342,11 @@ namespace MusicImportKit {
             }
 
             if (renameLogCueEnabled == true) {
-                // Create lists of the .logs and .cues in the outputFolder
+                // Find .logs and .cues that were copied
                 List<string> logList = new List<string>();
-                logList.AddRange(GetRecursiveFilesSafe(outputFolder, "*.log"));
+                logList.AddRange(copiedFiles.FindAll(x => x.EndsWith(".log")));
                 List<string> cueList = new List<string>();
-                cueList.AddRange(GetRecursiveFilesSafe(outputFolder, "*.cue"));
+                cueList.AddRange(copiedFiles.FindAll(x => x.EndsWith(".cue")));
 
                 // If there are 2 or more .cues/.logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
                 if (cueList.Count() >= 2 || logList.Count() >= 2) {
@@ -1302,22 +1374,93 @@ namespace MusicImportKit {
             }
 
             if (stripImagesEnabled == true) {
-                // Add all image files in outputFolder to a list
-                List<string> imageFiles = new List<string>();
-                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.bmp"));
-                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.gif"));
-                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.jpg"));
-                imageFiles.AddRange(GetRecursiveFilesSafe(outputFolder, "*.png"));
+                // List that contains pending images to be stripped
+                List<string> pendingImages = new List<string>();
+                // Add .bmp and .gif formats to list
+                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".bmp")));
+                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".gif")));
 
-                // Parallel strip files (exiftool on windows is sluggish compared to linux; run in parallel and don't wait for completion)
-                Parallel.ForEach(imageFiles, (currentImage) => {
-                    // Initialize exiftool.exe on each image
-                    System.Diagnostics.Process exifProcess = new System.Diagnostics.Process();
-                    exifProcess.StartInfo.FileName = Settings.Default.ExifToolLocation;
-                    exifProcess.StartInfo.Arguments = "-overwrite_original -all= \"" + currentImage + "\"";
-                    exifProcess.StartInfo.UseShellExecute = false;
-                    exifProcess.StartInfo.CreateNoWindow = true;
-                    exifProcess.Start();
+                // For every image in pendingImages
+                Parallel.ForEach(pendingImages, (currentImage) => {
+                    Bitmap tempBitmap = new Bitmap(currentImage);
+                    // For every property (metadata)
+                    foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
+                        // Initialize a temporary property
+                        PropertyItem tempProperty = currentProperty;
+                        // Nullify temporary property
+                        tempProperty.Value = new byte[] { 0 };
+                        // Set original property to temporary property
+                        tempBitmap.SetPropertyItem(tempProperty);
+                    }
+                    // Save changed bitmap to original file
+                    tempBitmap.Save(currentImage + ".tmp");
+                    // Free resources
+                    tempBitmap.Dispose();
+                    // Delete original and rename .tmp file to original
+                    File.Delete(currentImage);
+                    File.Move(currentImage + ".tmp", currentImage);
+                });
+
+                // Clear image list and add pngs
+                pendingImages.Clear();
+                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".png")));
+
+                // For every image in pendingImages
+                Parallel.ForEach(pendingImages, (currentImage) => {
+                    // Used so OptiPNG doesn't throw errors at wacky filenames
+                    // Temp path + random guid string + .flac. Used to create a safe filename for OptiPNG to use
+                    string optiPngSafeName = Path.GetTempPath() + "OptiPNGTemp\\" + Guid.NewGuid().ToString() + ".png";
+                    // Directory for the new file
+                    Directory.CreateDirectory(Path.GetTempPath() + "OptiPNGTemp\\");
+
+                    // Copy input PNG into the optiPngSafeName position
+                    if (File.Exists(currentImage)) {
+                        File.Copy(currentImage, optiPngSafeName);
+                    }
+
+                    // Initialize optipng.exe and compress in place, stripping metadata on the way
+                    System.Diagnostics.Process optiPngProcess = new System.Diagnostics.Process();
+                    optiPngProcess.StartInfo.FileName = "Redist\\optipng.exe";
+                    optiPngProcess.StartInfo.UseShellExecute = false;
+                    optiPngProcess.StartInfo.CreateNoWindow = true;
+                    optiPngProcess.StartInfo.Arguments = "\"" + optiPngSafeName + "\" -strip all";
+
+                    // Start and wait
+                    optiPngProcess.Start();
+                    optiPngProcess.WaitForExit();
+
+                    // Move safe file back to its original spot, delete the original copy on the way
+                    if (File.Exists(optiPngSafeName)) {
+                        if (File.Exists(currentImage)) {
+                            File.Delete(currentImage);
+                        }
+                        File.Move(optiPngSafeName, currentImage);
+                    }
+
+                    // Remove temp directory if it exists and is empty
+                    if (Directory.Exists(Path.GetTempPath() + "OptiPNGTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "OptiPNGTemp\\").Count() == 0) {
+                        Directory.Delete(Path.GetTempPath() + "OptiPNGTemp\\");
+                    }
+                });
+
+                // Clear image list and add jpegs
+                pendingImages.Clear();
+                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".jpg")));
+                pendingImages.AddRange(copiedFiles.FindAll(x => x.EndsWith(".jpeg")));
+
+                // For every image in pendingImages
+                Parallel.ForEach(pendingImages, (currentImage) => {
+                    // Open input filestream (currentImage)
+                    using (FileStream sourceJPGStream = File.Open(currentImage, FileMode.Open)) {
+                        // Open output filestream (currentImage + ".tmp")
+                        using (FileStream outputJPGStream = File.Open(currentImage + ".tmp", FileMode.Create)) {
+                            // Strip EXIF data from input filestream and feed it into output filestream
+                            StripExif(sourceJPGStream, outputJPGStream);
+                        }
+                    }
+                    // Delete original and rename .tmp file to original
+                    File.Delete(currentImage);
+                    File.Move(currentImage + ".tmp", currentImage);
                 });
             }
 
@@ -2046,19 +2189,15 @@ namespace MusicImportKit {
                 CopyFileTypesTextBox.Enabled = true;
                 RenameLogCueCheckbox.Enabled = true;
                 RenameLogCueCheckbox.Checked = Settings.Default.DefaultRenameLogCue;
-                if (Settings.Default.ExifToolLocation != "") {
-                    StripImageMetadataCheckbox.Enabled = true;
-                    StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
-                }
+                StripImageMetadataCheckbox.Enabled = true;
+                StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
             }
             else {
                 CopyFileTypesTextBox.Enabled = false;
                 RenameLogCueCheckbox.Enabled = false;
                 RenameLogCueCheckbox.Checked = false;
-                if (Settings.Default.ExifToolLocation != "") {
-                    StripImageMetadataCheckbox.Enabled = false;
-                    StripImageMetadataCheckbox.Checked = false;
-                }
+                StripImageMetadataCheckbox.Enabled = false;
+                StripImageMetadataCheckbox.Checked = false;
             }
         }
 

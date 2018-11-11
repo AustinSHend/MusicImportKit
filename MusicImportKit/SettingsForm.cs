@@ -43,12 +43,6 @@ namespace MusicImportKit
                 AADLocationTextBox.ForeColor = Color.Black;
             }
 
-            if (Settings.Default.ExifToolLocation != "")
-            {
-                ExifToolLocationTextBox.Text = Settings.Default.ExifToolLocation;
-                ExifToolLocationTextBox.ForeColor = Color.Black;
-            }
-
             if (Settings.Default.FLACLocation != "")
             {
                 FlacLocationTextBox.Text = Settings.Default.FLACLocation;
@@ -153,26 +147,6 @@ namespace MusicImportKit
             {
                 AADLocationTextBox.Text = "AlbumArt.exe location";
                 AADLocationTextBox.ForeColor = SystemColors.GrayText;
-            }
-        }
-
-        private void ExifToolLocationTextBox_Enter(object sender, EventArgs e)
-        {
-            // Text watermarking
-            if (ExifToolLocationTextBox.Text == "exiftool.exe location")
-            {
-                ExifToolLocationTextBox.Text = "";
-                ExifToolLocationTextBox.ForeColor = Color.Black;
-            }
-        }
-
-        private void ExifToolLocationTextBox_Leave(object sender, EventArgs e)
-        {
-            // Text watermarking
-            if (ExifToolLocationTextBox.Text == "")
-            {
-                ExifToolLocationTextBox.Text = "exiftool.exe location";
-                ExifToolLocationTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
@@ -475,15 +449,6 @@ namespace MusicImportKit
                 Settings.Default.AADLocation = "";
             }
 
-            if (File.Exists(ExifToolLocationTextBox.Text))
-            {
-                Settings.Default.ExifToolLocation = ExifToolLocationTextBox.Text;
-            }
-            else
-            {
-                Settings.Default.ExifToolLocation = "";
-            }
-
             if (File.Exists(FlacLocationTextBox.Text))
             {
                 Settings.Default.FLACLocation = FlacLocationTextBox.Text;
@@ -682,24 +647,6 @@ namespace MusicImportKit
             {
                 AADLocationTextBox.Text = ofd.FileName;
                 AADLocationTextBox.ForeColor = Color.Black;
-            }
-        }
-
-        private void DefaultExifToolPathButton_Click(object sender, EventArgs e)
-        {
-            // File picker
-            OpenFileDialog ofd = new OpenFileDialog();
-            if (ExifToolLocationTextBox.Text != "exiftool.exe location" && ExifToolLocationTextBox.Text != "" && Directory.Exists(Directory.GetParent(ExifToolLocationTextBox.Text).FullName))
-                ofd.InitialDirectory = Directory.GetParent(ExifToolLocationTextBox.Text).FullName;
-            else
-                ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
-            ofd.DefaultExt = ".exe";
-            ofd.Filter = "exiftool.exe|exiftool.exe";
-            ofd.CheckFileExists = true;
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                ExifToolLocationTextBox.Text = ofd.FileName;
-                ExifToolLocationTextBox.ForeColor = Color.Black;
             }
         }
 
