@@ -254,18 +254,6 @@ namespace MusicImportKit.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ExifToolLocation {
-            get {
-                return ((string)(this["ExifToolLocation"]));
-            }
-            set {
-                this["ExifToolLocation"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string LAMELocation {
             get {
                 return ((string)(this["LAMELocation"]));

@@ -59,9 +59,6 @@
     <Setting Name="DefaultStripImageMetadata" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="ExifToolLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="LAMELocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
