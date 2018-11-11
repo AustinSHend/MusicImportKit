@@ -227,7 +227,8 @@ namespace MusicImportKit {
             }
         }
 
-        private string CleanString(string input) {
+        // Used for cleaning a string of invalid file name characters
+        private string CleanString(string input, string ignoredChars = "") {
             if (input == null) {
                 return input;
             }
@@ -239,7 +240,9 @@ namespace MusicImportKit {
             input = input.Replace('”', '-');
 
             foreach (char c in Path.GetInvalidFileNameChars()) {
-                input = input.Replace(c, '-');
+                if (!ignoredChars.Contains(c)) {
+                    input = input.Replace(c, '-');
+                }
             }
 
             return input;
@@ -546,12 +549,15 @@ namespace MusicImportKit {
 
         // Parses custom syntax (e.g. %tag% and &codec&) and returns a string based on the metadata/tags of a file
         private string ParseNamingSyntax(string syntax, string codec, string preset, string filename, int futureBPS = -1, int futureSampleRate = -1) {
-            string formattedString = "";
             string parsedString = "";
+            string formattedString = "";
             int nextMarkerIndex = 0;
 
             // Replace UNIX folder delimiters with Windows folder delimiters
             syntax = syntax.Replace('/', '\\');
+
+            // Clean the input syntax of illegal file characters before starting, and ignore folder delimiters in this process
+            syntax = CleanString(syntax, "\\");
 
             // Get tags of (flac) file
             TagLib.File tagFile = TagLib.File.Create(filename);
@@ -740,8 +746,8 @@ namespace MusicImportKit {
                     syntax = syntax.Remove(0, nextMarkerIndex + 1);
                 }
                 else {
-                    // Remove spaces and periods from the end of a folder name; not allowed
                     if (syntax[0] == '\\') {
+                        // Remove spaces and periods from the end of a folder name; not allowed
                         formattedString = formattedString.TrimEnd(' ', '.');
                     }
 
