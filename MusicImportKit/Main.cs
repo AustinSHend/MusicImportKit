@@ -334,40 +334,21 @@ namespace MusicImportKit {
 
             // For every image in pendingImages
             Parallel.ForEach(pendingImages, (currentImage) => {
-                // Used so OptiPNG doesn't throw errors at wacky filenames
-                // Temp path + random guid string + .flac. Used to create a safe filename for OptiPNG to use
-                string optiPngSafeName = Path.GetTempPath() + "OptiPNGTemp\\" + Guid.NewGuid().ToString() + ".png";
-                // Directory for the new file
-                Directory.CreateDirectory(Path.GetTempPath() + "OptiPNGTemp\\");
-
-                // Copy input PNG into the optiPngSafeName position
-                if (File.Exists(currentImage)) {
-                    File.Copy(currentImage, optiPngSafeName);
+                // Initialize oxipng.exe and compress in place, stripping metadata on the way
+                System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
+                if (Environment.Is64BitOperatingSystem) {
+                    oxiPngProcess.StartInfo.FileName = "Redist\\oxipng64.exe";
                 }
-
-                // Initialize optipng.exe and compress in place, stripping metadata on the way
-                System.Diagnostics.Process optiPngProcess = new System.Diagnostics.Process();
-                optiPngProcess.StartInfo.FileName = "Redist\\optipng.exe";
-                optiPngProcess.StartInfo.UseShellExecute = false;
-                optiPngProcess.StartInfo.CreateNoWindow = true;
-                optiPngProcess.StartInfo.Arguments = "\"" + optiPngSafeName + "\" -strip all";
+                else {
+                    oxiPngProcess.StartInfo.FileName = "Redist\\oxipng86.exe";
+                }
+                oxiPngProcess.StartInfo.UseShellExecute = false;
+                oxiPngProcess.StartInfo.CreateNoWindow = true;
+                oxiPngProcess.StartInfo.Arguments = "-o 4 --strip all \"" + currentImage + "\"";
 
                 // Start and wait
-                optiPngProcess.Start();
-                optiPngProcess.WaitForExit();
-
-                // Move safe file back to its original spot, delete the original copy on the way
-                if (File.Exists(optiPngSafeName)) {
-                    if (File.Exists(currentImage)) {
-                        File.Delete(currentImage);
-                    }
-                    File.Move(optiPngSafeName, currentImage);
-                }
-
-                // Remove temp directory if it exists and is empty
-                if (Directory.Exists(Path.GetTempPath() + "OptiPNGTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "OptiPNGTemp\\").Count() == 0) {
-                    Directory.Delete(Path.GetTempPath() + "OptiPNGTemp\\");
-                }
+                oxiPngProcess.Start();
+                oxiPngProcess.WaitForExit();
             });
 
             // Clear image list and add jpegs
