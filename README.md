@@ -124,8 +124,8 @@ Designed for power users who take lineage and data integrity seriously. Integrat
     * SoX cannot handle crazy ASCII characters in a file's path or filename at all. Offending files are copied to %temp%/SoXTemp with a randomly generated name, fed into SoX, and moved back+renamed to their original name. This adds some disk usage that wouldn't otherwise be required. (Note: this should almost never happen in practice; only exceptionally/purposefully absurd filepaths cause issues).
 
 * Metadata Stripping/PNG compression:
-    * Stripping metadata from a PNG requires loading it into a lossless format, removing the metadata ourselves, and resaving it as a PNG. However, due to the nature of PNG, haphazardly resaving will probably create a bigger file than we started with. To alleviate this, we use OptiPNG to optimize PNGs to a sane size. It's possible to compress PNGs even further with OptiPNG, but the process is very CPU-intensive for very little payoff.
-    * OptiPNG also supports native metadata stripping, so we defer that to it.
+    * Stripping metadata from a PNG requires loading it into a lossless format, removing the metadata ourselves, and resaving it as a PNG. However, due to the nature of PNG, haphazardly resaving will probably create a bigger file than we started with. To alleviate this, we use OxiPNG to optimize PNGs to their smallest size. It's possible to compress PNGs even further with OxiPNG, but the process is extremely CPU-intensive and usually yields no gains.
+    * OxiPNG also supports native metadata stripping, so we defer that to it.
 
 * MP3 Conversions: 
     * Simpler methods of MP3 conversion (e.g. FFmpeg, which uses LAME as well) strip the LAME header info from the output MP3 and thus there is no (easy) way to tell if an unknown MP3 file that you find used LAME in its creation or an inferior tool (such as FhG). For being courteous to others (and our future selves), we take extra steps to preserve this data. Manual decoding to .wav and encoding to .mp3 is actually (~33%) faster than using an FFmpeg implementation, but destroys tags in the process so we handle that manually.
