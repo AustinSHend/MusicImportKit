@@ -336,7 +336,7 @@ namespace MusicImportKit {
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".png")));
 
             // For every image in pendingImages
-            Parallel.ForEach(pendingImages, (currentImage) => {
+            foreach (string currentImage in pendingImages) {
                 // Initialize oxipng.exe and compress in place, stripping metadata on the way
                 System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
                 if (Environment.Is64BitOperatingSystem) {
@@ -352,7 +352,7 @@ namespace MusicImportKit {
                 // Start and wait
                 oxiPngProcess.Start();
                 oxiPngProcess.WaitForExit();
-            });
+            }
 
             // Clear image list and add jpegs
             pendingImages.Clear();
