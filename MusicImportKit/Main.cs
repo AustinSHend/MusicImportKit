@@ -501,9 +501,6 @@ namespace MusicImportKit {
             fromPath = NormalizePath(fromPath);
             toPath = NormalizePath(toPath);
 
-            // Creates a directory of toPath + lastFolder, inherently checks if it exists before creation
-            Directory.CreateDirectory(toPath);
-
             // Create a list of pending files
             List<string> pendingFiles = Directory.GetFiles(fromPath).ToList();
 
@@ -522,6 +519,8 @@ namespace MusicImportKit {
                         // Check if the file matches this file type via Regex
                         Match match = Regex.Match("^" + curFileInfo.Name + "$", currentFileType);
                         if (match.Success && File.Exists(curFileInfo.FullName)) {
+                            // Creates a directory of toPath, inherently checks if it exists before creation
+                            Directory.CreateDirectory(toPath);
                             File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
                             // Add copied file to outputFile list
                             copiedFiles.Add(toPath + curFileInfo.Name);
@@ -531,6 +530,8 @@ namespace MusicImportKit {
                 // If file is not going to be copied to itself
                 else if (currentFile != toPath + curFileInfo.Name) {
                     if (File.Exists(curFileInfo.FullName)) {
+                        // Creates a directory of toPath, inherently checks if it exists before creation
+                        Directory.CreateDirectory(toPath);
                         File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
                         // Add copied file to outputFile list
                         copiedFiles.Add(toPath + curFileInfo.Name);
