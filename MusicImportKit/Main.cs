@@ -233,11 +233,14 @@ namespace MusicImportKit {
                 return input;
             }
 
-            input = input.Replace('*', 'x');
-            input = input.Replace('<', '[');
-            input = input.Replace('>', ']');
-            input = input.Replace('“', '-');
-            input = input.Replace('”', '-');
+            string replaceableIllegalChars = "\\/:*?\"“”<>|";
+            string fullWidthReplacements = "＼／：＊？＂＂＂＜＞｜";
+
+            for (int i = 0; i < replaceableIllegalChars.Length; i++) {
+                if (!ignoredChars.Contains(replaceableIllegalChars[i])) {
+                    input = input.Replace(replaceableIllegalChars[i], fullWidthReplacements[i]);
+                }
+            }
 
             foreach (char c in Path.GetInvalidFileNameChars()) {
                 if (!ignoredChars.Contains(c)) {
