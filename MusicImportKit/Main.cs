@@ -233,17 +233,24 @@ namespace MusicImportKit {
                 return input;
             }
 
+            // First string holds characters to replace, second holds the replacement. Replacements are done serially so make sure they line up
             string replaceableIllegalChars = "\\/:*?\"“”<>|";
             string fullWidthReplacements = "＼／：＊？＂＂＂＜＞｜";
 
+            // For every character in first string
             for (int i = 0; i < replaceableIllegalChars.Length; i++) {
+                // If the character is not ignored via parameter
                 if (!ignoredChars.Contains(replaceableIllegalChars[i])) {
+                    // Replace the character with its replacement in the input string
                     input = input.Replace(replaceableIllegalChars[i], fullWidthReplacements[i]);
                 }
             }
 
+            // For each character that exists in the invalid file name chars string
             foreach (char c in Path.GetInvalidFileNameChars()) {
+                // If the character is not ignored via paramter
                 if (!ignoredChars.Contains(c)) {
+                    // Replace the illegal character with a '-'. Note that this runs after the initial fullwidth replacement so this will only catch characters we don't prettify
                     input = input.Replace(c, '-');
                 }
             }
@@ -277,6 +284,7 @@ namespace MusicImportKit {
             return outStream;
         }
 
+        // Helper function for StripExif that skips all "APP" sections at the beginning of a JPEG file and returns control once it hits the payload
         private void SkipAppHeaders(Stream inStream) {
             // Read next two bytes into header variable (should be 0xff and 0xe0 to denote the first (APP0) section)
             byte[] header = new byte[2];
@@ -306,6 +314,7 @@ namespace MusicImportKit {
             inStream.Position -= 2;
         }
 
+        // Strips metadata from images in the input list (and compresses .png files)
         private void StripImages (List<string> inputFiles) {
             // List that contains pending images to be stripped
             List<string> pendingImages = new List<string>();
@@ -313,7 +322,8 @@ namespace MusicImportKit {
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".bmp")));
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".gif")));
 
-            // For every image in pendingImages
+            // For every image in pendingImages (should contain only .bmps and .gifs)
+            // Parallelized for measureable improvement in speed.
             Parallel.ForEach(pendingImages, (currentImage) => {
                 Bitmap tempBitmap = new Bitmap(currentImage);
                 // For every property (metadata)
@@ -334,14 +344,16 @@ namespace MusicImportKit {
                 File.Move(currentImage + ".tmp", currentImage);
             });
 
-            // Clear image list and add pngs
+            // Clear image list and add .pngs
             pendingImages.Clear();
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".png")));
 
-            // For every image in pendingImages
+            // For every image in pendingImages (should contain only .pngs)
+            // OxiPNG is already multi-threaded so we defer parallelization to it
             foreach (string currentImage in pendingImages) {
                 // Initialize oxipng.exe and compress in place, stripping metadata on the way
                 System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
+                // Only use the 64-bit version of oxipng on 64-bit systems
                 if (Environment.Is64BitOperatingSystem) {
                     oxiPngProcess.StartInfo.FileName = "Redist\\oxipng64.exe";
                 }
@@ -350,6 +362,8 @@ namespace MusicImportKit {
                 }
                 oxiPngProcess.StartInfo.UseShellExecute = false;
                 oxiPngProcess.StartInfo.CreateNoWindow = true;
+                // -o 4 sets the iteration level to 4. Possible values are 0->6, but anything above 4 takes a long time for little gain
+                // --strip safe only strips metadata which will not impact viewing of the image
                 oxiPngProcess.StartInfo.Arguments = "-o 4 --strip safe \"" + currentImage + "\"";
 
                 // Start and wait
@@ -362,7 +376,8 @@ namespace MusicImportKit {
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpg")));
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpeg")));
 
-            // For every image in pendingImages
+            // For every image in pendingImages (should contain only .jpgs and .jpegs)
+            // Paralellized but little to no improvement in speed. Unparallelize at will.
             Parallel.ForEach(pendingImages, (currentImage) => {
                 // Open input filestream (currentImage)
                 using (FileStream sourceJPGStream = File.Open(currentImage, FileMode.Open)) {
@@ -377,7 +392,8 @@ namespace MusicImportKit {
                 File.Move(currentImage + ".tmp", currentImage);
             });
         }
-
+        
+        // Adds information to the next available row in an Excel spreadsheet and sorts it
         private void AddToExcel(string lastFolder, string excelLogScore, string excelNotes) {
             // Initialization for Excel functionality
             Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
@@ -394,7 +410,6 @@ namespace MusicImportKit {
             if (excelLogScore != "Log score" && excelLogScore != "") {
                 currentWorksheet.Cells[numRows + 1, 2] = excelLogScore;
             }
-
             if (excelNotes != "Notes" && excelNotes != "") {
                 currentWorksheet.Cells[numRows + 1, 3] = excelNotes;
             }
@@ -413,6 +428,8 @@ namespace MusicImportKit {
             excel.Quit();
         }
 
+        // Renames .logs and .cues in an input file list to the standard naming scheme used by EAC (%artist% - %album%.log and %album%.cue)
+        // Fails if there are multiple .logs or multiple .cues in the input list, as this means there are multiple discs in the album and we cannot determine what their ordering is
         private void RenameLogCue (List<string> inputFiles, string outputFolder, string artist, string album) {
             // Find .logs and .cues that were copied
             List<string> logList = new List<string>();
@@ -450,38 +467,53 @@ namespace MusicImportKit {
             return path.EndsWith("\\") ? path : path + "\\";
         }
 
+        // Gets a list of all non-system directories that are recursively nested under the input directory.
+        // Mainly used as a helper function for GetRecursiveFilesSafe
         private string[] GetRecursiveDirectoriesSafe(string initialPath) {
+            // List to hold the directories we find for eventual return
             List<string> outputDirectories = new List<string>();
 
+            // For each directory that's one level below us
             foreach (string currentDir in Directory.GetDirectories(initialPath)) {
+                // try; we're expecting errors if we run into illegal folders
                 try {
                     DirectoryInfo currentDirInfo = new DirectoryInfo(currentDir);
-                    if (currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName) || !currentDirInfo.Attributes.HasFlag(FileAttributes.System)) {
+                    // If the file is not marked as a system folder (i.e. will throw errors) OR if the folder is a root folder. Root folders are technically system folders but they are safe to use
+                    if (!currentDirInfo.Attributes.HasFlag(FileAttributes.System) || currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName)) {
                         outputDirectories.AddRange(GetRecursiveDirectoriesSafe(currentDir));
                     }
                 }
+                // blackhole errors. Each error is a folder we don't want. We shouldn't ever be getting errors due to !system.folder conditional above but this is a just in case.
                 catch { }
             }
 
+            // Add the input path to the list
             outputDirectories.Add(initialPath);
 
             return outputDirectories.ToArray();
         }
 
+        // Gets a list of all files that are recursively nested under the input directory (ignoring restricted folders), and optionally allows filtering with second parameter
         private string[] GetRecursiveFilesSafe(string initialPath, string searchPattern = "*.*") {
+            // Holds the eventual file list
             List<string> files = new List<string>();
+            // Holds the eventual list of safe directories as determined by GetRecursiveDirectoriesSafe
             List<string> directories = new List<string>();
 
+            // Add all safe directories to directories list
             directories.AddRange(GetRecursiveDirectoriesSafe(initialPath));
 
+            // For each directory in the safe directory list
             foreach (string currentDir in directories) {
+                // Add all files within the directory to the file list, and searches with a user-specified pattern (default is "*.*")
                 files.AddRange(Directory.GetFiles(currentDir, searchPattern));
             }
 
             return files.ToArray();
         }
 
-        // Recursively copy a folder's contents into another folder. Selectively copies certain files if 3rd parameter is specified
+        // Recursively copy a folder's contents into another folder. Selectively copies certain files if 3rd parameter is specified.
+        // Fourth parameter prevents .flacs from being copied (for preventing overwriting of newly converted .flacs with the old .flacs)
         private string[] RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "*.*", bool noFlac = false) {
             List<string> pendingFileTypes = new List<string>();
             string originalFiletypeText = specificFiletypeText;
@@ -1305,6 +1337,8 @@ namespace MusicImportKit {
             return outputFiles;
         }
 
+        // Calculates ReplayGain on a list of input files.
+        // Uses the input list as a single album in album mode.
         private void CalculateReplayGain(List<string> inputFLACs) {
             // Used partially in guesswork, pulls tag/file data from first .flac file
             TagLib.File tempTagFile = TagLib.File.Create(inputFLACs[0]);
