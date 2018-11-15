@@ -269,16 +269,17 @@ namespace MusicImportKit {
             if (jpegHeader[0] == 0xff && jpegHeader[1] == 0xd8) {
                 // Skip through its header section
                 SkipAppHeaders(inStream);
-            }
-            // Write manual magic jpeg header to the beginning of outStream
-            outStream.WriteByte(0xff);
-            outStream.WriteByte(0xd8);
 
-            // Copy the rest of the file's payload from inStream to outStream
-            int readCount;
-            byte[] readBuffer = new byte[4096];
-            while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
-                outStream.Write(readBuffer, 0, readCount);
+                // Write manual magic jpeg header to the beginning of outStream
+                outStream.WriteByte(0xff);
+                outStream.WriteByte(0xd8);
+
+                // Copy the rest of the file's payload from inStream to outStream
+                int readCount;
+                byte[] readBuffer = new byte[4096];
+                while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
+                    outStream.Write(readBuffer, 0, readCount);
+                }
             }
 
             return outStream;
