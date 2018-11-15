@@ -273,13 +273,18 @@ namespace MusicImportKit {
                 // Write manual magic jpeg header to the beginning of outStream
                 outStream.WriteByte(0xff);
                 outStream.WriteByte(0xd8);
+            }
+            // Else if file is masquerading as a jpeg
+            else {
+                // Back up two bytes in stream in preparation to move the entire file to outStream
+                inStream.Position -= 2;
+            }
 
-                // Copy the rest of the file's payload from inStream to outStream
-                int readCount;
-                byte[] readBuffer = new byte[4096];
-                while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
-                    outStream.Write(readBuffer, 0, readCount);
-                }
+            // Copy the rest of the file's payload from inStream to outStream
+            int readCount;
+            byte[] readBuffer = new byte[4096];
+            while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
+                outStream.Write(readBuffer, 0, readCount);
             }
 
             return outStream;
