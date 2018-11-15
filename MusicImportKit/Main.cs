@@ -276,6 +276,7 @@ namespace MusicImportKit {
             }
             // Else if file is masquerading as a jpeg
             else {
+                MessageBox.Show("False JPEG file detected. Make sure the file isn't another format renamed to .jpg/.jpeg.");
                 // Back up two bytes in stream in preparation to move the entire file to outStream
                 inStream.Position -= 2;
             }
