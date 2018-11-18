@@ -51,12 +51,12 @@ Designed for power users who take lineage and data integrity seriously. Integrat
     * The Spek button will open every .flac in the temp folder sequentially in Spek. Spek can be used to detect files which have been "upconverted" or "transcoded" (usually used in a negative context).
         * Converting from a lossy (MP3, Opus) file to a lossless (FLAC, WAV) file does not increase its quality, and you may find that Bandcamp artists that don't know better are just transcoding their MP3s to FLAC to upload to Bandcamp. This means you're not really getting lossless files; you're getting bloated MP3s.
         * True lossless files will extend to the very top of the spectral with no shelves visible
-        * 320kBps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 20.5kHz and a barely visible "shelf" at 16kHz
-        * 256kBps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 20kHz and a clearly visible "shelf" at 16kHz
-        * 245kBps VBR (aka V0) MP3s that have been transcoded to FLAC will have a "cut-off" at 19.5kHz and a visible "shelf" at 16kHz
-        * 192kBps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 19kHz and a clearly visible "shelf" at 16kHz
-        * 190kBps VBR (aka V2) MP3s that have been transcoded to FLAC will have a "cut-off" at 18.5kHz and a visible "shelf" at 16kHz
-        * 128kBps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 16kHz
+        * 320kbps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 20.5kHz and a barely visible "shelf" at 16kHz
+        * 256kbps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 20kHz and a clearly visible "shelf" at 16kHz
+        * 245kbps VBR (aka V0) MP3s that have been transcoded to FLAC will have a "cut-off" at 19.5kHz and a visible "shelf" at 16kHz
+        * 192kbps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 19kHz and a clearly visible "shelf" at 16kHz
+        * 190kbps VBR (aka V2) MP3s that have been transcoded to FLAC will have a "cut-off" at 18.5kHz and a visible "shelf" at 16kHz
+        * 128kbps CBR MP3s that have been transcoded to FLAC will have a "cut-off" at 16kHz
 
 6. Choose output folder: Pick a base folder that you want to send the converted files to. This folder path will be combined with your preferred syntax to create directories and files as desired.
 
@@ -83,7 +83,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
     * Opus:
         * Opus conversions require opusenc.exe
-        * 192kBps VBR is considered transparent, or indistinguishable from the original FLAC file. This is the recommended setting for high quality Opus audio.
+        * 192kbps VBR is considered transparent, or indistinguishable from the original FLAC file. This is the recommended setting for high quality Opus audio.
         * Other recommended encoder settings can be found [here](https://wiki.hydrogenaud.io/index.php?title=Opus#Music_encoding_quality) and [here](https://wiki.xiph.org/Opus_Recommended_Settings#Recommended_Bitrates).
 
 
@@ -100,10 +100,10 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * [lame.exe](http://lame.sourceforge.net/) ([Unofficial binaries](http://rarewares.org/mp3-lame-bundle.php))
     * Convert .wav to .mp3 (automatically gets .wavs from flac.exe, which is also required for MP3 conversions)
-    
+
 * [metaflac.exe](https://xiph.org/flac/)
     * Primary ReplayGain calculator
-    
+
 * [Mp3Tag.exe](https://www.mp3tag.de/en/) (I highly recommend pairing with [Grammartron](https://community.mp3tag.de/t/case-conversion/11684))
     * Opens the temp folder in Mp3Tag for tag editing
 
@@ -127,7 +127,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
     * Stripping metadata from a PNG requires loading it into a lossless format, removing the metadata ourselves, and resaving it as a PNG. However, due to the nature of PNG, haphazardly resaving will probably create a bigger file than we started with. To alleviate this, we use OxiPNG to optimize PNGs to their smallest size. It's possible to compress PNGs even further with OxiPNG, but the process is extremely CPU-intensive and usually yields no gains.
     * OxiPNG also supports native metadata stripping, so we defer that to it.
 
-* MP3 Conversions: 
+* MP3 Conversions:
     * Simpler methods of MP3 conversion (e.g. FFmpeg, which uses LAME as well) strip the LAME header info from the output MP3 and thus there is no (easy) way to tell if an unknown MP3 file that you find used LAME in its creation or an inferior tool (such as FhG). For being courteous to others (and our future selves), we take extra steps to preserve this data. Manual decoding to .wav and encoding to .mp3 is actually (~33%) faster than using an FFmpeg implementation, but destroys tags in the process so we handle that manually.
 
 * ReplayGain:

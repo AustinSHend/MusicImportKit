@@ -809,30 +809,30 @@ namespace MusicImportKit
             }
             else if (DefaultConvertToComboBox.Text == "MP3")
             {
-                DefaultPresetComboBox.Items.Add("245kBps VBR (V0)");
-                DefaultPresetComboBox.Items.Add("225kBps VBR (V1)");
-                DefaultPresetComboBox.Items.Add("190kBps VBR (V2)");
-                DefaultPresetComboBox.Items.Add("175kBps VBR (V3)");
-                DefaultPresetComboBox.Items.Add("165kBps VBR (V4)");
-                DefaultPresetComboBox.Items.Add("130kBps VBR (V5)");
-                DefaultPresetComboBox.Items.Add("115kBps VBR (V6)");
-                DefaultPresetComboBox.Items.Add("100kBps VBR (V7)");
-                DefaultPresetComboBox.Items.Add("85kBps VBR (V8)");
-                DefaultPresetComboBox.Items.Add("65kBps VBR (V9)");
-                DefaultPresetComboBox.Items.Add("320kBps CBR");
-                DefaultPresetComboBox.Items.Add("256kBps CBR");
-                DefaultPresetComboBox.Items.Add("192kBps CBR");
-                DefaultPresetComboBox.Items.Add("128kBps CBR");
-                DefaultPresetComboBox.Items.Add("64kBps CBR");
+                DefaultPresetComboBox.Items.Add("245kbps VBR (V0)");
+                DefaultPresetComboBox.Items.Add("225kbps VBR (V1)");
+                DefaultPresetComboBox.Items.Add("190kbps VBR (V2)");
+                DefaultPresetComboBox.Items.Add("175kbps VBR (V3)");
+                DefaultPresetComboBox.Items.Add("165kbps VBR (V4)");
+                DefaultPresetComboBox.Items.Add("130kbps VBR (V5)");
+                DefaultPresetComboBox.Items.Add("115kbps VBR (V6)");
+                DefaultPresetComboBox.Items.Add("100kbps VBR (V7)");
+                DefaultPresetComboBox.Items.Add("85kbps VBR (V8)");
+                DefaultPresetComboBox.Items.Add("65kbps VBR (V9)");
+                DefaultPresetComboBox.Items.Add("320kbps CBR");
+                DefaultPresetComboBox.Items.Add("256kbps CBR");
+                DefaultPresetComboBox.Items.Add("192kbps CBR");
+                DefaultPresetComboBox.Items.Add("128kbps CBR");
+                DefaultPresetComboBox.Items.Add("64kbps CBR");
             }
             else if (DefaultConvertToComboBox.Text == "Opus")
             {
-                DefaultPresetComboBox.Items.Add("192kBps VBR");
-                DefaultPresetComboBox.Items.Add("160kBps VBR");
-                DefaultPresetComboBox.Items.Add("128kBps VBR");
-                DefaultPresetComboBox.Items.Add("96kBps VBR");
-                DefaultPresetComboBox.Items.Add("64kBps VBR");
-                DefaultPresetComboBox.Items.Add("32kBps VBR");
+                DefaultPresetComboBox.Items.Add("192kbps VBR");
+                DefaultPresetComboBox.Items.Add("160kbps VBR");
+                DefaultPresetComboBox.Items.Add("128kbps VBR");
+                DefaultPresetComboBox.Items.Add("96kbps VBR");
+                DefaultPresetComboBox.Items.Add("64kbps VBR");
+                DefaultPresetComboBox.Items.Add("32kbps VBR");
             }
         }
     }

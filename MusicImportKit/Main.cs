@@ -172,32 +172,32 @@ namespace MusicImportKit {
             // Add MP3 entries if lame.exe and flac.exe are detected
             if (Settings.Default.LAMELocation != "" && Settings.Default.FLACLocation != "") {
                 ConvertToComboBox.Items.Add("MP3");
-                PresetComboBox.Items.Add("245kBps VBR (V0)");
-                PresetComboBox.Items.Add("225kBps VBR (V1)");
-                PresetComboBox.Items.Add("190kBps VBR (V2)");
-                PresetComboBox.Items.Add("175kBps VBR (V3)");
-                PresetComboBox.Items.Add("165kBps VBR (V4)");
-                PresetComboBox.Items.Add("130kBps VBR (V5)");
-                PresetComboBox.Items.Add("115kBps VBR (V6)");
-                PresetComboBox.Items.Add("100kBps VBR (V7)");
-                PresetComboBox.Items.Add("85kBps VBR (V8)");
-                PresetComboBox.Items.Add("65kBps VBR (V9)");
-                PresetComboBox.Items.Add("320kBps CBR");
-                PresetComboBox.Items.Add("256kBps CBR");
-                PresetComboBox.Items.Add("192kBps CBR");
-                PresetComboBox.Items.Add("128kBps CBR");
-                PresetComboBox.Items.Add("64kBps CBR");
+                PresetComboBox.Items.Add("245kbps VBR (V0)");
+                PresetComboBox.Items.Add("225kbps VBR (V1)");
+                PresetComboBox.Items.Add("190kbps VBR (V2)");
+                PresetComboBox.Items.Add("175kbps VBR (V3)");
+                PresetComboBox.Items.Add("165kbps VBR (V4)");
+                PresetComboBox.Items.Add("130kbps VBR (V5)");
+                PresetComboBox.Items.Add("115kbps VBR (V6)");
+                PresetComboBox.Items.Add("100kbps VBR (V7)");
+                PresetComboBox.Items.Add("85kbps VBR (V8)");
+                PresetComboBox.Items.Add("65kbps VBR (V9)");
+                PresetComboBox.Items.Add("320kbps CBR");
+                PresetComboBox.Items.Add("256kbps CBR");
+                PresetComboBox.Items.Add("192kbps CBR");
+                PresetComboBox.Items.Add("128kbps CBR");
+                PresetComboBox.Items.Add("64kbps CBR");
             }
 
             // Add Opus entries if opusenc.exe detected
             if (Settings.Default.OpusLocation != "") {
                 ConvertToComboBox.Items.Add("Opus");
-                PresetComboBox.Items.Add("192kBps VBR");
-                PresetComboBox.Items.Add("160kBps VBR");
-                PresetComboBox.Items.Add("128kBps VBR");
-                PresetComboBox.Items.Add("96kBps VBR");
-                PresetComboBox.Items.Add("64kBps VBR");
-                PresetComboBox.Items.Add("32kBps VBR");
+                PresetComboBox.Items.Add("192kbps VBR");
+                PresetComboBox.Items.Add("160kbps VBR");
+                PresetComboBox.Items.Add("128kbps VBR");
+                PresetComboBox.Items.Add("96kbps VBR");
+                PresetComboBox.Items.Add("64kbps VBR");
+                PresetComboBox.Items.Add("32kbps VBR");
             }
 
             // Set the user-preferred default
@@ -258,8 +258,96 @@ namespace MusicImportKit {
             return input;
         }
 
+        private string GetRealImageFormat (Stream inStream) {
+            string realFormat = "";
+
+            // Read first 4 bytes into header
+            byte[] imageHeader = new byte[4];
+            for (int i = 0; i < 4; i++) {
+                imageHeader[i] = (byte)inStream.ReadByte();
+            }
+
+            // Reset position of stream
+            inStream.Position -= 4;
+
+
+            // If file has a magic BMP header ("BM")
+            if (imageHeader[0] == 0x42 && imageHeader[1] == 0x4d) {
+                realFormat = "BMP";
+            }
+            // Else if file has a magic GIF header ("GIF")
+            else if (imageHeader[0] == 0x47 && imageHeader[1] == 0x49 && imageHeader[2] == 0x46) {
+                realFormat = "GIF";
+            }
+            // Else if file has a magic JPG/JPEG header ("ÿØ")
+            else if (imageHeader[0] == 0xff && imageHeader[1] == 0xd8) {
+                realFormat = "JPG";
+            }
+            // Else if file has a magic PNG header (".PNG")
+            else if (imageHeader[0] == 0x89 && imageHeader[1] == 0x50 && imageHeader[2] == 0x4e && imageHeader[3] == 0x47) {
+                realFormat = "PNG";
+            }
+
+            return realFormat;
+        }
+
+        // Compress and remove metadata from PNG files
+        private void CompressPng(string inputPNG, bool strip = false) {
+            // Initialize oxipng.exe and compress in place, stripping metadata on the way
+            System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
+            // Only use the 64-bit version of oxipng on 64-bit systems
+            if (Environment.Is64BitOperatingSystem) {
+                oxiPngProcess.StartInfo.FileName = "Redist\\oxipng64.exe";
+            }
+            else {
+                oxiPngProcess.StartInfo.FileName = "Redist\\oxipng86.exe";
+            }
+            oxiPngProcess.StartInfo.UseShellExecute = false;
+            oxiPngProcess.StartInfo.CreateNoWindow = true;
+            // -o 4 sets the iteration level to 4. Possible values are 0->6, but anything above 4 takes a long time for little gain
+            oxiPngProcess.StartInfo.Arguments = "-o 4";
+
+            // If metadata stripping is enabled
+            if (strip) {
+                // Add argument to --strip safe (only strips metadata which will not impact viewing of the image)
+                oxiPngProcess.StartInfo.Arguments += " --strip safe";
+            }
+
+            // Add input file argument
+            oxiPngProcess.StartInfo.Arguments += " \"" + inputPNG + "\"";
+
+            // Start and wait
+            oxiPngProcess.Start();
+            oxiPngProcess.WaitForExit();
+
+            return;
+        }
+
+        // Remove metadata from bmp/gif files
+        private void StripBmpGifMetadata(string inputFile) {
+            Bitmap tempBitmap = new Bitmap(inputFile);
+            // For every property (metadata)
+            foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
+                // Initialize a temporary property
+                PropertyItem tempProperty = currentProperty;
+                // Nullify temporary property
+                tempProperty.Value = new byte[] { 0 };
+                // Set original property to temporary property
+                tempBitmap.SetPropertyItem(tempProperty);
+            }
+            // Save changed bitmap to original file
+            tempBitmap.Save(inputFile + ".tmp");
+            // Free resources
+            tempBitmap.Dispose();
+            // Delete original and rename .tmp file to original
+            File.Delete(inputFile);
+            File.Move(inputFile + ".tmp", inputFile);
+
+            return;
+        }
+
         // Remove EXIF data from jpg/jpeg files
-        private Stream StripExif(Stream inStream, Stream outStream) {
+        private Stream StripJpegExif(Stream inStream, Stream outStream) {
             // Read first 2 bytes into header (should be 0xff and 0xd8 aka magic jpeg header)
             byte[] jpegHeader = new byte[2];
             jpegHeader[0] = (byte)inStream.ReadByte();
@@ -291,7 +379,7 @@ namespace MusicImportKit {
             return outStream;
         }
 
-        // Helper function for StripExif that skips all "APP" sections at the beginning of a JPEG file and returns control once it hits the payload
+        // Helper function for StripJpegExif that skips all "APP" sections at the beginning of a JPEG file and returns control once it hits the payload
         private void SkipAppHeaders(Stream inStream) {
             // Read next two bytes into header variable (should be 0xff and 0xe0 to denote the first (APP0) section)
             byte[] header = new byte[2];
@@ -317,87 +405,128 @@ namespace MusicImportKit {
                 header[1] = (byte)inStream.ReadByte();
             }
             // Skip back two bytes (these two bytes could have been an APP header but it was determined it was part of the payload instead,
-            // so back up 2 bytes and send control back to StripExif
+            // so back up 2 bytes and send control back to StripJpegExif
             inStream.Position -= 2;
         }
 
         // Strips metadata from images in the input list (and compresses .png files)
         private void StripImages (List<string> inputFiles) {
-            // List that contains pending images to be stripped
+            // List that contains pending images to be checked and moved
             List<string> pendingImages = new List<string>();
-            // Add .bmp and .gif formats to list
+
+            // Add supported image formats to list
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".bmp")));
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".gif")));
-
-            // For every image in pendingImages (should contain only .bmps and .gifs)
-            // Parallelized for measureable improvement in speed.
-            Parallel.ForEach(pendingImages, (currentImage) => {
-                Bitmap tempBitmap = new Bitmap(currentImage);
-                // For every property (metadata)
-                foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
-                    // Initialize a temporary property
-                    PropertyItem tempProperty = currentProperty;
-                    // Nullify temporary property
-                    tempProperty.Value = new byte[] { 0 };
-                    // Set original property to temporary property
-                    tempBitmap.SetPropertyItem(tempProperty);
-                }
-                // Save changed bitmap to original file
-                tempBitmap.Save(currentImage + ".tmp");
-                // Free resources
-                tempBitmap.Dispose();
-                // Delete original and rename .tmp file to original
-                File.Delete(currentImage);
-                File.Move(currentImage + ".tmp", currentImage);
-            });
-
-            // Clear image list and add .pngs
-            pendingImages.Clear();
-            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".png")));
-
-            // For every image in pendingImages (should contain only .pngs)
-            // OxiPNG is already multi-threaded so we defer parallelization to it
-            foreach (string currentImage in pendingImages) {
-                // Initialize oxipng.exe and compress in place, stripping metadata on the way
-                System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
-                // Only use the 64-bit version of oxipng on 64-bit systems
-                if (Environment.Is64BitOperatingSystem) {
-                    oxiPngProcess.StartInfo.FileName = "Redist\\oxipng64.exe";
-                }
-                else {
-                    oxiPngProcess.StartInfo.FileName = "Redist\\oxipng86.exe";
-                }
-                oxiPngProcess.StartInfo.UseShellExecute = false;
-                oxiPngProcess.StartInfo.CreateNoWindow = true;
-                // -o 4 sets the iteration level to 4. Possible values are 0->6, but anything above 4 takes a long time for little gain
-                // --strip safe only strips metadata which will not impact viewing of the image
-                oxiPngProcess.StartInfo.Arguments = "-o 4 --strip safe \"" + currentImage + "\"";
-
-                // Start and wait
-                oxiPngProcess.Start();
-                oxiPngProcess.WaitForExit();
-            }
-
-            // Clear image list and add jpegs
-            pendingImages.Clear();
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpg")));
             pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".jpeg")));
+            pendingImages.AddRange(inputFiles.FindAll(x => x.EndsWith(".png")));
 
-            // For every image in pendingImages (should contain only .jpgs and .jpegs)
-            // Paralellized but little to no improvement in speed. Unparallelize at will.
+            // Lists to hold the images as defined by their magic headers, not their formats
+            List<string> pendingBMP = new List<string>();
+            List<string> pendingGIF = new List<string>();
+            List<string> pendingJPG = new List<string>();
+            List<string> pendingPNG = new List<string>();
+
+            // For every file in pendingImages
             Parallel.ForEach(pendingImages, (currentImage) => {
                 // Open input filestream (currentImage)
-                using (FileStream sourceJPGStream = File.Open(currentImage, FileMode.Open)) {
-                    // Open output filestream (currentImage + ".tmp")
-                    using (FileStream outputJPGStream = File.Open(currentImage + ".tmp", FileMode.Create)) {
-                        // Strip EXIF data from input filestream and feed it into output filestream
-                        StripExif(sourceJPGStream, outputJPGStream);
+                using (FileStream sourceIMGStream = File.Open(currentImage, FileMode.Open)) {
+                    // Send it to GetRealImageFormat to determine its format by its magic header
+                    string realFormat = GetRealImageFormat(sourceIMGStream);
+
+                    // Depending on its realFormat, send it to appropriate list
+                    if (realFormat == "BMP") {
+                        pendingBMP.Add(currentImage);
+                    }
+                    else if (realFormat == "GIF") {
+                        pendingGIF.Add(currentImage);
+                    }
+                    else if(realFormat == "JPG") {
+                        pendingJPG.Add(currentImage);
+                    }
+                    else if (realFormat == "PNG") {
+                        pendingPNG.Add(currentImage);
                     }
                 }
-                // Delete original and rename .tmp file to original
-                File.Delete(currentImage);
-                File.Move(currentImage + ".tmp", currentImage);
             });
+
+            // For every image in pendingBMP
+            // Parallelized for measureable improvement in speed.
+            Parallel.ForEach(pendingBMP, (currentBMP) => {
+                // String that holds the location of the BMP file. Will be modified if the file is renamed.
+                string location = currentBMP;
+
+                // If the current file is a BMP but does not end with the right extension
+                if (!currentBMP.EndsWith(".bmp")) {
+                    // Rename to correct extension
+                    location = Path.GetDirectoryName(currentBMP) + "\\" + Path.GetFileNameWithoutExtension(currentBMP) + ".bmp";
+                    File.Move(currentBMP, location);
+                }
+
+                // Strip the file of its metadata
+                StripBmpGifMetadata(location);
+            });
+
+            // For every image in pendingGIF
+            // Parallelized for measureable improvement in speed.
+            Parallel.ForEach(pendingGIF, (currentGIF) => {
+                // String that holds the location of the GIF file. Will be modified if the file is renamed.
+                string location = currentGIF;
+
+                // If the current file is a GIF but does not end with the right extension
+                if (!currentGIF.EndsWith(".gif")) {
+                    // Rename to correct extension
+                    location = Path.GetDirectoryName(currentGIF) + "\\" + Path.GetFileNameWithoutExtension(currentGIF) + ".gif";
+                    File.Move(currentGIF, location);
+                }
+
+                // Strip the file of its metadata
+                StripBmpGifMetadata(location);
+            });
+
+            // For every image in pendingJPG
+            // Paralellized but little to no improvement in speed. Unparallelize at will.
+            Parallel.ForEach(pendingJPG, (currentJPG) => {
+                // String that holds the location of the JPG file. Will be modified if the file is renamed.
+                string location = currentJPG;
+
+                // If the current file is a JPG/JPEG but does not end with the right extension
+                if (!currentJPG.EndsWith(".jpg") && !currentJPG.EndsWith(".jpeg")) {
+                    // Rename to correct extension
+                    location = Path.GetDirectoryName(currentJPG) + "\\" + Path.GetFileNameWithoutExtension(currentJPG) + ".jpg";
+                    File.Move(currentJPG, location);
+                }
+
+                // Open input filestream (currentImage)
+                using (FileStream sourceJPGStream = File.Open(location, FileMode.Open)) {
+                    // Open output filestream (currentImage + ".tmp")
+                    using (FileStream outputJPGStream = File.Open(location + ".tmp", FileMode.Create)) {
+                        // Strip EXIF data from input filestream and feed it into output filestream
+                        StripJpegExif(sourceJPGStream, outputJPGStream);
+                    }
+                }
+
+                // Delete original and rename .tmp file to original
+                File.Delete(location);
+                File.Move(location + ".tmp", location);
+            });
+            
+            // For every image in pendingPNG
+            // OxiPNG is already multi-threaded so we defer parallelization to it
+            foreach (string currentPNG in pendingPNG) {
+                // String that holds the location of the PNG file. Will be modified if the file is renamed.
+                string location = currentPNG;
+
+                // If the current file is a PNG but does not end with the right extension
+                if (!currentPNG.EndsWith(".png")) {
+                    // Rename to correct extension
+                    location = Path.GetDirectoryName(currentPNG) + "\\" + Path.GetFileNameWithoutExtension(currentPNG) + ".png";
+                    File.Move(currentPNG, location);
+                }
+
+                // Compress the currentPNG and pass a parameter to strip the metadata as well
+                CompressPng(location, true);
+            }
         }
         
         // Adds information to the next available row in an Excel spreadsheet and sorts it
@@ -610,49 +739,49 @@ namespace MusicImportKit {
             // MP3
             if (codec == "MP3") {
                 switch (preset) {
-                    case "245kBps VBR (V0)":
+                    case "245kbps VBR (V0)":
                         preset = "V0";
                         break;
-                    case "225kBps VBR (V1)":
+                    case "225kbps VBR (V1)":
                         preset = "V1";
                         break;
-                    case "190kBps VBR (V2)":
+                    case "190kbps VBR (V2)":
                         preset = "V2";
                         break;
-                    case "175kBps VBR (V3)":
+                    case "175kbps VBR (V3)":
                         preset = "V3";
                         break;
-                    case "165kBps VBR (V4)":
+                    case "165kbps VBR (V4)":
                         preset = "V4";
                         break;
-                    case "130kBps VBR (V5)":
+                    case "130kbps VBR (V5)":
                         preset = "V5";
                         break;
-                    case "115kBps VBR (V6)":
+                    case "115kbps VBR (V6)":
                         preset = "V6";
                         break;
-                    case "100kBps VBR (V7)":
+                    case "100kbps VBR (V7)":
                         preset = "V7";
                         break;
-                    case "85kBps VBR (V8)":
+                    case "85kbps VBR (V8)":
                         preset = "V8";
                         break;
-                    case "65kBps VBR (V9)":
+                    case "65kbps VBR (V9)":
                         preset = "V9";
                         break;
-                    case "320kBps CBR":
+                    case "320kbps CBR":
                         preset = "320";
                         break;
-                    case "256kBps CBR":
+                    case "256kbps CBR":
                         preset = "256";
                         break;
-                    case "192kBps CBR":
+                    case "192kbps CBR":
                         preset = "192";
                         break;
-                    case "128kBps CBR":
+                    case "128kbps CBR":
                         preset = "128";
                         break;
-                    case "64kBps CBR":
+                    case "64kbps CBR":
                         preset = "64";
                         break;
                 }
@@ -660,22 +789,22 @@ namespace MusicImportKit {
             // Opus
             else if (codec == "Opus") {
                 switch (preset) {
-                    case "192kBps VBR":
+                    case "192kbps VBR":
                         preset = "192";
                         break;
-                    case "160kBps VBR":
+                    case "160kbps VBR":
                         preset = "160";
                         break;
-                    case "128kBps VBR":
+                    case "128kbps VBR":
                         preset = "128";
                         break;
-                    case "96kBps VBR":
+                    case "96kbps VBR":
                         preset = "96";
                         break;
-                    case "64kBps VBR":
+                    case "64kbps VBR":
                         preset = "64";
                         break;
-                    case "32kBps VBR":
+                    case "32kbps VBR":
                         preset = "32";
                         break;
                 }
@@ -803,7 +932,7 @@ namespace MusicImportKit {
             return formattedString;
         }
 
-        // For a given list of input FLACs, convert them to a certain codec (FLAC, MP3, etc.) in a specific preset (16-bit resample, 192kBps, V0, etc.)
+        // For a given list of input FLACs, convert them to a certain codec (FLAC, MP3, etc.) in a specific preset (16-bit resample, 192kbps, V0, etc.)
         // Returns a list of output files
         private List<string> ConvertToFormat(List<string> inputFLACs, string outputPath, string syntax, string codec, string preset) {
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
@@ -1083,49 +1212,49 @@ namespace MusicImportKit {
 
                     // Determine which preset to use
                     switch (preset) {
-                        case "245kBps VBR (V0)":
+                        case "245kbps VBR (V0)":
                             lameProcess.StartInfo.Arguments += " -V 0";
                             break;
-                        case "225kBps VBR (V1)":
+                        case "225kbps VBR (V1)":
                             lameProcess.StartInfo.Arguments += " -V 1";
                             break;
-                        case "190kBps VBR (V2)":
+                        case "190kbps VBR (V2)":
                             lameProcess.StartInfo.Arguments += " -V 2";
                             break;
-                        case "175kBps VBR (V3)":
+                        case "175kbps VBR (V3)":
                             lameProcess.StartInfo.Arguments += " -V 3";
                             break;
-                        case "165kBps VBR (V4)":
+                        case "165kbps VBR (V4)":
                             lameProcess.StartInfo.Arguments += " -V 4";
                             break;
-                        case "130kBps VBR (V5)":
+                        case "130kbps VBR (V5)":
                             lameProcess.StartInfo.Arguments += " -V 5";
                             break;
-                        case "115kBps VBR (V6)":
+                        case "115kbps VBR (V6)":
                             lameProcess.StartInfo.Arguments += " -V 6";
                             break;
-                        case "100kBps VBR (V7)":
+                        case "100kbps VBR (V7)":
                             lameProcess.StartInfo.Arguments += " -V 7";
                             break;
-                        case "85kBps VBR (V8)":
+                        case "85kbps VBR (V8)":
                             lameProcess.StartInfo.Arguments += " -V 8";
                             break;
-                        case "65kBps VBR (V9)":
+                        case "65kbps VBR (V9)":
                             lameProcess.StartInfo.Arguments += " -V 9";
                             break;
-                        case "320kBps CBR":
+                        case "320kbps CBR":
                             lameProcess.StartInfo.Arguments += " -b 320";
                             break;
-                        case "256kBps CBR":
+                        case "256kbps CBR":
                             lameProcess.StartInfo.Arguments += " -b 256";
                             break;
-                        case "192kBps CBR":
+                        case "192kbps CBR":
                             lameProcess.StartInfo.Arguments += " -b 192";
                             break;
-                        case "128kBps CBR":
+                        case "128kbps CBR":
                             lameProcess.StartInfo.Arguments += " -b 128";
                             break;
-                        case "64kBps CBR":
+                        case "64kbps CBR":
                             lameProcess.StartInfo.Arguments += " -b 64";
                             break;
                     }
@@ -1309,22 +1438,22 @@ namespace MusicImportKit {
 
                     // Determine which preset to use
                     switch (preset) {
-                        case "192kBps VBR":
+                        case "192kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 192 --vbr";
                             break;
-                        case "160kBps VBR":
+                        case "160kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 160 --vbr";
                             break;
-                        case "128kBps VBR":
+                        case "128kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 128 --vbr";
                             break;
-                        case "96kBps VBR":
+                        case "96kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 96 --vbr";
                             break;
-                        case "64kBps VBR":
+                        case "64kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 64 --vbr";
                             break;
-                        case "32kBps VBR":
+                        case "32kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 32 --vbr";
                             break;
                     }
@@ -1521,7 +1650,9 @@ namespace MusicImportKit {
                 album = CleanString(tempTagMap.GetFirstField("album"));
             }
 
+            // If copying files is enabled
             if (copyFileTypesEnabled == true) {
+                // If the copy syntax isn't default or empty
                 if (copyFileTypes != "e.g. *.jpg; *.log; *.cue; *.pdf" && copyFileTypes != "") {
                     // Begin recursive copy function
                     copiedFiles.AddRange(RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes, true));
@@ -2281,35 +2412,35 @@ namespace MusicImportKit {
                 PresetComboBox.Text = "Standard";
             }
             else if (ConvertToComboBox.Text == "MP3") {
-                PresetComboBox.Items.Add("245kBps VBR (V0)");
-                PresetComboBox.Items.Add("225kBps VBR (V1)");
-                PresetComboBox.Items.Add("190kBps VBR (V2)");
-                PresetComboBox.Items.Add("175kBps VBR (V3)");
-                PresetComboBox.Items.Add("165kBps VBR (V4)");
-                PresetComboBox.Items.Add("130kBps VBR (V5)");
-                PresetComboBox.Items.Add("115kBps VBR (V6)");
-                PresetComboBox.Items.Add("100kBps VBR (V7)");
-                PresetComboBox.Items.Add("85kBps VBR (V8)");
-                PresetComboBox.Items.Add("65kBps VBR (V9)");
-                PresetComboBox.Items.Add("320kBps CBR");
-                PresetComboBox.Items.Add("256kBps CBR");
-                PresetComboBox.Items.Add("192kBps CBR");
-                PresetComboBox.Items.Add("128kBps CBR");
-                PresetComboBox.Items.Add("64kBps CBR");
+                PresetComboBox.Items.Add("245kbps VBR (V0)");
+                PresetComboBox.Items.Add("225kbps VBR (V1)");
+                PresetComboBox.Items.Add("190kbps VBR (V2)");
+                PresetComboBox.Items.Add("175kbps VBR (V3)");
+                PresetComboBox.Items.Add("165kbps VBR (V4)");
+                PresetComboBox.Items.Add("130kbps VBR (V5)");
+                PresetComboBox.Items.Add("115kbps VBR (V6)");
+                PresetComboBox.Items.Add("100kbps VBR (V7)");
+                PresetComboBox.Items.Add("85kbps VBR (V8)");
+                PresetComboBox.Items.Add("65kbps VBR (V9)");
+                PresetComboBox.Items.Add("320kbps CBR");
+                PresetComboBox.Items.Add("256kbps CBR");
+                PresetComboBox.Items.Add("192kbps CBR");
+                PresetComboBox.Items.Add("128kbps CBR");
+                PresetComboBox.Items.Add("64kbps CBR");
 
-                // Set to "245kBps VBR (V0)" by default
-                PresetComboBox.Text = "245kBps VBR (V0)";
+                // Set to "245kbps VBR (V0)" by default
+                PresetComboBox.Text = "245kbps VBR (V0)";
             }
             else if (ConvertToComboBox.Text == "Opus") {
-                PresetComboBox.Items.Add("192kBps VBR");
-                PresetComboBox.Items.Add("160kBps VBR");
-                PresetComboBox.Items.Add("128kBps VBR");
-                PresetComboBox.Items.Add("96kBps VBR");
-                PresetComboBox.Items.Add("64kBps VBR");
-                PresetComboBox.Items.Add("32kBps VBR");
+                PresetComboBox.Items.Add("192kbps VBR");
+                PresetComboBox.Items.Add("160kbps VBR");
+                PresetComboBox.Items.Add("128kbps VBR");
+                PresetComboBox.Items.Add("96kbps VBR");
+                PresetComboBox.Items.Add("64kbps VBR");
+                PresetComboBox.Items.Add("32kbps VBR");
 
-                // Set to "192kBps VBR" by default
-                PresetComboBox.Text = "192kBps VBR";
+                // Set to "192kbps VBR" by default
+                PresetComboBox.Text = "192kbps VBR";
             }
         }
 

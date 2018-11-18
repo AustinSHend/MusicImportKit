@@ -72,7 +72,6 @@
             this.InputPathUpOneButton = new System.Windows.Forms.Button();
             this.TempPathUpOneButton = new System.Windows.Forms.Button();
             this.OutputPathUpOneButton = new System.Windows.Forms.Button();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.PresetComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
@@ -571,7 +570,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "MusicImportKit v2.1.6";
+            this.Text = "MusicImportKit v2.1.7";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -621,7 +620,6 @@
         private System.Windows.Forms.Button InputPathUpOneButton;
         private System.Windows.Forms.Button TempPathUpOneButton;
         private System.Windows.Forms.Button OutputPathUpOneButton;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ComboBox PresetComboBox;
     }
 }
