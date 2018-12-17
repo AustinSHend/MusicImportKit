@@ -73,6 +73,8 @@ namespace MusicImportKit {
                 OutputNamingSyntaxTextBox.ForeColor = SystemColors.GrayText;
             }
 
+            ReplayGainCheckbox.Checked = Settings.Default.DefaultRG;
+
             if (Settings.Default.DefaultSpecificFiletypeText != "") {
                 CopyFileTypesTextBox.Text = Settings.Default.DefaultSpecificFiletypeText;
                 CopyFileTypesTextBox.ForeColor = Color.Black;
@@ -205,25 +207,6 @@ namespace MusicImportKit {
                 // Set the comboboxes to the user's preference
                 ConvertToComboBox.Text = Settings.Default.DefaultConvertFormat;
                 PresetComboBox.Text = Settings.Default.DefaultConvertPreset;
-
-                // Dynamic ReplayGain enable for FLAC, MP3, and Opus
-                // FLAC uses metaflac to generate ReplayGain data
-                // Opus converts the input FLAC's tags automatically (we metaflac the input FLACs before conversion if enabled)
-                // MP3 RG tags can be copied manually (we metaflac the input FLACs before conversion if enabled)
-                if (ConvertToComboBox.Text == "FLAC" || ConvertToComboBox.Text == "MP3" || ConvertToComboBox.Text == "Opus") {
-                    // If metaflac.exe and flac.exe are found, enable ReplayGain
-                    if (Settings.Default.MetaFLACLocation != "" && Settings.Default.FLACLocation != "") {
-                        ReplayGainCheckbox.Enabled = true;
-                        ReplayGainCheckbox.Checked = Settings.Default.DefaultRG;
-                        ReplayGainCheckbox.Text = "Apply ReplayGain";
-                    }
-                    // Otherwise, disable
-                    else {
-                        ReplayGainCheckbox.Enabled = false;
-                        ReplayGainCheckbox.Checked = false;
-                        ReplayGainCheckbox.Text = "Apply ReplayGain (requires flac.exe and metaflac.exe)";
-                    }
-                }
             }
         }
 
@@ -428,7 +411,7 @@ namespace MusicImportKit {
             List<string> pendingPNG = new List<string>();
 
             // For every file in pendingImages
-            Parallel.ForEach(pendingImages, (currentImage) => {
+            foreach (string currentImage in pendingImages) {
                 // Open input filestream (currentImage)
                 using (FileStream sourceIMGStream = File.Open(currentImage, FileMode.Open)) {
                     // Send it to GetRealImageFormat to determine its format by its magic header
@@ -448,11 +431,11 @@ namespace MusicImportKit {
                         pendingPNG.Add(currentImage);
                     }
                 }
-            });
+            }
 
             // For every image in pendingBMP
             // Parallelized for measureable improvement in speed.
-            Parallel.ForEach(pendingBMP, (currentBMP) => {
+            Parallel.ForEach(pendingBMP, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentBMP) => {
                 // String that holds the location of the BMP file. Will be modified if the file is renamed.
                 string location = currentBMP;
 
@@ -469,7 +452,7 @@ namespace MusicImportKit {
 
             // For every image in pendingGIF
             // Parallelized for measureable improvement in speed.
-            Parallel.ForEach(pendingGIF, (currentGIF) => {
+            Parallel.ForEach(pendingGIF, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentGIF) => {
                 // String that holds the location of the GIF file. Will be modified if the file is renamed.
                 string location = currentGIF;
 
@@ -486,7 +469,7 @@ namespace MusicImportKit {
 
             // For every image in pendingJPG
             // Paralellized but little to no improvement in speed. Unparallelize at will.
-            Parallel.ForEach(pendingJPG, (currentJPG) => {
+            Parallel.ForEach(pendingJPG, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentJPG) => {
                 // String that holds the location of the JPG file. Will be modified if the file is renamed.
                 string location = currentJPG;
 
@@ -990,7 +973,7 @@ namespace MusicImportKit {
                 }
 
                 // Parallel convert files
-                Parallel.ForEach(inputFLACs, (currentFLAC) => {
+                Parallel.ForEach(inputFLACs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFLAC) => {
                     // Get a tagmap of the current file
                     TagLib.File tagFile = TagLib.File.Create(currentFLAC);
                     TagLib.Ogg.XiphComment tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
@@ -1159,7 +1142,7 @@ namespace MusicImportKit {
 
             // MP3 Conversion
             else if (codec == "MP3") {
-                Parallel.ForEach(inputFLACs, (currentFLAC) => {
+                Parallel.ForEach(inputFLACs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFLAC) => {
                     // Get a tagmap of the current file
                     TagLib.File tagFile = TagLib.File.Create(currentFLAC);
                     TagLib.Ogg.XiphComment tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
@@ -1414,7 +1397,7 @@ namespace MusicImportKit {
 
             // Opus Conversion
             else if (codec == "Opus") {
-                Parallel.ForEach(inputFLACs, (currentFLAC) => {
+                Parallel.ForEach(inputFLACs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFLAC) => {
                     string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC);
                     string parsedFolderSyntax = "";
                     // If the path denotes there is a folder
@@ -1476,91 +1459,120 @@ namespace MusicImportKit {
         // Calculates ReplayGain on a list of input files.
         // Uses the input list as a single album in album mode.
         private void CalculateReplayGain(List<string> inputFLACs) {
-            // Used partially in guesswork, pulls tag/file data from first .flac file
-            TagLib.File tempTagFile = TagLib.File.Create(inputFLACs[0]);
+            // Sort the inputFLACs
+            inputFLACs.Sort();
 
-            // Used to determine if files need upsampling for proper ReplayGain scanning
-            int highestSampleRate = tempTagFile.Properties.AudioSampleRate;
-            int highestBPS = tempTagFile.Properties.BitsPerSample;
-
-            // Find the highest BPS and samplerate in the input files
-            foreach (string currentFLAC in inputFLACs) {
-                TagLib.File tempLoopTagFile = TagLib.File.Create(currentFLAC);
-                TagLib.Ogg.XiphComment tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
-
-                if (tempLoopTagFile.Properties.AudioSampleRate > highestSampleRate) {
-                    highestSampleRate = tempLoopTagFile.Properties.AudioSampleRate;
-                }
-
-                if (tempLoopTagFile.Properties.BitsPerSample > highestBPS) {
-                    highestBPS = tempLoopTagFile.Properties.BitsPerSample;
-                }
-            }
-
-            // Determine if any of the files need to use flac.exe instead of Metaflac for ReplayGain
-            // Metaflac cannot handle differing sample rates (SoX resampled audio is different when converted to a different sample rate (but can still be losslessly changed back),
-            //     so calculated ReplayGain will not be the same), but flac.exe can do it.
-            // Metaflac *can* handle different bit depths (by lossless SoX bit-padding), but files that have previously gone through SoX use FLAC 1.3.1 anyway,
-            //     so we take the opportunity to re-encode with FLAC 1.3.2 and generate ReplayGain data at the same time.
-            // Metaflac's ReplayGain calculation process is about twice as fast as flac.exe's (it's not encoding at the same time), so we still want to use it when possible
-            // (There was a giant manual SoX pipe here. It's gone now.)
-            bool needsUpsample = false;
-            foreach (string currentFLAC in inputFLACs) {
-                TagLib.File tempLoopTagFile = TagLib.File.Create(currentFLAC);
-                TagLib.Ogg.XiphComment tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
-
-                // If file needs to be upsampled or bit-depth increased, set the overall "this batch needs upsampling" flag to true
-                if (tempLoopTagFile.Properties.BitsPerSample < highestBPS || tempLoopTagFile.Properties.AudioSampleRate < highestSampleRate) {
-                    needsUpsample = true;
-                }
-            }
-
-            // Initialize metaflac.exe
+            // Initialize bs1770gain.exe
             System.Diagnostics.Process replayGainProcess = new System.Diagnostics.Process();
-            replayGainProcess.StartInfo.FileName = Settings.Default.MetaFLACLocation;
+            // Only use the 64-bit version of bs1770gain on 64-bit systems
+            if (Environment.Is64BitOperatingSystem) {
+                replayGainProcess.StartInfo.FileName = @"Redist\bs1770gain64\bs1770gain.exe";
+            }
+            else {
+                replayGainProcess.StartInfo.FileName = @"Redist\bs1770gain86\bs1770gain.exe";
+            }
             replayGainProcess.StartInfo.UseShellExecute = false;
             replayGainProcess.StartInfo.CreateNoWindow = true;
 
-            // Strip replaygain from the files
-            // Add each input file onto the --remove-replay-gain command
-            replayGainProcess.StartInfo.Arguments = "--remove-replay-gain";
+            // Initialize commands onto bs1770gain
+            // --ebu: sets reference loudness to -23.00 dB
+            // -t: calculates true peaks
+            // --unit=dB: sets measurement unit to dB
+            // --format flac: force output format to flac (if this option isn't set, the presence of cover art will trigger an mkv container instead)
+            replayGainProcess.StartInfo.Arguments = "--ebu -t --unit=dB --format flac";
+            // Add each input file into the argument string
             foreach (string currentFLAC in inputFLACs) {
                 replayGainProcess.StartInfo.Arguments += " \"" + currentFLAC + "\"";
             }
-
+            
+            // Set the output directory to .\R128
+            replayGainProcess.StartInfo.Arguments += " -f \"" + Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt\"";
             // Start and wait
             replayGainProcess.Start();
             replayGainProcess.WaitForExit();
 
-            // If we are forced to use flac.exe
-            if (needsUpsample) {
-                // Initialize flac.exe and convert in place, using V8 compression and applying ReplayGain tags.
-                System.Diagnostics.Process flacProcess = new System.Diagnostics.Process();
-                flacProcess.StartInfo.FileName = Settings.Default.FLACLocation;
-                flacProcess.StartInfo.UseShellExecute = false;
-                flacProcess.StartInfo.CreateNoWindow = true;
+            // Read in the resultant text file
+            using (StreamReader reader = File.OpenText(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt")) {
+                // String to hold current parsed line
+                string line = "";
 
-                flacProcess.StartInfo.Arguments = "-f -V8 --replay-gain";
+                // Skip first line "analyzing ..."
+                reader.ReadLine();
+
+                // List to split up elements of a parsed line into
+                List<string> elements = new List<string>();
 
                 foreach (string currentFLAC in inputFLACs) {
-                    flacProcess.StartInfo.Arguments += " \"" + currentFLAC + "\"";
+                    // Tag containers for the input file
+                    TagLib.File originTagFile = TagLib.File.Create(currentFLAC);
+                    TagLib.Ogg.XiphComment originTagMap = (TagLib.Ogg.XiphComment)originTagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                    // Skip identifying track line.
+                    reader.ReadLine();
+                    // Read in first line (integrated)
+                    line = reader.ReadLine();
+                    // Separate elements based on whitespace
+                    elements.Clear();
+                    elements.AddRange(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
+                    // Copy relevant ReplayGain tags from the file we generated back into our original input file
+                    originTagMap.SetField("REPLAYGAIN_TRACK_GAIN", elements[4] + " dB");
+                    // Read in next line (true peak)
+                    line = reader.ReadLine();
+                    // Separate elements based on whitespace
+                    elements.Clear();
+                    elements.AddRange(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
+                    originTagMap.SetField("REPLAYGAIN_TRACK_PEAK", elements[5]);
+                    // We manually insert the correct reference loudness, which needs to be correct for Opus's RG calculation (matches other scanners' format as well)
+                    // Formula to get this number is "107 dB + Reference Loudness." In our case we are using EBU reference loudness which is -23.00 dB.
+                    originTagMap.SetField("REPLAYGAIN_REFERENCE_LOUDNESS", "84.00 dB");
+
+                    // Save changes to original file
+                    originTagFile.Save();
                 }
 
-                // Start and wait
-                flacProcess.Start();
-                flacProcess.WaitForExit();
+                // Variables to hold the parsed album gain and peak, as we're going to apply it to multiple files
+                double albumGain = 0;
+                double albumPeak = 0;
+
+                // Skip identifying "[ALBUM]:" line.
+                reader.ReadLine();
+                // Read in first line (integrated)
+                line = reader.ReadLine();
+                // Separate elements based on whitespace
+                elements.Clear();
+                elements.AddRange(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
+                // Set album gain variable
+                albumGain = double.Parse(elements[4]);
+                // Read in next line (true peak)
+                line = reader.ReadLine();
+                // Separate elements based on whitespace
+                elements.Clear();
+                elements.AddRange(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
+                // Set album peak variable
+                albumPeak = double.Parse(elements[5]);
+
+                foreach (string currentFLAC in inputFLACs) {
+                    // Tag containers for the input file
+                    TagLib.File originTagFile = TagLib.File.Create(currentFLAC);
+                    TagLib.Ogg.XiphComment originTagMap = (TagLib.Ogg.XiphComment)originTagFile.GetTag(TagLib.TagTypes.Xiph);
+
+                    // Copy relevant ReplayGain tags from the file we generated back into our original input file
+                    originTagMap.SetField("REPLAYGAIN_ALBUM_GAIN", albumGain.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + " dB");
+                    originTagMap.SetField("REPLAYGAIN_ALBUM_PEAK", albumPeak.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture));
+
+                    // Save changes to original file
+                    originTagFile.Save();
+                }
             }
-            // Else use Metaflac
-            else {
-                replayGainProcess.StartInfo.Arguments = "--add-replay-gain";
 
-                foreach (string currentFLAC in inputFLACs) {
-                    replayGainProcess.StartInfo.Arguments += " \"" + currentFLAC + "\"";
+            // Delete temporary directory and files within
+            if (File.Exists(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt")) {
+                try {
+                    File.Delete(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt");
                 }
-
-                // Start and wait
-                replayGainProcess.Start();
-                replayGainProcess.WaitForExit();
+                catch (IOException) {
+                    MessageBox.Show("TempReplayGainData.txt is open and cannot be deleted. Delete manually.");
+                }
             }
 
             return;
@@ -2194,7 +2206,7 @@ namespace MusicImportKit {
             }
 
             // Parallelized version, opens all at once and in random order
-            /*Parallel.ForEach(files, (currentFile) =>
+            /*Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFile) =>
             {
                 // Initialize spek.exe to generate spectrograms
                 System.Diagnostics.Process spekProcess = new System.Diagnostics.Process();
@@ -2305,7 +2317,7 @@ namespace MusicImportKit {
                 inputWAVs.AddRange(GetRecursiveFilesSafe(outputPath, "*.wav"));
 
                 // Parallel convert files
-                Parallel.ForEach(inputWAVs, (currentWAV) => {
+                Parallel.ForEach(inputWAVs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentWAV) => {
                     // Location of the output .flac file, by removing .wav and appending .flac
                     string outputFLAC = currentWAV.Substring(0, currentWAV.LastIndexOf(".wav")) + ".flac";
 
@@ -2378,24 +2390,6 @@ namespace MusicImportKit {
         }
 
         private void ConvertToComboBox_SelectedIndexChanged(object sender, EventArgs e) {
-            // Dynamic ReplayGain enable for FLAC, MP3, and Opus
-            // FLAC uses metaflac to generate ReplayGain data
-            // Opus converts the input FLAC's tags automatically (we metaflac the input FLACs before conversion if enabled)
-            // MP3 RG tags can be copied manually (we metaflac the input FLACs before conversion if enabled)
-            if (ConvertToComboBox.Text == "FLAC" || ConvertToComboBox.Text == "MP3" || ConvertToComboBox.Text == "Opus") {
-                // If metaflac.exe is found, enable ReplayGain
-                if (Settings.Default.MetaFLACLocation != "" && Settings.Default.FLACLocation != "") {
-                    ReplayGainCheckbox.Enabled = true;
-                    ReplayGainCheckbox.Text = "Apply ReplayGain";
-                }
-                // Otherwise, disable
-                else {
-                    ReplayGainCheckbox.Enabled = false;
-                    ReplayGainCheckbox.Checked = false;
-                    ReplayGainCheckbox.Text = "Apply ReplayGain (requires flac.exe and metaflac.exe)";
-                }
-            }
-
             // Clear presets
             PresetComboBox.Items.Clear();
 

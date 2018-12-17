@@ -55,12 +55,6 @@ namespace MusicImportKit
                 LameLocationTextBox.ForeColor = Color.Black;
             }
 
-            if (Settings.Default.MetaFLACLocation != "")
-            {
-                MetaFlacLocationTextBox.Text = Settings.Default.MetaFLACLocation;
-                MetaFlacLocationTextBox.ForeColor = Color.Black;
-            }
-
             if (Settings.Default.Mp3tagLocation != "")
             {
                 Mp3tagLocationTextBox.Text = Settings.Default.Mp3tagLocation;
@@ -187,26 +181,6 @@ namespace MusicImportKit
             {
                 LameLocationTextBox.Text = "lame.exe location";
                 LameLocationTextBox.ForeColor = SystemColors.GrayText;
-            }
-        }
-
-        private void MetaFlacLocationTextBox_Enter(object sender, EventArgs e)
-        {
-            // Text watermarking
-            if (MetaFlacLocationTextBox.Text == "metaflac.exe location")
-            {
-                MetaFlacLocationTextBox.Text = "";
-                MetaFlacLocationTextBox.ForeColor = Color.Black;
-            }
-        }
-
-        private void MetaFlacLocationTextBox_Leave(object sender, EventArgs e)
-        {
-            // Text watermarking
-            if (MetaFlacLocationTextBox.Text == "")
-            {
-                MetaFlacLocationTextBox.Text = "metaflac.exe location";
-                MetaFlacLocationTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
@@ -467,15 +441,6 @@ namespace MusicImportKit
                 Settings.Default.LAMELocation = "";
             }
 
-            if (File.Exists(MetaFlacLocationTextBox.Text))
-            {
-                Settings.Default.MetaFLACLocation = MetaFlacLocationTextBox.Text;
-            }
-            else
-            {
-                Settings.Default.MetaFLACLocation = "";
-            }
-
             if (File.Exists(Mp3tagLocationTextBox.Text))
             {
                 Settings.Default.Mp3tagLocation = Mp3tagLocationTextBox.Text;
@@ -683,24 +648,6 @@ namespace MusicImportKit
             {
                 LameLocationTextBox.Text = ofd.FileName;
                 LameLocationTextBox.ForeColor = Color.Black;
-            }
-        }
-
-        private void DefaultMetaFlacPathButton_Click(object sender, EventArgs e)
-        {
-            // File picker
-            OpenFileDialog ofd = new OpenFileDialog();
-            if (MetaFlacLocationTextBox.Text != "metaflac.exe location" && MetaFlacLocationTextBox.Text != "" && Directory.Exists(Directory.GetParent(MetaFlacLocationTextBox.Text).FullName))
-                ofd.InitialDirectory = Directory.GetParent(MetaFlacLocationTextBox.Text).FullName;
-            else
-                ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
-            ofd.DefaultExt = ".exe";
-            ofd.Filter = "metaflac.exe|metaflac.exe";
-            ofd.CheckFileExists = true;
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                MetaFlacLocationTextBox.Text = ofd.FileName;
-                MetaFlacLocationTextBox.ForeColor = Color.Black;
             }
         }
 

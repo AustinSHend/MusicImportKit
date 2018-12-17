@@ -12,7 +12,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Genuine LAME header info is preserved by exporting all tags from a .flac, decoding to .wav (destroying all tags in the process), encoding the .wav to .mp3 through LAME, and reapplying original tags to the .mp3 (including preserving unlimited custom tags through TXXX frame manipulation).
 
-* MetaFLAC-powered ReplayGain on all formats, including proper ReplayGain calculation on albums with varying bit-depths and sample-rates, and those that have been resampled or had their bit-depth reduced.
+* BS1770GAIN-powered ReplayGain data on all formats, using the ITU-R BS.1770 algorithm with EBU (-23 dB) reference loudness and true peak calculation.
 
 * Custom Excel exports for database keeping.
 
@@ -28,7 +28,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Impossible to make bad (Lossy->Lossless, Lossy->Lossy) transcodes, ensuring that data stays artifact-free.
 
-* Robust codebase, currently tested on **164** albums of all shapes and sizes (including a few [witch.house](https://i.imgur.com/lBUJZfz.png) albums for good measure). All features have been double and triple-checked against proper traditional methods to make sure the output files match.
+* Robust codebase, currently tested on **179** albums of all shapes and sizes (including a few [witch.house](https://i.imgur.com/lBUJZfz.png) albums for good measure). All features have been double and triple-checked against proper traditional methods to make sure the output files match.
 
 * All features operate as fast as possible while still maintaining proper output. This program will always trade speed for accuracy. Check "Necessary Limitations/Quirks" below for inconvenient aspects of that decision.
 
@@ -96,13 +96,9 @@ Designed for power users who take lineage and data integrity seriously. Integrat
     * Encode input .wavs to .flac
     * Re-encode input .flacs to .flac
     * Decode .flac to .wav, for feeding into LAME
-    * Backup ReplayGain calculator in worst case scenario (see "Necessary Limitations/Quirks" below)
 
 * [lame.exe](http://lame.sourceforge.net/) ([Unofficial binaries](http://rarewares.org/mp3-lame-bundle.php))
     * Convert .wav to .mp3 (automatically gets .wavs from flac.exe, which is also required for MP3 conversions)
-
-* [metaflac.exe](https://xiph.org/flac/)
-    * Primary ReplayGain calculator
 
 * [Mp3Tag.exe](https://www.mp3tag.de/en/) (I highly recommend pairing with [Grammartron](https://community.mp3tag.de/t/case-conversion/11684))
     * Opens the temp folder in Mp3Tag for tag editing
@@ -131,6 +127,4 @@ Designed for power users who take lineage and data integrity seriously. Integrat
     * Simpler methods of MP3 conversion (e.g. FFmpeg, which uses LAME as well) strip the LAME header info from the output MP3 and thus there is no (easy) way to tell if an unknown MP3 file that you find used LAME in its creation or an inferior tool (such as FhG). For being courteous to others (and our future selves), we take extra steps to preserve this data. Manual decoding to .wav and encoding to .mp3 is actually (~33%) faster than using an FFmpeg implementation, but destroys tags in the process so we handle that manually.
 
 * ReplayGain:
-    * MetaFLAC's ReplayGain implementation cannot be multithreaded and takes a *large* portion (~50%) of the conversion process time. Disable ReplayGain if you don't need it and speed is a priority.
-    * MetaFLAC cannot handle files of varying bit-depths and sample rates, so we calculate those using flac.exe instead. This adds some computation time as FLAC will actually be re-encoding the file while calculating the ReplayGain, but it doesn't add as much time as it would take to upsample/increase BPS of all files to match each other with SoX and then running MetaFLAC on them (previous solution). In addition, upsampling (sample rate) causes audio data to change and ReplayGain calculation will be affected (you can upsample and downsample losslessly through SoX, but while it's in a state of non-original sample rate the audio data is different).
-    * MetaFLAC and FLAC are both required for ReplayGain calculation. In most cases, FLAC will not be used at all.
+    * BS1770GAIN's ReplayGain implementation cannot be multithreaded and includes relatively intensive true peak calculation. This means ReplayGain calculation takes a frustratingly *large* portion (~70%) of the overall conversion process time. Disable ReplayGain if you don't need it or speed is a priority.

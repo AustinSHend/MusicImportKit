@@ -134,18 +134,6 @@ namespace MusicImportKit.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MetaFLACLocation {
-            get {
-                return ((string)(this["MetaFLACLocation"]));
-            }
-            set {
-                this["MetaFLACLocation"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Mp3tagLocation {
             get {
                 return ((string)(this["Mp3tagLocation"]));

@@ -29,9 +29,6 @@
     <Setting Name="FLACLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MetaFLACLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="Mp3tagLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

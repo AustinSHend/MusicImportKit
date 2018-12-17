@@ -34,7 +34,6 @@
             this.AADLocationTextBox = new System.Windows.Forms.TextBox();
             this.SpekLocationTextBox = new System.Windows.Forms.TextBox();
             this.FlacLocationTextBox = new System.Windows.Forms.TextBox();
-            this.MetaFlacLocationTextBox = new System.Windows.Forms.TextBox();
             this.SoxLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultTempFolderLocationTextBox = new System.Windows.Forms.TextBox();
             this.DefaultInputFolderLocationTextBox = new System.Windows.Forms.TextBox();
@@ -62,7 +61,6 @@
             this.DefaultAADPathButton = new System.Windows.Forms.Button();
             this.DefaultFlacPathButton = new System.Windows.Forms.Button();
             this.DefaultLamePathButton = new System.Windows.Forms.Button();
-            this.DefaultMetaFlacPathButton = new System.Windows.Forms.Button();
             this.DefaultMp3tagPathButton = new System.Windows.Forms.Button();
             this.DefaultOpusPathButton = new System.Windows.Forms.Button();
             this.DefaultSoxPathButton = new System.Windows.Forms.Button();
@@ -76,7 +74,7 @@
             // Mp3tagLocationTextBox
             // 
             this.Mp3tagLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.Mp3tagLocationTextBox.Location = new System.Drawing.Point(480, 116);
+            this.Mp3tagLocationTextBox.Location = new System.Drawing.Point(480, 91);
             this.Mp3tagLocationTextBox.Name = "Mp3tagLocationTextBox";
             this.Mp3tagLocationTextBox.Size = new System.Drawing.Size(373, 20);
             this.Mp3tagLocationTextBox.TabIndex = 30;
@@ -98,7 +96,7 @@
             // SpekLocationTextBox
             // 
             this.SpekLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SpekLocationTextBox.Location = new System.Drawing.Point(480, 194);
+            this.SpekLocationTextBox.Location = new System.Drawing.Point(480, 169);
             this.SpekLocationTextBox.Name = "SpekLocationTextBox";
             this.SpekLocationTextBox.Size = new System.Drawing.Size(373, 20);
             this.SpekLocationTextBox.TabIndex = 36;
@@ -117,21 +115,10 @@
             this.FlacLocationTextBox.Enter += new System.EventHandler(this.FlacLocationTextBox_Enter);
             this.FlacLocationTextBox.Leave += new System.EventHandler(this.FlacLocationTextBox_Leave);
             // 
-            // MetaFlacLocationTextBox
-            // 
-            this.MetaFlacLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.MetaFlacLocationTextBox.Location = new System.Drawing.Point(480, 90);
-            this.MetaFlacLocationTextBox.Name = "MetaFlacLocationTextBox";
-            this.MetaFlacLocationTextBox.Size = new System.Drawing.Size(373, 20);
-            this.MetaFlacLocationTextBox.TabIndex = 28;
-            this.MetaFlacLocationTextBox.Text = "metaflac.exe location";
-            this.MetaFlacLocationTextBox.Enter += new System.EventHandler(this.MetaFlacLocationTextBox_Enter);
-            this.MetaFlacLocationTextBox.Leave += new System.EventHandler(this.MetaFlacLocationTextBox_Leave);
-            // 
             // SoxLocationTextBox
             // 
             this.SoxLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SoxLocationTextBox.Location = new System.Drawing.Point(480, 168);
+            this.SoxLocationTextBox.Location = new System.Drawing.Point(480, 143);
             this.SoxLocationTextBox.Name = "SoxLocationTextBox";
             this.SoxLocationTextBox.Size = new System.Drawing.Size(373, 20);
             this.SoxLocationTextBox.TabIndex = 34;
@@ -341,7 +328,7 @@
             // OpusencLocationTextBox
             // 
             this.OpusencLocationTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.OpusencLocationTextBox.Location = new System.Drawing.Point(480, 142);
+            this.OpusencLocationTextBox.Location = new System.Drawing.Point(480, 117);
             this.OpusencLocationTextBox.Name = "OpusencLocationTextBox";
             this.OpusencLocationTextBox.Size = new System.Drawing.Size(373, 20);
             this.OpusencLocationTextBox.TabIndex = 32;
@@ -410,19 +397,9 @@
             this.DefaultLamePathButton.UseVisualStyleBackColor = true;
             this.DefaultLamePathButton.Click += new System.EventHandler(this.DefaultLamePathButton_Click);
             // 
-            // DefaultMetaFlacPathButton
-            // 
-            this.DefaultMetaFlacPathButton.Location = new System.Drawing.Point(859, 89);
-            this.DefaultMetaFlacPathButton.Name = "DefaultMetaFlacPathButton";
-            this.DefaultMetaFlacPathButton.Size = new System.Drawing.Size(83, 22);
-            this.DefaultMetaFlacPathButton.TabIndex = 29;
-            this.DefaultMetaFlacPathButton.Text = "Choose File";
-            this.DefaultMetaFlacPathButton.UseVisualStyleBackColor = true;
-            this.DefaultMetaFlacPathButton.Click += new System.EventHandler(this.DefaultMetaFlacPathButton_Click);
-            // 
             // DefaultMp3tagPathButton
             // 
-            this.DefaultMp3tagPathButton.Location = new System.Drawing.Point(859, 115);
+            this.DefaultMp3tagPathButton.Location = new System.Drawing.Point(859, 90);
             this.DefaultMp3tagPathButton.Name = "DefaultMp3tagPathButton";
             this.DefaultMp3tagPathButton.Size = new System.Drawing.Size(83, 22);
             this.DefaultMp3tagPathButton.TabIndex = 31;
@@ -432,7 +409,7 @@
             // 
             // DefaultOpusPathButton
             // 
-            this.DefaultOpusPathButton.Location = new System.Drawing.Point(859, 141);
+            this.DefaultOpusPathButton.Location = new System.Drawing.Point(859, 116);
             this.DefaultOpusPathButton.Name = "DefaultOpusPathButton";
             this.DefaultOpusPathButton.Size = new System.Drawing.Size(83, 22);
             this.DefaultOpusPathButton.TabIndex = 33;
@@ -442,7 +419,7 @@
             // 
             // DefaultSoxPathButton
             // 
-            this.DefaultSoxPathButton.Location = new System.Drawing.Point(859, 167);
+            this.DefaultSoxPathButton.Location = new System.Drawing.Point(859, 142);
             this.DefaultSoxPathButton.Name = "DefaultSoxPathButton";
             this.DefaultSoxPathButton.Size = new System.Drawing.Size(83, 22);
             this.DefaultSoxPathButton.TabIndex = 35;
@@ -452,7 +429,7 @@
             // 
             // DefaultSpekPathButton
             // 
-            this.DefaultSpekPathButton.Location = new System.Drawing.Point(859, 193);
+            this.DefaultSpekPathButton.Location = new System.Drawing.Point(859, 168);
             this.DefaultSpekPathButton.Name = "DefaultSpekPathButton";
             this.DefaultSpekPathButton.Size = new System.Drawing.Size(83, 22);
             this.DefaultSpekPathButton.TabIndex = 37;
@@ -517,7 +494,6 @@
             this.Controls.Add(this.DefaultSoxPathButton);
             this.Controls.Add(this.DefaultOpusPathButton);
             this.Controls.Add(this.DefaultMp3tagPathButton);
-            this.Controls.Add(this.DefaultMetaFlacPathButton);
             this.Controls.Add(this.DefaultLamePathButton);
             this.Controls.Add(this.DefaultFlacPathButton);
             this.Controls.Add(this.DefaultAADPathButton);
@@ -545,7 +521,6 @@
             this.Controls.Add(this.DefaultInputFolderLocationTextBox);
             this.Controls.Add(this.DefaultTempFolderLocationTextBox);
             this.Controls.Add(this.SoxLocationTextBox);
-            this.Controls.Add(this.MetaFlacLocationTextBox);
             this.Controls.Add(this.FlacLocationTextBox);
             this.Controls.Add(this.SpekLocationTextBox);
             this.Controls.Add(this.AADLocationTextBox);
@@ -567,7 +542,6 @@
         private System.Windows.Forms.TextBox AADLocationTextBox;
         private System.Windows.Forms.TextBox SpekLocationTextBox;
         private System.Windows.Forms.TextBox FlacLocationTextBox;
-        private System.Windows.Forms.TextBox MetaFlacLocationTextBox;
         private System.Windows.Forms.TextBox SoxLocationTextBox;
         private System.Windows.Forms.TextBox DefaultTempFolderLocationTextBox;
         private System.Windows.Forms.TextBox DefaultInputFolderLocationTextBox;
@@ -595,7 +569,6 @@
         private System.Windows.Forms.Button DefaultAADPathButton;
         private System.Windows.Forms.Button DefaultFlacPathButton;
         private System.Windows.Forms.Button DefaultLamePathButton;
-        private System.Windows.Forms.Button DefaultMetaFlacPathButton;
         private System.Windows.Forms.Button DefaultMp3tagPathButton;
         private System.Windows.Forms.Button DefaultOpusPathButton;
         private System.Windows.Forms.Button DefaultSoxPathButton;

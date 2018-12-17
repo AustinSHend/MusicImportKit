@@ -289,7 +289,6 @@
             // ReplayGainCheckbox
             // 
             this.ReplayGainCheckbox.AutoSize = true;
-            this.ReplayGainCheckbox.Enabled = false;
             this.ReplayGainCheckbox.Location = new System.Drawing.Point(12, 259);
             this.ReplayGainCheckbox.Name = "ReplayGainCheckbox";
             this.ReplayGainCheckbox.Size = new System.Drawing.Size(110, 17);
@@ -570,7 +569,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "MusicImportKit v2.1.8";
+            this.Text = "MusicImportKit v2.2.0";
             this.ResumeLayout(false);
             this.PerformLayout();
 
