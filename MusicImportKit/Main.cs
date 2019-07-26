@@ -13,9 +13,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 
-namespace MusicImportKit {
-    public partial class Main : Form {
-        public Main() {
+namespace MusicImportKit
+{
+    public partial class Main : Form
+    {
+        public Main()
+        {
             InitializeComponent();
 
             // Initialize user settings at program load
@@ -23,29 +26,36 @@ namespace MusicImportKit {
         }
 
         // Applies user settings and dynamically enables features
-        private void ApplyUserSettings() {
-            if (Settings.Default.DefaultInput != "") {
+        private void ApplyUserSettings()
+        {
+            if (Settings.Default.DefaultInput != "")
+            {
                 InputPathBox.Text = Settings.Default.DefaultInput;
                 InputPathBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 InputPathBox.Text = "Input Folder";
                 InputPathBox.ForeColor = SystemColors.GrayText;
             }
 
-            if (Settings.Default.DefaultTemp != "") {
+            if (Settings.Default.DefaultTemp != "")
+            {
                 TempPathBox.Text = Settings.Default.DefaultTemp;
                 TempPathBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 TempPathBox.Text = "Temp Folder";
                 TempPathBox.ForeColor = SystemColors.GrayText;
             }
 
-            if (Settings.Default.DefaultRedacted == true) {
+            if (Settings.Default.DefaultRedacted == true)
+            {
                 RedactedButton.Visible = true;
             }
-            else {
+            else
+            {
                 RedactedButton.Visible = false;
             }
 
@@ -55,55 +65,65 @@ namespace MusicImportKit {
             AlbumTextBox.Text = "Album";
             AlbumTextBox.ForeColor = SystemColors.GrayText;
 
-            if (Settings.Default.DefaultOutput != "") {
+            if (Settings.Default.DefaultOutput != "")
+            {
                 OutputPathTextBox.Text = Settings.Default.DefaultOutput;
                 OutputPathTextBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 OutputPathTextBox.Text = "Output Folder (base path)";
                 OutputPathTextBox.ForeColor = SystemColors.GrayText;
             }
 
-            if (Settings.Default.DefaultParse != "") {
+            if (Settings.Default.DefaultParse != "")
+            {
                 OutputNamingSyntaxTextBox.Text = Settings.Default.DefaultParse;
                 OutputNamingSyntaxTextBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 OutputNamingSyntaxTextBox.Text = "Output Folder+File Name (syntax in tooltip)";
                 OutputNamingSyntaxTextBox.ForeColor = SystemColors.GrayText;
             }
 
             ReplayGainCheckbox.Checked = Settings.Default.DefaultRG;
 
-            if (Settings.Default.DefaultSpecificFiletypeText != "") {
+            if (Settings.Default.DefaultSpecificFiletypeText != "")
+            {
                 CopyFileTypesTextBox.Text = Settings.Default.DefaultSpecificFiletypeText;
                 CopyFileTypesTextBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf";
                 CopyFileTypesTextBox.ForeColor = SystemColors.GrayText;
             }
 
             // Check specific file copy setting and enable or disable file types textbox with it
             CopyContentsCheckbox.Checked = Settings.Default.DefaultSpecificFiletypes;
-            if (CopyContentsCheckbox.Checked == true) {
+            if (CopyContentsCheckbox.Checked == true)
+            {
                 CopyFileTypesTextBox.Enabled = true;
                 RenameLogCueCheckbox.Enabled = true;
             }
-            else {
+            else
+            {
                 CopyFileTypesTextBox.Enabled = false;
                 RenameLogCueCheckbox.Enabled = false;
                 StripImageMetadataCheckbox.Enabled = false;
             }
 
-            if (Settings.Default.ExcelSheetLocation != "") {
+            if (Settings.Default.ExcelSheetLocation != "")
+            {
                 ExcelExportCheckbox.Checked = Settings.Default.DefaultExcelExport;
                 ExcelExportCheckbox.Enabled = true;
                 ExcelExportCheckbox.Text = "Append parsed data to Excel sheet";
                 ExcelLogScoreTextBox.Visible = true;
                 ExcelNotesTextBox.Visible = true;
             }
-            else {
+            else
+            {
                 ExcelExportCheckbox.Checked = false;
                 ExcelExportCheckbox.Enabled = false;
                 ExcelExportCheckbox.Text = "Append parsed data to Excel sheet (requires Excel sheet be set)";
@@ -117,30 +137,37 @@ namespace MusicImportKit {
             ConvertOpenFolderCheckbox.Checked = Settings.Default.DefaultFolderOpen;
 
             // Dynamically enable functionality based on available .exes
-            if (Settings.Default.AADLocation != "") {
+            if (Settings.Default.AADLocation != "")
+            {
                 AADButton.Enabled = true;
             }
-            else {
+            else
+            {
                 AADButton.Enabled = false;
             }
 
             StripImageMetadataCheckbox.Text = "Strip image metadata (bmp, gif, jpg, png) and compress .pngs";
-            if (CopyContentsCheckbox.Checked == true) {
+            if (CopyContentsCheckbox.Checked == true)
+            {
                 StripImageMetadataCheckbox.Enabled = true;
                 StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
             }
 
-            if (Settings.Default.Mp3tagLocation != "") {
+            if (Settings.Default.Mp3tagLocation != "")
+            {
                 Mp3tagButton.Enabled = true;
             }
-            else {
+            else
+            {
                 Mp3tagButton.Enabled = false;
             }
 
-            if (Settings.Default.SpekLocation != "") {
+            if (Settings.Default.SpekLocation != "")
+            {
                 SpectrogramsButton.Enabled = true;
             }
-            else {
+            else
+            {
                 SpectrogramsButton.Enabled = false;
             }
 
@@ -150,7 +177,8 @@ namespace MusicImportKit {
             PresetComboBox.Items.Clear();
 
             // Add FLAC entries if flac.exe detected
-            if (Settings.Default.FLACLocation != "") {
+            if (Settings.Default.FLACLocation != "")
+            {
                 AutoWavConvertCheckbox.Checked = Settings.Default.DefaultAutoWAVConvert;
                 AutoWavConvertCheckbox.Enabled = true;
                 AutoWavConvertCheckbox.Text = "Convert input .wav files to .flac";
@@ -159,20 +187,23 @@ namespace MusicImportKit {
                 PresetComboBox.Items.Add("Standard");
 
                 // SoX is required for proper downsampling and dithering
-                if (Settings.Default.SoXLocation != "") {
+                if (Settings.Default.SoXLocation != "")
+                {
                     PresetComboBox.Items.Add("Force 16-bit");
                     PresetComboBox.Items.Add("Force 44.1kHz/48kHz");
                     PresetComboBox.Items.Add("Force 16-bit and 44.1/48kHz");
                 }
             }
-            else {
+            else
+            {
                 AutoWavConvertCheckbox.Checked = false;
                 AutoWavConvertCheckbox.Enabled = false;
                 AutoWavConvertCheckbox.Text = "Convert input .wav files to .flac (requires flac.exe)";
             }
 
             // Add MP3 entries if lame.exe and flac.exe are detected
-            if (Settings.Default.LAMELocation != "" && Settings.Default.FLACLocation != "") {
+            if (Settings.Default.LAMELocation != "" && Settings.Default.FLACLocation != "")
+            {
                 ConvertToComboBox.Items.Add("MP3");
                 PresetComboBox.Items.Add("245kbps VBR (V0)");
                 PresetComboBox.Items.Add("225kbps VBR (V1)");
@@ -192,7 +223,8 @@ namespace MusicImportKit {
             }
 
             // Add Opus entries if opusenc.exe detected
-            if (Settings.Default.OpusLocation != "") {
+            if (Settings.Default.OpusLocation != "")
+            {
                 ConvertToComboBox.Items.Add("Opus");
                 PresetComboBox.Items.Add("192kbps VBR");
                 PresetComboBox.Items.Add("160kbps VBR");
@@ -203,7 +235,8 @@ namespace MusicImportKit {
             }
 
             // Set the user-preferred default
-            if (ConvertToComboBox.Items.Contains(Settings.Default.DefaultConvertFormat) && Settings.Default.DefaultConvertFormat != "") {
+            if (ConvertToComboBox.Items.Contains(Settings.Default.DefaultConvertFormat) && Settings.Default.DefaultConvertFormat != "")
+            {
                 // Set the comboboxes to the user's preference
                 ConvertToComboBox.Text = Settings.Default.DefaultConvertFormat;
                 PresetComboBox.Text = Settings.Default.DefaultConvertPreset;
@@ -211,8 +244,10 @@ namespace MusicImportKit {
         }
 
         // Used for cleaning a string of invalid file name characters
-        private string CleanString(string input, string ignoredChars = "") {
-            if (input == null) {
+        private string CleanString(string input, string ignoredChars = "")
+        {
+            if (input == null)
+            {
                 return input;
             }
 
@@ -221,18 +256,22 @@ namespace MusicImportKit {
             string fullWidthReplacements = "＼／：＊？＂＂＂＜＞｜";
 
             // For every character in first string
-            for (int i = 0; i < replaceableIllegalChars.Length; i++) {
+            for (int i = 0; i < replaceableIllegalChars.Length; i++)
+            {
                 // If the character is not ignored via parameter
-                if (!ignoredChars.Contains(replaceableIllegalChars[i])) {
+                if (!ignoredChars.Contains(replaceableIllegalChars[i]))
+                {
                     // Replace the character with its replacement in the input string
                     input = input.Replace(replaceableIllegalChars[i], fullWidthReplacements[i]);
                 }
             }
 
             // For each character that exists in the invalid file name chars string
-            foreach (char c in Path.GetInvalidFileNameChars()) {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
                 // If the character is not ignored via paramter
-                if (!ignoredChars.Contains(c)) {
+                if (!ignoredChars.Contains(c))
+                {
                     // Replace the illegal character with a '-'. Note that this runs after the initial fullwidth replacement so this will only catch characters we don't prettify
                     input = input.Replace(c, '-');
                 }
@@ -241,12 +280,14 @@ namespace MusicImportKit {
             return input;
         }
 
-        private string GetRealImageFormat (Stream inStream) {
+        private string GetRealImageFormat(Stream inStream)
+        {
             string realFormat = "";
 
             // Read first 4 bytes into header
             byte[] imageHeader = new byte[4];
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4; i++)
+            {
                 imageHeader[i] = (byte)inStream.ReadByte();
             }
 
@@ -255,19 +296,23 @@ namespace MusicImportKit {
 
 
             // If file has a magic BMP header ("BM")
-            if (imageHeader[0] == 0x42 && imageHeader[1] == 0x4d) {
+            if (imageHeader[0] == 0x42 && imageHeader[1] == 0x4d)
+            {
                 realFormat = "BMP";
             }
             // Else if file has a magic GIF header ("GIF")
-            else if (imageHeader[0] == 0x47 && imageHeader[1] == 0x49 && imageHeader[2] == 0x46) {
+            else if (imageHeader[0] == 0x47 && imageHeader[1] == 0x49 && imageHeader[2] == 0x46)
+            {
                 realFormat = "GIF";
             }
             // Else if file has a magic JPG/JPEG header ("ÿØ")
-            else if (imageHeader[0] == 0xff && imageHeader[1] == 0xd8) {
+            else if (imageHeader[0] == 0xff && imageHeader[1] == 0xd8)
+            {
                 realFormat = "JPG";
             }
             // Else if file has a magic PNG header (".PNG")
-            else if (imageHeader[0] == 0x89 && imageHeader[1] == 0x50 && imageHeader[2] == 0x4e && imageHeader[3] == 0x47) {
+            else if (imageHeader[0] == 0x89 && imageHeader[1] == 0x50 && imageHeader[2] == 0x4e && imageHeader[3] == 0x47)
+            {
                 realFormat = "PNG";
             }
 
@@ -275,14 +320,17 @@ namespace MusicImportKit {
         }
 
         // Compress and remove metadata from PNG files
-        private void CompressPng(string inputPNG, bool strip = false) {
+        private void CompressPng(string inputPNG, bool strip = false)
+        {
             // Initialize oxipng.exe and compress in place, stripping metadata on the way
             System.Diagnostics.Process oxiPngProcess = new System.Diagnostics.Process();
             // Only use the 64-bit version of oxipng on 64-bit systems
-            if (Environment.Is64BitOperatingSystem) {
+            if (Environment.Is64BitOperatingSystem)
+            {
                 oxiPngProcess.StartInfo.FileName = "Redist\\oxipng64.exe";
             }
-            else {
+            else
+            {
                 oxiPngProcess.StartInfo.FileName = "Redist\\oxipng86.exe";
             }
             oxiPngProcess.StartInfo.UseShellExecute = false;
@@ -291,7 +339,8 @@ namespace MusicImportKit {
             oxiPngProcess.StartInfo.Arguments = "-o 4";
 
             // If metadata stripping is enabled
-            if (strip) {
+            if (strip)
+            {
                 // Add argument to --strip safe (only strips metadata which will not impact viewing of the image)
                 oxiPngProcess.StartInfo.Arguments += " --strip safe";
             }
@@ -307,10 +356,12 @@ namespace MusicImportKit {
         }
 
         // Remove metadata from bmp/gif files
-        private void StripBmpGifMetadata(string inputFile) {
+        private void StripBmpGifMetadata(string inputFile)
+        {
             Bitmap tempBitmap = new Bitmap(inputFile);
             // For every property (metadata)
-            foreach (PropertyItem currentProperty in tempBitmap.PropertyItems) {
+            foreach (PropertyItem currentProperty in tempBitmap.PropertyItems)
+            {
                 // Initialize a temporary property
                 PropertyItem tempProperty = currentProperty;
                 // Nullify temporary property
@@ -330,14 +381,16 @@ namespace MusicImportKit {
         }
 
         // Remove EXIF data from jpg/jpeg files
-        private Stream StripJpegExif(Stream inStream, Stream outStream) {
+        private Stream StripJpegExif(Stream inStream, Stream outStream)
+        {
             // Read first 2 bytes into header (should be 0xff and 0xd8 aka magic jpeg header)
             byte[] jpegHeader = new byte[2];
             jpegHeader[0] = (byte)inStream.ReadByte();
             jpegHeader[1] = (byte)inStream.ReadByte();
 
             // If file has a magic jpeg header
-            if (jpegHeader[0] == 0xff && jpegHeader[1] == 0xd8) {
+            if (jpegHeader[0] == 0xff && jpegHeader[1] == 0xd8)
+            {
                 // Skip through its header section
                 SkipAppHeaders(inStream);
 
@@ -346,7 +399,8 @@ namespace MusicImportKit {
                 outStream.WriteByte(0xd8);
             }
             // Else if file is masquerading as a jpeg
-            else {
+            else
+            {
                 MessageBox.Show("False JPEG file detected. Make sure the file isn't another format renamed to .jpg/.jpeg.");
                 // Back up two bytes in stream in preparation to move the entire file to outStream
                 inStream.Position -= 2;
@@ -355,7 +409,8 @@ namespace MusicImportKit {
             // Copy the rest of the file's payload from inStream to outStream
             int readCount;
             byte[] readBuffer = new byte[4096];
-            while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0) {
+            while ((readCount = inStream.Read(readBuffer, 0, readBuffer.Length)) > 0)
+            {
                 outStream.Write(readBuffer, 0, readCount);
             }
 
@@ -363,14 +418,16 @@ namespace MusicImportKit {
         }
 
         // Helper function for StripJpegExif that skips all "APP" sections at the beginning of a JPEG file and returns control once it hits the payload
-        private void SkipAppHeaders(Stream inStream) {
+        private void SkipAppHeaders(Stream inStream)
+        {
             // Read next two bytes into header variable (should be 0xff and 0xe0 to denote the first (APP0) section)
             byte[] header = new byte[2];
             header[0] = (byte)inStream.ReadByte();
             header[1] = (byte)inStream.ReadByte();
 
             // While we're still in an APP section, skip forward until we're not (0xef denotes the last possible APP section)
-            while (header[0] == 0xff && header[1] >= 0xe0 && header[1] <= 0xef) {
+            while (header[0] == 0xff && header[1] >= 0xe0 && header[1] <= 0xef)
+            {
                 // Read next byte into appLength (contains data for the length of the current APP section)
                 int appLength = inStream.ReadByte();
 
@@ -393,7 +450,8 @@ namespace MusicImportKit {
         }
 
         // Strips metadata from images in the input list (and compresses .png files)
-        private void StripImages (List<string> inputFiles) {
+        private void StripImages(List<string> inputFiles)
+        {
             // List that contains pending images to be checked and moved
             List<string> pendingImages = new List<string>();
 
@@ -411,23 +469,29 @@ namespace MusicImportKit {
             List<string> pendingPNG = new List<string>();
 
             // For every file in pendingImages
-            foreach (string currentImage in pendingImages) {
+            foreach (string currentImage in pendingImages)
+            {
                 // Open input filestream (currentImage)
-                using (FileStream sourceIMGStream = File.Open(currentImage, FileMode.Open)) {
+                using (FileStream sourceIMGStream = File.Open(currentImage, FileMode.Open))
+                {
                     // Send it to GetRealImageFormat to determine its format by its magic header
                     string realFormat = GetRealImageFormat(sourceIMGStream);
 
                     // Depending on its realFormat, send it to appropriate list
-                    if (realFormat == "BMP") {
+                    if (realFormat == "BMP")
+                    {
                         pendingBMP.Add(currentImage);
                     }
-                    else if (realFormat == "GIF") {
+                    else if (realFormat == "GIF")
+                    {
                         pendingGIF.Add(currentImage);
                     }
-                    else if(realFormat == "JPG") {
+                    else if (realFormat == "JPG")
+                    {
                         pendingJPG.Add(currentImage);
                     }
-                    else if (realFormat == "PNG") {
+                    else if (realFormat == "PNG")
+                    {
                         pendingPNG.Add(currentImage);
                     }
                 }
@@ -440,7 +504,8 @@ namespace MusicImportKit {
                 string location = currentBMP;
 
                 // If the current file is a BMP but does not end with the right extension
-                if (!currentBMP.EndsWith(".bmp")) {
+                if (!currentBMP.EndsWith(".bmp"))
+                {
                     // Rename to correct extension
                     location = Path.GetDirectoryName(currentBMP) + "\\" + Path.GetFileNameWithoutExtension(currentBMP) + ".bmp";
                     File.Move(currentBMP, location);
@@ -457,7 +522,8 @@ namespace MusicImportKit {
                 string location = currentGIF;
 
                 // If the current file is a GIF but does not end with the right extension
-                if (!currentGIF.EndsWith(".gif")) {
+                if (!currentGIF.EndsWith(".gif"))
+                {
                     // Rename to correct extension
                     location = Path.GetDirectoryName(currentGIF) + "\\" + Path.GetFileNameWithoutExtension(currentGIF) + ".gif";
                     File.Move(currentGIF, location);
@@ -474,16 +540,19 @@ namespace MusicImportKit {
                 string location = currentJPG;
 
                 // If the current file is a JPG/JPEG but does not end with the right extension
-                if (!currentJPG.EndsWith(".jpg") && !currentJPG.EndsWith(".jpeg")) {
+                if (!currentJPG.EndsWith(".jpg") && !currentJPG.EndsWith(".jpeg"))
+                {
                     // Rename to correct extension
                     location = Path.GetDirectoryName(currentJPG) + "\\" + Path.GetFileNameWithoutExtension(currentJPG) + ".jpg";
                     File.Move(currentJPG, location);
                 }
 
                 // Open input filestream (currentImage)
-                using (FileStream sourceJPGStream = File.Open(location, FileMode.Open)) {
+                using (FileStream sourceJPGStream = File.Open(location, FileMode.Open))
+                {
                     // Open output filestream (currentImage + ".tmp")
-                    using (FileStream outputJPGStream = File.Open(location + ".tmp", FileMode.Create)) {
+                    using (FileStream outputJPGStream = File.Open(location + ".tmp", FileMode.Create))
+                    {
                         // Strip EXIF data from input filestream and feed it into output filestream
                         StripJpegExif(sourceJPGStream, outputJPGStream);
                     }
@@ -493,15 +562,17 @@ namespace MusicImportKit {
                 File.Delete(location);
                 File.Move(location + ".tmp", location);
             });
-            
+
             // For every image in pendingPNG
             // OxiPNG is already multi-threaded so we defer parallelization to it
-            foreach (string currentPNG in pendingPNG) {
+            foreach (string currentPNG in pendingPNG)
+            {
                 // String that holds the location of the PNG file. Will be modified if the file is renamed.
                 string location = currentPNG;
 
                 // If the current file is a PNG but does not end with the right extension
-                if (!currentPNG.EndsWith(".png")) {
+                if (!currentPNG.EndsWith(".png"))
+                {
                     // Rename to correct extension
                     location = Path.GetDirectoryName(currentPNG) + "\\" + Path.GetFileNameWithoutExtension(currentPNG) + ".png";
                     File.Move(currentPNG, location);
@@ -511,9 +582,10 @@ namespace MusicImportKit {
                 CompressPng(location, true);
             }
         }
-        
+
         // Adds information to the next available row in an Excel spreadsheet and sorts it
-        private void AddToExcel(string lastFolder, string excelLogScore, string excelNotes) {
+        private void AddToExcel(string lastFolder, string excelLogScore, string excelNotes)
+        {
             // Initialization for Excel functionality
             Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
             Workbook currentWorkbook = excel.Workbooks.Open(Settings.Default.ExcelSheetLocation);
@@ -526,10 +598,12 @@ namespace MusicImportKit {
             currentWorksheet.Cells[numRows + 1, 1] = lastFolder;
 
             // Check if log score and notes are empty before writing
-            if (excelLogScore != "Log score" && excelLogScore != "") {
+            if (excelLogScore != "Log score" && excelLogScore != "")
+            {
                 currentWorksheet.Cells[numRows + 1, 2] = excelLogScore;
             }
-            if (excelNotes != "Notes" && excelNotes != "") {
+            if (excelNotes != "Notes" && excelNotes != "")
+            {
                 currentWorksheet.Cells[numRows + 1, 3] = excelNotes;
             }
 
@@ -549,7 +623,8 @@ namespace MusicImportKit {
 
         // Renames .logs and .cues in an input file list to the standard naming scheme used by EAC (%artist% - %album%.log and %album%.cue)
         // Fails if there are multiple .logs or multiple .cues in the input list, as this means there are multiple discs in the album and we cannot determine what their ordering is
-        private void RenameLogCue (List<string> inputFiles, string outputFolder, string artist, string album) {
+        private void RenameLogCue(List<string> inputFiles, string outputFolder, string artist, string album)
+        {
             // Find .logs and .cues that were copied
             List<string> logList = new List<string>();
             logList.AddRange(inputFiles.FindAll(x => x.EndsWith(".log")));
@@ -557,24 +632,31 @@ namespace MusicImportKit {
             cueList.AddRange(inputFiles.FindAll(x => x.EndsWith(".cue")));
 
             // If there are 2 or more .cues/.logs in the output, alert the user to rename manually (not possible to detect which .cue is CD1/CD2/etc)
-            if (cueList.Count() >= 2 || logList.Count() >= 2) {
+            if (cueList.Count() >= 2 || logList.Count() >= 2)
+            {
                 MessageBox.Show("More than one .cue/.log file detected in output folder. Rename manually.");
                 // Opens output path in explorer
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
                     FileName = outputFolder,
                     UseShellExecute = true,
                 });
             }
-            else {
+            else
+            {
                 // If there's only one .cue, rename it (only if it's not already named properly)
-                if (cueList.Count() == 1 && !File.Exists(outputFolder + album + ".cue")) {
-                    if (File.Exists(cueList[0])) {
+                if (cueList.Count() == 1 && !File.Exists(outputFolder + album + ".cue"))
+                {
+                    if (File.Exists(cueList[0]))
+                    {
                         File.Move(cueList[0], outputFolder + album + ".cue");
                     }
                 }
                 // If there's only one .log, rename it (only if it's not already named properly)
-                if (logList.Count() == 1 && !File.Exists(outputFolder + artist + " - " + album + ".log")) {
-                    if (File.Exists(logList[0])) {
+                if (logList.Count() == 1 && !File.Exists(outputFolder + artist + " - " + album + ".log"))
+                {
+                    if (File.Exists(logList[0]))
+                    {
                         File.Move(logList[0], outputFolder + artist + " - " + album + ".log");
                     }
                 }
@@ -582,23 +664,28 @@ namespace MusicImportKit {
         }
 
         // Adds a "\" to the end of a path if it doesn't already have one
-        private string NormalizePath(string path) {
+        private string NormalizePath(string path)
+        {
             return path.EndsWith("\\") ? path : path + "\\";
         }
 
         // Gets a list of all non-system directories that are recursively nested under the input directory.
         // Mainly used as a helper function for GetRecursiveFilesSafe
-        private string[] GetRecursiveDirectoriesSafe(string initialPath) {
+        private string[] GetRecursiveDirectoriesSafe(string initialPath)
+        {
             // List to hold the directories we find for eventual return
             List<string> outputDirectories = new List<string>();
 
             // For each directory that's one level below us
-            foreach (string currentDir in Directory.GetDirectories(initialPath)) {
+            foreach (string currentDir in Directory.GetDirectories(initialPath))
+            {
                 // try; we're expecting errors if we run into illegal folders
-                try {
+                try
+                {
                     DirectoryInfo currentDirInfo = new DirectoryInfo(currentDir);
                     // If the file is not marked as a system folder (i.e. will throw errors) OR if the folder is a root folder. Root folders are technically system folders but they are safe to use
-                    if (!currentDirInfo.Attributes.HasFlag(FileAttributes.System) || currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName)) {
+                    if (!currentDirInfo.Attributes.HasFlag(FileAttributes.System) || currentDirInfo.Root.FullName.Equals(currentDirInfo.FullName))
+                    {
                         outputDirectories.AddRange(GetRecursiveDirectoriesSafe(currentDir));
                     }
                 }
@@ -613,7 +700,8 @@ namespace MusicImportKit {
         }
 
         // Gets a list of all files that are recursively nested under the input directory (ignoring restricted folders), and optionally allows filtering with second parameter
-        private string[] GetRecursiveFilesSafe(string initialPath, string searchPattern = "*.*") {
+        private string[] GetRecursiveFilesSafe(string initialPath, string searchPattern = "*.*")
+        {
             // Holds the eventual file list
             List<string> files = new List<string>();
             // Holds the eventual list of safe directories as determined by GetRecursiveDirectoriesSafe
@@ -623,7 +711,8 @@ namespace MusicImportKit {
             directories.AddRange(GetRecursiveDirectoriesSafe(initialPath));
 
             // For each directory in the safe directory list
-            foreach (string currentDir in directories) {
+            foreach (string currentDir in directories)
+            {
                 // Add all files within the directory to the file list, and searches with a user-specified pattern (default is "*.*")
                 files.AddRange(Directory.GetFiles(currentDir, searchPattern));
             }
@@ -633,14 +722,16 @@ namespace MusicImportKit {
 
         // Recursively copy a folder's contents into another folder. Selectively copies certain files if 3rd parameter is specified.
         // Fourth parameter prevents .flacs from being copied (for preventing overwriting of newly converted .flacs with the old .flacs)
-        private string[] RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "*.*", bool noFlac = false) {
+        private string[] RecursiveFolderCopy(string fromPath, string toPath, string specificFiletypeText = "*.*", bool noFlac = false)
+        {
             List<string> pendingFileTypes = new List<string>();
             string originalFiletypeText = specificFiletypeText;
 
             // List to hold all files created by this function (for returning)
             List<string> copiedFiles = new List<string>();
 
-            if (specificFiletypeText != "") {
+            if (specificFiletypeText != "")
+            {
                 // Convert common wildcards into regex
                 specificFiletypeText = specificFiletypeText.Replace(@".", @"\.");
                 specificFiletypeText = specificFiletypeText.Replace(@"*", @".*");
@@ -658,21 +749,26 @@ namespace MusicImportKit {
             // Create a list of pending files
             List<string> pendingFiles = Directory.GetFiles(fromPath).ToList();
 
-            if (noFlac) {
+            if (noFlac)
+            {
                 // Remove all .flacs from the pending files (presumed to be converted)
                 pendingFiles.RemoveAll(str => str.EndsWith(".flac"));
             }
 
             // For each file in the pending files
-            foreach (string currentFile in pendingFiles) {
+            foreach (string currentFile in pendingFiles)
+            {
                 FileInfo curFileInfo = new FileInfo(currentFile);
                 // If file is not going to be copied to itself
-                if (specificFiletypeText != "" && currentFile != toPath + curFileInfo.Name) {
+                if (specificFiletypeText != "" && currentFile != toPath + curFileInfo.Name)
+                {
                     // For every file type (e.g. *.jpg, *.png)
-                    foreach (string currentFileType in pendingFileTypes) {
+                    foreach (string currentFileType in pendingFileTypes)
+                    {
                         // Check if the file matches this file type via Regex
                         Match match = Regex.Match("^" + curFileInfo.Name + "$", currentFileType);
-                        if (match.Success && File.Exists(curFileInfo.FullName)) {
+                        if (match.Success && File.Exists(curFileInfo.FullName))
+                        {
                             // Creates a directory of toPath, inherently checks if it exists before creation
                             Directory.CreateDirectory(toPath);
                             File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
@@ -682,8 +778,10 @@ namespace MusicImportKit {
                     }
                 }
                 // If file is not going to be copied to itself
-                else if (currentFile != toPath + curFileInfo.Name) {
-                    if (File.Exists(curFileInfo.FullName)) {
+                else if (currentFile != toPath + curFileInfo.Name)
+                {
+                    if (File.Exists(curFileInfo.FullName))
+                    {
                         // Creates a directory of toPath, inherently checks if it exists before creation
                         Directory.CreateDirectory(toPath);
                         File.Copy(curFileInfo.FullName, toPath + curFileInfo.Name, true);
@@ -694,7 +792,8 @@ namespace MusicImportKit {
             }
 
             // Recurse each folder in the fromPath into this function again, so that they may create new folders and copy
-            foreach (string currentFolder in Directory.GetDirectories(fromPath)) {
+            foreach (string currentFolder in Directory.GetDirectories(fromPath))
+            {
                 DirectoryInfo curFolderInfo = new DirectoryInfo(currentFolder);
                 copiedFiles.AddRange(RecursiveFolderCopy(currentFolder, toPath + curFolderInfo.Name, originalFiletypeText, noFlac));
             }
@@ -703,7 +802,8 @@ namespace MusicImportKit {
         }
 
         // Parses custom syntax (e.g. %tag% and &codec&) and returns a string based on the metadata/tags of a file
-        private string ParseNamingSyntax(string syntax, string codec, string preset, string filename, int futureBPS = -1, int futureSampleRate = -1) {
+        private string ParseNamingSyntax(string syntax, string codec, string preset, string filename, int futureBPS = -1, int futureSampleRate = -1)
+        {
             string parsedString = "";
             string formattedString = "";
             int nextMarkerIndex = 0;
@@ -720,8 +820,10 @@ namespace MusicImportKit {
 
             // Prettier metadata to use for folder/filenames
             // MP3
-            if (codec == "MP3") {
-                switch (preset) {
+            if (codec == "MP3")
+            {
+                switch (preset)
+                {
                     case "245kbps VBR (V0)":
                         preset = "V0";
                         break;
@@ -770,8 +872,10 @@ namespace MusicImportKit {
                 }
             }
             // Opus
-            else if (codec == "Opus") {
-                switch (preset) {
+            else if (codec == "Opus")
+            {
+                switch (preset)
+                {
                     case "192kbps VBR":
                         preset = "192";
                         break;
@@ -794,9 +898,11 @@ namespace MusicImportKit {
             }
 
             // Move through the input string, matching syntax, pushing its equivalent into a formatted string, then deleting the matched portion of the original and loop
-            while (syntax.Length > 0) {
+            while (syntax.Length > 0)
+            {
                 // If we are at a % and there is a matching %
-                if (syntax[0] == '%' && syntax.IndexOf('%') != syntax.LastIndexOf('%')) {
+                if (syntax[0] == '%' && syntax.IndexOf('%') != syntax.LastIndexOf('%'))
+                {
                     // Find the matching percent marker, e.g. %artist"%"
                     nextMarkerIndex = syntax.IndexOf('%', 1);
 
@@ -810,87 +916,108 @@ namespace MusicImportKit {
                     syntax = syntax.Remove(0, nextMarkerIndex + 1);
                 }
                 // If we are at a & and there is a matching &
-                else if (syntax[0] == '&' && syntax.IndexOf('&') != syntax.LastIndexOf('&')) {
+                else if (syntax[0] == '&' && syntax.IndexOf('&') != syntax.LastIndexOf('&'))
+                {
                     // Find the matching ampersand, e.g. &codec"&"
                     nextMarkerIndex = syntax.IndexOf('&', 1);
 
                     // Bit-depth e.g. 16, 24
-                    if (syntax.Substring(1, nextMarkerIndex - 1) == "bps") {
+                    if (syntax.Substring(1, nextMarkerIndex - 1) == "bps")
+                    {
                         // Manual BPS insertion
-                        if (futureBPS != -1) {
+                        if (futureBPS != -1)
+                        {
                             formattedString += futureBPS;
                         }
-                        else {
+                        else
+                        {
                             formattedString += tagFile.Properties.BitsPerSample.ToString();
                         }
                     }
 
                     // Lossless smartbit, uses bit-depth + "-" + a short sample rate e.g. 16-44, 24-96
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "smartbit" && (codec == "FLAC")) {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "smartbit" && (codec == "FLAC"))
+                    {
                         // Manual BPS and sample rate insertion
-                        if (futureBPS != -1 && futureSampleRate != -1) {
+                        if (futureBPS != -1 && futureSampleRate != -1)
+                        {
                             formattedString += futureBPS + "-" + futureSampleRate.ToString().Substring(0, 2);
                         }
-                        else if (futureBPS != -1) {
+                        else if (futureBPS != -1)
+                        {
                             formattedString += futureBPS + "-" + tagFile.Properties.AudioSampleRate.ToString().Substring(0, 2);
                         }
-                        else if (futureSampleRate != -1) {
+                        else if (futureSampleRate != -1)
+                        {
                             formattedString += tagFile.Properties.BitsPerSample.ToString() + "-" + futureSampleRate;
                         }
-                        else {
+                        else
+                        {
                             formattedString += tagFile.Properties.BitsPerSample.ToString() + "-" + tagFile.Properties.AudioSampleRate.ToString().Substring(0, 2);
                         }
                     }
 
                     // Lossy smartbit, uses bitrate/preset e.g. 320
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "smartbit") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "smartbit")
+                    {
                         formattedString += preset;
                     }
 
                     // Sample rate e.g. 44100, 48000, 96000
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "samplerate") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "samplerate")
+                    {
                         // Manual sample rate insertion
-                        if (futureSampleRate != -1) {
+                        if (futureSampleRate != -1)
+                        {
                             formattedString += futureSampleRate;
                         }
-                        else {
+                        else
+                        {
                             formattedString += tagFile.Properties.AudioSampleRate.ToString();
                         }
                     }
 
                     // Shortened sample rate, e.g. 44, 48, 96
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "short-samplerate") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "short-samplerate")
+                    {
                         // Manual sample rate insertion
-                        if (futureSampleRate != -1) {
+                        if (futureSampleRate != -1)
+                        {
                             formattedString += futureSampleRate.ToString().Substring(0, 2);
                         }
-                        else {
+                        else
+                        {
                             formattedString += tagFile.Properties.AudioSampleRate.ToString().Substring(0, 2);
                         }
                     }
 
                     // Codec
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "codec") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "codec")
+                    {
                         formattedString += codec;
                     }
 
                     // Bitrate
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "bitrate") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "bitrate")
+                    {
                         formattedString += preset;
                     }
 
                     // Padded track number logic
-                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "paddedtracknumber") {
+                    else if (syntax.Substring(1, nextMarkerIndex - 1).ToLower() == "paddedtracknumber")
+                    {
                         // Retrieve parsed tag from the file, and clean it of illegal characters on the way
                         parsedString = CleanString(tagMap.GetFirstField("tracknumber"));
 
                         // Pad the track number if it's 1-9
-                        if (Int32.Parse(parsedString) >= 1 && Int32.Parse(parsedString) <= 9) {
+                        if (Int32.Parse(parsedString) >= 1 && Int32.Parse(parsedString) <= 9)
+                        {
                             parsedString = parsedString.TrimStart('0').Insert(0, "0");
                         }
 
                         // If 0, set to 00
-                        else if (Int32.Parse(parsedString) == 0) {
+                        else if (Int32.Parse(parsedString) == 0)
+                        {
                             parsedString = "00";
                         }
 
@@ -900,8 +1027,10 @@ namespace MusicImportKit {
                     // Remove the matched portion from the input string
                     syntax = syntax.Remove(0, nextMarkerIndex + 1);
                 }
-                else {
-                    if (syntax[0] == '\\') {
+                else
+                {
+                    if (syntax[0] == '\\')
+                    {
                         // Remove spaces and periods from the end of a folder name; not allowed
                         formattedString = formattedString.TrimEnd(' ', '.');
                     }
@@ -917,7 +1046,8 @@ namespace MusicImportKit {
 
         // For a given list of input FLACs, convert them to a certain codec (FLAC, MP3, etc.) in a specific preset (16-bit resample, 192kbps, V0, etc.)
         // Returns a list of output files
-        private List<string> ConvertToFormat(List<string> inputFLACs, string outputPath, string syntax, string codec, string preset) {
+        private List<string> ConvertToFormat(List<string> inputFLACs, string outputPath, string syntax, string codec, string preset)
+        {
             // Future lists of resultant output files. Note that this list will be randomly ordered due to parallelization.
             List<string> outputFiles = new List<string>();
 
@@ -932,43 +1062,51 @@ namespace MusicImportKit {
             int highestBaseSampleRate = 0;
 
             // Find the highest BPS and samplerate in the input files
-            foreach (string currentFLAC in inputFLACs) {
+            foreach (string currentFLAC in inputFLACs)
+            {
                 TagLib.File tempLoopTagFile = TagLib.File.Create(currentFLAC);
                 TagLib.Ogg.XiphComment tempLoopTagMap = (TagLib.Ogg.XiphComment)tempLoopTagFile.GetTag(TagLib.TagTypes.Xiph);
 
-                if (tempLoopTagFile.Properties.AudioSampleRate > highestSampleRate) {
+                if (tempLoopTagFile.Properties.AudioSampleRate > highestSampleRate)
+                {
                     highestSampleRate = tempLoopTagFile.Properties.AudioSampleRate;
                 }
 
-                if (tempLoopTagFile.Properties.BitsPerSample > highestBPS) {
+                if (tempLoopTagFile.Properties.BitsPerSample > highestBPS)
+                {
                     highestBPS = tempLoopTagFile.Properties.BitsPerSample;
                 }
             }
 
             // Holds the highest base sample rate, aka 44100 for CD audio or 48000 for digital
             // This will result in 48000 for 192kHz, 44100 for 88.2kHz etc.
-            if (highestSampleRate % 44100 == 0) {
+            if (highestSampleRate % 44100 == 0)
+            {
                 highestBaseSampleRate = 44100;
             }
-            else if (highestSampleRate % 48000 == 0) {
+            else if (highestSampleRate % 48000 == 0)
+            {
                 highestBaseSampleRate = 48000;
             }
 
             // Normalizes the outputPath for consistency
             NormalizePath(outputPath);
             // FLAC Conversion
-            if (codec == "FLAC") {
+            if (codec == "FLAC")
+            {
                 // Initialize a variable for input into ParseNamingSyntax, disambiguating output
                 int futureBPS = highestBPS;
                 // If other files are going to reduce bit depth, change the futureBPS accordingly
-                if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz") {
+                if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz")
+                {
                     futureBPS = 16;
                 }
 
                 // Initialize a variable for input into ParseNamingSyntax, disambiguating output
                 int futureSampleRate = highestSampleRate;
                 // If other files are going to resample, change the futureSampleRate accordingly
-                if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz") {
+                if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz")
+                {
                     futureSampleRate = highestBaseSampleRate;
                 }
 
@@ -980,12 +1118,14 @@ namespace MusicImportKit {
 
                     // If bit depth reduction/resampling is selected and the file actually needs it
                     if ((preset == "Force 16-bit" || preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz")
-                                    && (tagFile.Properties.BitsPerSample >= 24 || (tagFile.Properties.AudioSampleRate != 44100 && tagFile.Properties.AudioSampleRate != 48000))) {
+                                    && (tagFile.Properties.BitsPerSample >= 24 || (tagFile.Properties.AudioSampleRate != 44100 && tagFile.Properties.AudioSampleRate != 48000)))
+                    {
                         // Set up parse strings, faking futureBPS and futureSampleRate to the function
                         string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, futureBPS, futureSampleRate);
                         string parsedFolderSyntax = "";
                         // If the path denotes there is a folder
-                        if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                        if (parsedFileSyntax.LastIndexOf('\\') != -1)
+                        {
                             parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
                         }
 
@@ -1004,7 +1144,8 @@ namespace MusicImportKit {
                         // Add intial arguments to SoX (guarding)
                         soxProcess.StartInfo.Arguments = "\"" + currentFLAC + "\" -G";
 
-                        if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz") {
+                        if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz")
+                        {
                             soxProcess.StartInfo.Arguments += " -b 16";
                         }
 
@@ -1012,16 +1153,20 @@ namespace MusicImportKit {
                         soxProcess.StartInfo.Arguments += " \"" + outputFile + "\" rate -v -L";
 
                         // Add resampling arguments to SoX, depending on their base sample rate
-                        if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz") {
-                            if (tagFile.Properties.AudioSampleRate % 44100 == 0) {
+                        if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz")
+                        {
+                            if (tagFile.Properties.AudioSampleRate % 44100 == 0)
+                            {
                                 soxProcess.StartInfo.Arguments += " 44100";
                             }
-                            else if (tagFile.Properties.AudioSampleRate % 48000 == 0) {
+                            else if (tagFile.Properties.AudioSampleRate % 48000 == 0)
+                            {
                                 soxProcess.StartInfo.Arguments += " 48000";
                             }
                         }
                         // If we're only reducing bit depth, specify the audio sample rate to use
-                        else if (preset == "Force 16-bit") {
+                        else if (preset == "Force 16-bit")
+                        {
                             soxProcess.StartInfo.Arguments += " " + tagFile.Properties.AudioSampleRate.ToString();
                         }
 
@@ -1035,7 +1180,8 @@ namespace MusicImportKit {
                         // If SoX did not complete sucessfully, begin a workaround
                         // This section copies the file into %temp% and uses a guid as a filename, creating a totally safe file path+name for SoX to use
                         // SoX throws errors on both high ASCII filenames and filepaths, meaning even a containing folder with high ASCII will cause SoX to fail
-                        if (!File.Exists(Path.GetDirectoryName(currentFLAC) + "\\" + Path.GetFileNameWithoutExtension(currentFLAC) + "downsampled" + ".flac")) {
+                        if (!File.Exists(Path.GetDirectoryName(currentFLAC) + "\\" + Path.GetFileNameWithoutExtension(currentFLAC) + "downsampled" + ".flac"))
+                        {
                             // Used so Sox doesn't throw errors at wacky filenames
                             // Temp path + random guid string + .flac. Used to create a safe filename for SoX to use
                             string soxSafeName = Path.GetTempPath() + "SoXTemp\\" + Guid.NewGuid().ToString() + ".flac";
@@ -1046,14 +1192,16 @@ namespace MusicImportKit {
                             Directory.CreateDirectory(Path.GetTempPath() + "SoXTemp\\");
 
                             // Copy input FLAC into the soxSafeName position
-                            if (File.Exists(currentFLAC)) {
+                            if (File.Exists(currentFLAC))
+                            {
                                 File.Copy(currentFLAC, soxSafeName);
                             }
 
                             // Add intial arguments to SoX (guarding)
                             soxProcess.StartInfo.Arguments = "\"" + soxSafeName + "\" -G";
 
-                            if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz") {
+                            if (preset == "Force 16-bit" || preset == "Force 16-bit and 44.1/48kHz")
+                            {
                                 soxProcess.StartInfo.Arguments += " -b 16";
                             }
 
@@ -1061,16 +1209,20 @@ namespace MusicImportKit {
                             soxProcess.StartInfo.Arguments += " \"" + outputFile + "\" rate -v -L";
 
                             // Add resampling arguments to SoX, depending on their base sample rate
-                            if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz") {
-                                if (tagFile.Properties.AudioSampleRate % 44100 == 0) {
+                            if (preset == "Force 44.1kHz/48kHz" || preset == "Force 16-bit and 44.1/48kHz")
+                            {
+                                if (tagFile.Properties.AudioSampleRate % 44100 == 0)
+                                {
                                     soxProcess.StartInfo.Arguments += " 44100";
                                 }
-                                else if (tagFile.Properties.AudioSampleRate % 48000 == 0) {
+                                else if (tagFile.Properties.AudioSampleRate % 48000 == 0)
+                                {
                                     soxProcess.StartInfo.Arguments += " 48000";
                                 }
                             }
                             // If we're only reducing bit depth, specify the audio sample rate to use
-                            else if (preset == "Force 16-bit") {
+                            else if (preset == "Force 16-bit")
+                            {
                                 soxProcess.StartInfo.Arguments += " " + tagFile.Properties.AudioSampleRate.ToString();
                             }
 
@@ -1082,7 +1234,8 @@ namespace MusicImportKit {
                             soxProcess.WaitForExit();
 
                             // Remove non-downsampled file
-                            if (File.Exists(soxSafeName)) {
+                            if (File.Exists(soxSafeName))
+                            {
                                 File.Delete(soxSafeName);
                             }
                         }
@@ -1090,9 +1243,11 @@ namespace MusicImportKit {
                         // Create a directory to move the file to
                         Directory.CreateDirectory(outputPath + parsedFolderSyntax);
                         // Move the output downsampled file to the standard output directory, renaming in the process
-                        if (File.Exists(outputFile)) {
+                        if (File.Exists(outputFile))
+                        {
                             // Delete file if it already exists. Combined with below command simulates an overwrite
-                            if (File.Exists(outputPath + parsedFileSyntax + ".flac")) {
+                            if (File.Exists(outputPath + parsedFileSyntax + ".flac"))
+                            {
                                 File.Delete(outputPath + parsedFileSyntax + ".flac");
                             }
 
@@ -1100,7 +1255,8 @@ namespace MusicImportKit {
                         }
 
                         // Remove temp directory if it exists and is empty
-                        if (Directory.Exists(Path.GetTempPath() + "SoXTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "SoXTemp\\").Count() == 0) {
+                        if (Directory.Exists(Path.GetTempPath() + "SoXTemp\\") && GetRecursiveFilesSafe(Path.GetTempPath() + "SoXTemp\\").Count() == 0)
+                        {
                             Directory.Delete(Path.GetTempPath() + "SoXTemp\\");
                         }
 
@@ -1108,12 +1264,14 @@ namespace MusicImportKit {
                         outputFiles.Add(outputPath + parsedFileSyntax + ".flac");
                     }
                     // Plain FLAC re-encoding if bit depth reduction/resampling is not selected or not needed
-                    else {
+                    else
+                    {
                         // Set up parse strings, faking futureBPS and futureSampleRate to the function
                         string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC, futureBPS, futureSampleRate);
                         string parsedFolderSyntax = "";
                         // If the path denotes there is a folder
-                        if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                        if (parsedFileSyntax.LastIndexOf('\\') != -1)
+                        {
                             parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
                         }
 
@@ -1141,7 +1299,8 @@ namespace MusicImportKit {
             }
 
             // MP3 Conversion
-            else if (codec == "MP3") {
+            else if (codec == "MP3")
+            {
                 Parallel.ForEach(inputFLACs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFLAC) => {
                     // Get a tagmap of the current file
                     TagLib.File tagFile = TagLib.File.Create(currentFLAC);
@@ -1151,7 +1310,8 @@ namespace MusicImportKit {
                     string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC);
                     string parsedFolderSyntax = "";
                     // If the path denotes there is a folder
-                    if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                    if (parsedFileSyntax.LastIndexOf('\\') != -1)
+                    {
                         parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
                     }
 
@@ -1165,7 +1325,8 @@ namespace MusicImportKit {
                     // Get all tags from input .flac and store them
                     List<string> pendingTagNames = new List<string>();
                     List<string> pendingTagData = new List<string>();
-                    foreach (string currentField in tagMap) {
+                    foreach (string currentField in tagMap)
+                    {
                         pendingTagNames.Add(currentField);
                         pendingTagData.Add(tagMap.GetFirstField(currentField));
                     }
@@ -1178,7 +1339,6 @@ namespace MusicImportKit {
 
                     // Add arguments to decode FLAC to WAV
                     deflacProcess.StartInfo.Arguments = "-d \"" + currentFLAC + "\" -o \"" + outputWAV + "\"";
-
 
                     // Start and wait
                     deflacProcess.Start();
@@ -1194,7 +1354,8 @@ namespace MusicImportKit {
                     lameProcess.StartInfo.Arguments = "-h";
 
                     // Determine which preset to use
-                    switch (preset) {
+                    switch (preset)
+                    {
                         case "245kbps VBR (V0)":
                             lameProcess.StartInfo.Arguments += " -V 0";
                             break;
@@ -1250,7 +1411,8 @@ namespace MusicImportKit {
                     lameProcess.WaitForExit();
 
                     // Remove .wav files
-                    if (File.Exists(outputWAV)) {
+                    if (File.Exists(outputWAV))
+                    {
                         File.Delete(outputWAV);
                     }
 
@@ -1268,9 +1430,11 @@ namespace MusicImportKit {
                     List<string> performerList = new List<string>();
 
                     // Migrate standard tags from the flac's taglist to the mp3's tag map
-                    for (int i = 0; i < pendingTagNames.Count(); i++) {
+                    for (int i = 0; i < pendingTagNames.Count(); i++)
+                    {
                         // Determine what the current tag should be mapped to
-                        switch (pendingTagNames[i].ToLower()) {
+                        switch (pendingTagNames[i].ToLower())
+                        {
                             case "album":
                                 outputTagFile.Tag.Album = pendingTagData[i];
                                 break;
@@ -1380,7 +1544,8 @@ namespace MusicImportKit {
                     }
 
                     // Migrate pictures from .flac to .mp3
-                    if (tagFile.Tag.Pictures != null) {
+                    if (tagFile.Tag.Pictures != null)
+                    {
                         outputTagFile.Tag.Pictures = tagFile.Tag.Pictures;
                     }
 
@@ -1396,12 +1561,14 @@ namespace MusicImportKit {
             }
 
             // Opus Conversion
-            else if (codec == "Opus") {
+            else if (codec == "Opus")
+            {
                 Parallel.ForEach(inputFLACs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (currentFLAC) => {
                     string parsedFileSyntax = ParseNamingSyntax(syntax, codec, preset, currentFLAC);
                     string parsedFolderSyntax = "";
                     // If the path denotes there is a folder
-                    if (parsedFileSyntax.LastIndexOf('\\') != -1) {
+                    if (parsedFileSyntax.LastIndexOf('\\') != -1)
+                    {
                         parsedFolderSyntax = parsedFileSyntax.Substring(0, parsedFileSyntax.LastIndexOf('\\'));
                     }
 
@@ -1420,7 +1587,8 @@ namespace MusicImportKit {
                     opusProcess.StartInfo.Arguments = "--quiet";
 
                     // Determine which preset to use
-                    switch (preset) {
+                    switch (preset)
+                    {
                         case "192kbps VBR":
                             opusProcess.StartInfo.Arguments += " --bitrate 192 --vbr";
                             break;
@@ -1458,17 +1626,20 @@ namespace MusicImportKit {
 
         // Calculates ReplayGain on a list of input files.
         // Uses the input list as a single album in album mode.
-        private void CalculateReplayGain(List<string> inputFLACs) {
+        private void CalculateReplayGain(List<string> inputFLACs)
+        {
             // Sort the inputFLACs
             inputFLACs.Sort();
 
             // Initialize bs1770gain.exe
             System.Diagnostics.Process replayGainProcess = new System.Diagnostics.Process();
             // Only use the 64-bit version of bs1770gain on 64-bit systems
-            if (Environment.Is64BitOperatingSystem) {
+            if (Environment.Is64BitOperatingSystem)
+            {
                 replayGainProcess.StartInfo.FileName = @"Redist\bs1770gain64\bs1770gain.exe";
             }
-            else {
+            else
+            {
                 replayGainProcess.StartInfo.FileName = @"Redist\bs1770gain86\bs1770gain.exe";
             }
             replayGainProcess.StartInfo.UseShellExecute = false;
@@ -1481,10 +1652,11 @@ namespace MusicImportKit {
             // --format flac: force output format to flac (if this option isn't set, the presence of cover art will trigger an mkv container instead)
             replayGainProcess.StartInfo.Arguments = "--ebu -t --unit=dB --format flac";
             // Add each input file into the argument string
-            foreach (string currentFLAC in inputFLACs) {
+            foreach (string currentFLAC in inputFLACs)
+            {
                 replayGainProcess.StartInfo.Arguments += " \"" + currentFLAC + "\"";
             }
-            
+
             // Set the output directory to .\R128
             replayGainProcess.StartInfo.Arguments += " -f \"" + Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt\"";
             // Start and wait
@@ -1492,7 +1664,8 @@ namespace MusicImportKit {
             replayGainProcess.WaitForExit();
 
             // Read in the resultant text file
-            using (StreamReader reader = File.OpenText(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt")) {
+            using (StreamReader reader = File.OpenText(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt"))
+            {
                 // String to hold current parsed line
                 string line = "";
 
@@ -1502,7 +1675,8 @@ namespace MusicImportKit {
                 // List to split up elements of a parsed line into
                 List<string> elements = new List<string>();
 
-                foreach (string currentFLAC in inputFLACs) {
+                foreach (string currentFLAC in inputFLACs)
+                {
                     // Tag containers for the input file
                     TagLib.File originTagFile = TagLib.File.Create(currentFLAC);
                     TagLib.Ogg.XiphComment originTagMap = (TagLib.Ogg.XiphComment)originTagFile.GetTag(TagLib.TagTypes.Xiph);
@@ -1551,7 +1725,8 @@ namespace MusicImportKit {
                 // Set album peak variable
                 albumPeak = double.Parse(elements[5]);
 
-                foreach (string currentFLAC in inputFLACs) {
+                foreach (string currentFLAC in inputFLACs)
+                {
                     // Tag containers for the input file
                     TagLib.File originTagFile = TagLib.File.Create(currentFLAC);
                     TagLib.Ogg.XiphComment originTagMap = (TagLib.Ogg.XiphComment)originTagFile.GetTag(TagLib.TagTypes.Xiph);
@@ -1566,11 +1741,14 @@ namespace MusicImportKit {
             }
 
             // Delete temporary directory and files within
-            if (File.Exists(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt")) {
-                try {
+            if (File.Exists(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt"))
+            {
+                try
+                {
                     File.Delete(Path.GetDirectoryName(inputFLACs[0]) + "\\TempReplayGainData.txt");
                 }
-                catch (IOException) {
+                catch (IOException)
+                {
                     MessageBox.Show("TempReplayGainData.txt is open and cannot be deleted. Delete manually.");
                 }
             }
@@ -1579,7 +1757,8 @@ namespace MusicImportKit {
         }
 
         // Conversion work
-        private void ConvertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        private void ConvertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             // Arguments passed into the worker
             List<object> inputArguments = e.Argument as List<object>;
             string inputPath = (string)inputArguments[0];
@@ -1603,31 +1782,37 @@ namespace MusicImportKit {
             List<string> inputFLACs = new List<string>();
             inputFLACs.AddRange(GetRecursiveFilesSafe(tempPath, "*.flac"));
 
+            if (inputFLACs.Count() == 0)
+            {
+                MessageBox.Show("No valid files to convert.");
+                e.Cancel = true;
+                return;
+            }
+
             // Future list of output files
             List<string> outputFiles = new List<string>();
 
             // Future list of copied files (if enabled)
             List<string> copiedFiles = new List<string>();
 
-            if (inputFLACs.Count() == 0) {
-                MessageBox.Show("No valid files to convert.");
-                return;
-            }
-
             // If the codec is FLAC, calculate ReplayGain after we convert.
             // Resampling and reducing bit depth will affect audio data and thus ReplayGain, so it needs to be calculated afterwards
-            if (codecInput == "FLAC") {
+            if (codecInput == "FLAC")
+            {
                 // Send the necessary info to the conversion function and get back a list of converted files
                 outputFiles = ConvertToFormat(inputFLACs, outputPath, syntaxInput, codecInput, presetInput);
 
-                if (RGEnabled) {
+                if (RGEnabled)
+                {
                     CalculateReplayGain(outputFiles);
                 }
             }
             // Else if a file is lossy, calculate ReplayGain before we convert.
             // MP3 and Opus both use their parent FLAC's ReplayGain data to calculate their own ReplayGain so it needs to be calculated for the parent before conversion
-            else {
-                if (RGEnabled) {
+            else
+            {
+                if (RGEnabled)
+                {
                     CalculateReplayGain(inputFLACs);
                 }
 
@@ -1648,55 +1833,69 @@ namespace MusicImportKit {
             string album = "";
 
             // Gets albumartist (or artist if albumartist is missing) and album off of first file and store in a string for later use
-            if (tempTagMap.GetFirstField("albumartist") != null) {
+            if (tempTagMap.GetFirstField("albumartist") != null)
+            {
                 artist = CleanString(tempTagMap.GetFirstField("albumartist"));
             }
-            else if (tempTagMap.GetFirstField("album artist") != null) {
+            else if (tempTagMap.GetFirstField("album artist") != null)
+            {
                 artist = CleanString(tempTagMap.GetFirstField("album artist"));
             }
-            else if (tempTagMap.GetFirstField("artist") != null) {
+            else if (tempTagMap.GetFirstField("artist") != null)
+            {
                 artist = CleanString(tempTagMap.GetFirstField("artist"));
             }
 
-            if (tempTagMap.GetFirstField("album") != null) {
+            if (tempTagMap.GetFirstField("album") != null)
+            {
                 album = CleanString(tempTagMap.GetFirstField("album"));
             }
 
             // If copying files is enabled
-            if (copyFileTypesEnabled == true) {
+            if (copyFileTypesEnabled == true)
+            {
                 // If the copy syntax isn't default or empty
-                if (copyFileTypes != "e.g. *.jpg; *.log; *.cue; *.pdf" && copyFileTypes != "") {
+                if (copyFileTypes != "e.g. *.jpg; *.log; *.cue; *.pdf" && copyFileTypes != "")
+                {
                     // Begin recursive copy function
                     copiedFiles.AddRange(RecursiveFolderCopy(tempPath, outputFolder, copyFileTypes, true));
                 }
-                else {
+                else
+                {
                     MessageBox.Show("Copy files enabled but no filetypes specified.");
                 }
             }
 
-            if (renameLogCueEnabled == true) {
+            if (renameLogCueEnabled == true)
+            {
                 RenameLogCue(copiedFiles, outputFolder, artist, album);
             }
 
-            if (stripImagesEnabled == true) {
+            if (stripImagesEnabled == true)
+            {
                 // Pass the copiedFiles list into the StripImages function
                 StripImages(copiedFiles);
             }
 
-            if (deleteTempEnabled == true) {
+            if (deleteTempEnabled == true)
+            {
                 // Delete temp path recursively
-                if (tempPath != outputFolder && Directory.Exists(tempPath)) {
+                if (tempPath != outputFolder && Directory.Exists(tempPath))
+                {
                     Directory.Delete(tempPath, true);
                 }
             }
 
-            if (addToExcel == true) {
+            if (addToExcel == true)
+            {
                 AddToExcel(lastFolder, excelLogScore, excelNotes);
             }
 
-            if (openFolderEnabled == true) {
+            if (openFolderEnabled == true)
+            {
                 // Opens path in explorer
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
                     FileName = outputFolder,
                     UseShellExecute = true,
                     Verb = "open"
@@ -1714,83 +1913,104 @@ namespace MusicImportKit {
             ConvertBackgroundWorker.ReportProgress(100, e.Result);
         }
 
-        private void InputPathBox_DragEnter(object sender, DragEventArgs e) {
+        private void InputPathBox_DragEnter(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 e.Effect = DragDropEffects.Copy;
             }
-            else {
+            else
+            {
                 e.Effect = DragDropEffects.None;
             }
         }
 
-        private void InputPathBox_DragDrop(object sender, DragEventArgs e) {
+        private void InputPathBox_DragDrop(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 string[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
                 InputPathBox.Lines = fileNames;
                 InputPathBox.ForeColor = Color.Black;
             }
         }
 
-        private void OutputPathTextBox_DragEnter(object sender, DragEventArgs e) {
+        private void OutputPathTextBox_DragEnter(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 e.Effect = DragDropEffects.Copy;
             }
-            else {
+            else
+            {
                 e.Effect = DragDropEffects.None;
             }
         }
 
-        private void OutputPathTextBox_DragDrop(object sender, DragEventArgs e) {
+        private void OutputPathTextBox_DragDrop(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 string[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
                 OutputPathTextBox.Lines = fileNames;
                 OutputPathTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void InputPathBox_Enter(object sender, EventArgs e) {
+        private void InputPathBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (InputPathBox.Text == "Input Folder") {
+            if (InputPathBox.Text == "Input Folder")
+            {
                 InputPathBox.Text = "";
                 InputPathBox.ForeColor = Color.Black;
             }
         }
 
-        private void InputPathBox_Leave(object sender, EventArgs e) {
+        private void InputPathBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (InputPathBox.Text == "") {
+            if (InputPathBox.Text == "")
+            {
                 InputPathBox.Text = "Input Folder";
                 InputPathBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void InputPathButton_Click(object sender, EventArgs e) {
+        private void InputPathButton_Click(object sender, EventArgs e)
+        {
             // Folder picker
             CommonOpenFileDialog fbd = new CommonOpenFileDialog();
 
-            if (InputPathBox.Text != "Input Folder" && InputPathBox.Text != "" && Directory.Exists(InputPathBox.Text)) {
+            if (InputPathBox.Text != "Input Folder" && InputPathBox.Text != "" && Directory.Exists(InputPathBox.Text))
+            {
                 fbd.InitialDirectory = InputPathBox.Text;
             }
-            else {
+            else
+            {
                 fbd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
             }
 
             fbd.IsFolderPicker = true;
-            if (fbd.ShowDialog() == CommonFileDialogResult.Ok) {
+            if (fbd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
                 InputPathBox.Text = fbd.FileName;
                 InputPathBox.ForeColor = Color.Black;
             }
         }
 
-        private void InputExplorerButton_Click(object sender, EventArgs e) {
+        private void InputExplorerButton_Click(object sender, EventArgs e)
+        {
             // Checks if path is valid before opening
-            if (Directory.Exists(InputPathBox.Text)) {
+            if (Directory.Exists(InputPathBox.Text))
+            {
                 // Opens path in explorer
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
                     FileName = InputPathBox.Text,
                     UseShellExecute = true,
                     Verb = "open"
@@ -1798,54 +2018,67 @@ namespace MusicImportKit {
             }
         }
 
-        private void TempPathBox_DragEnter(object sender, DragEventArgs e) {
+        private void TempPathBox_DragEnter(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 e.Effect = DragDropEffects.Copy;
             }
-            else {
+            else
+            {
                 e.Effect = DragDropEffects.None;
             }
         }
 
-        private void TempPathBox_DragDrop(object sender, DragEventArgs e) {
+        private void TempPathBox_DragDrop(object sender, DragEventArgs e)
+        {
             // Allow drag+dropping of folders into text box
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 string[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
                 TempPathBox.Lines = fileNames;
                 TempPathBox.ForeColor = Color.Black;
             }
         }
 
-        private void TempPathBox_Enter(object sender, EventArgs e) {
+        private void TempPathBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (TempPathBox.Text == "Temp Folder") {
+            if (TempPathBox.Text == "Temp Folder")
+            {
                 TempPathBox.Text = "";
                 TempPathBox.ForeColor = Color.Black;
             }
         }
 
-        private void TempPathBox_Leave(object sender, EventArgs e) {
+        private void TempPathBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (TempPathBox.Text == "") {
+            if (TempPathBox.Text == "")
+            {
                 TempPathBox.Text = "Temp Folder";
                 TempPathBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void TempPathButton_Click(object sender, EventArgs e) {
+        private void TempPathButton_Click(object sender, EventArgs e)
+        {
             // Folder picker
             CommonOpenFileDialog fbd = new CommonOpenFileDialog();
 
-            if (TempPathBox.Text != "Temp Folder" && TempPathBox.Text != "" && Directory.Exists(TempPathBox.Text)) {
+            if (TempPathBox.Text != "Temp Folder" && TempPathBox.Text != "" && Directory.Exists(TempPathBox.Text))
+            {
                 fbd.InitialDirectory = TempPathBox.Text;
             }
-            else {
+            else
+            {
                 fbd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
             }
 
             fbd.IsFolderPicker = true;
-            if (fbd.ShowDialog() == CommonFileDialogResult.Ok) {
+            if (fbd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
                 TempPathBox.Text = fbd.FileName;
                 TempPathBox.ForeColor = Color.Black;
 
@@ -1855,11 +2088,14 @@ namespace MusicImportKit {
 
         }
 
-        private void TempExplorerButton_Click(object sender, EventArgs e) {
+        private void TempExplorerButton_Click(object sender, EventArgs e)
+        {
             // Checks if path is valid before opening
-            if (Directory.Exists(TempPathBox.Text)) {
+            if (Directory.Exists(TempPathBox.Text))
+            {
                 // Opens path in explorer
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
                     FileName = TempPathBox.Text,
                     UseShellExecute = true,
                     Verb = "open"
@@ -1867,162 +2103,219 @@ namespace MusicImportKit {
             }
         }
 
-        private void ArtistTextBox_Enter(object sender, EventArgs e) {
+        private void ArtistTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ArtistTextBox.Text == "Artist") {
+            if (ArtistTextBox.Text == "Artist")
+            {
                 ArtistTextBox.Text = "";
                 ArtistTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void ArtistTextBox_Leave(object sender, EventArgs e) {
+        private void ArtistTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ArtistTextBox.Text == "") {
+            if (ArtistTextBox.Text == "")
+            {
                 ArtistTextBox.Text = "Artist";
                 ArtistTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void AlbumTextBox_Enter(object sender, EventArgs e) {
+        private void AlbumTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (AlbumTextBox.Text == "Album") {
+            if (AlbumTextBox.Text == "Album")
+            {
                 AlbumTextBox.Text = "";
                 AlbumTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void AlbumTextBox_Leave(object sender, EventArgs e) {
+        private void AlbumTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (AlbumTextBox.Text == "") {
+            if (AlbumTextBox.Text == "")
+            {
                 AlbumTextBox.Text = "Album";
                 AlbumTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void DiscogsButton_Click(object sender, EventArgs e) {
+        private void DiscogsButton_Click(object sender, EventArgs e)
+        {
             // If artist and album textboxes are not empty
-            if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "" && AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "") {
+            if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "" && AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://www.discogs.com/search/?type=release&title=" + AlbumTextBox.Text + "&artist=" + ArtistTextBox.Text);
             }
             // If only artist is not empty
-            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") {
+            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://www.discogs.com/search/?q=" + ArtistTextBox.Text + "&type=artist");
             }
             // If only album is not empty
-            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "") {
+            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://www.discogs.com/search/?q=" + AlbumTextBox.Text + "&type=release");
             }
-            else {
+            else
+            {
                 MessageBox.Show("No artist and/or album specified.");
             }
         }
 
-        private void MusicBrainzButton_Click(object sender, EventArgs e) {
+        private void MusicBrainzButton_Click(object sender, EventArgs e)
+        {
             // If artist and album textboxes are not empty
-            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")) {
+            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != ""))
+            {
                 System.Diagnostics.Process.Start("https://musicbrainz.org/taglookup?tag-lookup.artist=" + ArtistTextBox.Text + "&tag-lookup.release=" + AlbumTextBox.Text);
             }
             // If only artist is not empty
-            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") {
+            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://musicbrainz.org/search?query=" + ArtistTextBox.Text + "&type=artist");
             }
             // If only album is not empty
-            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "") {
+            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://musicbrainz.org/search?query=" + AlbumTextBox.Text + "&type=release");
             }
-            else {
+            else
+            {
                 MessageBox.Show("No artist and/or album specified.");
             }
         }
 
-        private void RedactedButton_Click(object sender, EventArgs e) {
+        private void RedactedButton_Click(object sender, EventArgs e)
+        {
             // If artist and album textboxes are not empty
-            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")) {
+            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != ""))
+            {
                 System.Diagnostics.Process.Start("https://redacted.ch/torrents.php?artistname=" + ArtistTextBox.Text + "&groupname=" + AlbumTextBox.Text + "&order_by=seeders&order_way=desc&group_results=1&filter_cat[1]=1&action=basic&searchsubmit=1");
             }
             // If only artist is not empty
-            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") {
+            else if (ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://redacted.ch/artist.php?artistname=" + ArtistTextBox.Text);
             }
             // If only album is not empty
-            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "") {
+            else if (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")
+            {
                 System.Diagnostics.Process.Start("https://redacted.ch/artist.php?groupname=" + AlbumTextBox.Text + " &order_by=seeders&order_way=desc&group_results=1&filter_cat[1]=1&action=basic&searchsubmit=1");
             }
-            else {
+            else
+            {
                 MessageBox.Show("No artist and/or album specified.");
             }
         }
 
-        private void AADButton_Click(object sender, EventArgs e) {
+        private void AADButton_Click(object sender, EventArgs e)
+        {
             // If the tempPathBox doesn't end with "\", add "\" to it
             string tempPath = NormalizePath(TempPathBox.Text);
 
             // If artist and album textboxes are not empty
-            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != "")) {
+            if ((ArtistTextBox.Text != "Artist" && ArtistTextBox.Text != "") && (AlbumTextBox.Text != "Album" && AlbumTextBox.Text != ""))
+            {
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.FileName = Settings.Default.AADLocation;
                 startInfo.Arguments = "-ar \"" + ArtistTextBox.Text + "\" -al \"" + AlbumTextBox.Text + "\" -p \"" + tempPath + "folder.%extension%\"";
                 System.Diagnostics.Process.Start(startInfo);
             }
-            else {
+            else
+            {
                 MessageBox.Show("Artist or album is empty.");
             }
         }
 
-        private void Mp3tagButton_Click(object sender, EventArgs e) {
-            if (TempPathBox.Text != "Temp Path" && TempPathBox.Text != "") {
+        private void Mp3tagButton_Click(object sender, EventArgs e)
+        {
+            if (TempPathBox.Text != "Temp Path" && TempPathBox.Text != "")
+            {
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.FileName = Settings.Default.Mp3tagLocation;
                 startInfo.Arguments = "-fp:\"" + TempPathBox.Text + "\"";
                 System.Diagnostics.Process.Start(startInfo);
             }
-            else {
+            else
+            {
                 MessageBox.Show("No temp path specified.");
             }
         }
 
-        private void ExcelLogScoreTextBox_Enter(object sender, EventArgs e) {
+        private void ExcelLogScoreTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ExcelLogScoreTextBox.Text == "Log score") {
+            if (ExcelLogScoreTextBox.Text == "Log score")
+            {
                 ExcelLogScoreTextBox.Text = "";
                 ExcelLogScoreTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void ExcelLogScoreTextBox_Leave(object sender, EventArgs e) {
+        private void ExcelLogScoreTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ExcelLogScoreTextBox.Text == "") {
+            if (ExcelLogScoreTextBox.Text == "")
+            {
                 ExcelLogScoreTextBox.Text = "Log score";
                 ExcelLogScoreTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void ExcelNotesTextBox_Enter(object sender, EventArgs e) {
+        private void ExcelNotesTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ExcelNotesTextBox.Text == "Notes") {
+            if (ExcelNotesTextBox.Text == "Notes")
+            {
                 ExcelNotesTextBox.Text = "";
                 ExcelNotesTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void ExcelNotesTextBox_Leave(object sender, EventArgs e) {
+        private void ExcelNotesTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (ExcelNotesTextBox.Text == "") {
+            if (ExcelNotesTextBox.Text == "")
+            {
                 ExcelNotesTextBox.Text = "Notes";
                 ExcelNotesTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void ConvertButton_Click(object sender, EventArgs e) {
+        private void ConvertButton_Click(object sender, EventArgs e)
+        {
             // Input validation
-            if (!Directory.Exists(TempPathBox.Text) || !Directory.Exists(OutputPathTextBox.Text) || ConvertToComboBox.Text == "" || PresetComboBox.Text == "") {
+            if (!Directory.Exists(TempPathBox.Text))
+            {
+                MessageBox.Show("Temp folder does not exist.");
+                return;
+            }
+            else if (!Directory.Exists(OutputPathTextBox.Text))
+            {
+                MessageBox.Show("Output folder does not exist.");
+                return;
+            }
+            else if (OutputNamingSyntaxTextBox.Text == "Output Folder+File Name (syntax in tooltip)" || OutputNamingSyntaxTextBox.Text == "")
+            {
+                MessageBox.Show("Naming syntax is blank.");
+                return;
+            }
+            else if (ConvertToComboBox.Text == "" || PresetComboBox.Text == "")
+            {
+                MessageBox.Show("Conversion format is invalid.");
                 return;
             }
 
             // Make sure the user actually wants to use the default temp folder, and didn't just misclick
-            if (TempPathBox.Text == Settings.Default.DefaultTemp) {
+            if (TempPathBox.Text == Settings.Default.DefaultTemp)
+            {
                 DialogResult result = MessageBox.Show("Are you sure you want to convert using the default temp folder?", "Warning", MessageBoxButtons.YesNo);
-                if (result == DialogResult.No) {
+                if (result == DialogResult.No)
+                {
                     return;
                 }
             }
@@ -2052,51 +2345,64 @@ namespace MusicImportKit {
             outputArguments.Add(ConvertToComboBox.Text);
             outputArguments.Add(PresetComboBox.Text);
 
-            if (!ConvertBackgroundWorker.IsBusy) {
+            if (!ConvertBackgroundWorker.IsBusy)
+            {
                 ConvertBackgroundWorker.RunWorkerAsync(outputArguments);
             }
-            else {
+            else
+            {
                 MessageBox.Show("Already running a conversion operation.");
             }
         }
 
-        private void OutputNamingSyntaxTextBox_Enter(object sender, EventArgs e) {
+        private void OutputNamingSyntaxTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (OutputNamingSyntaxTextBox.Text == "Output Folder+File Name (syntax in tooltip)") {
+            if (OutputNamingSyntaxTextBox.Text == "Output Folder+File Name (syntax in tooltip)")
+            {
                 OutputNamingSyntaxTextBox.Text = "";
                 OutputNamingSyntaxTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void OutputNamingSyntaxTextBox_Leave(object sender, EventArgs e) {
+        private void OutputNamingSyntaxTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (OutputNamingSyntaxTextBox.Text == "") {
+            if (OutputNamingSyntaxTextBox.Text == "")
+            {
                 OutputNamingSyntaxTextBox.Text = "Output Folder+File Name (syntax in tooltip)";
                 OutputNamingSyntaxTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void OutputPathTextBox_Enter(object sender, EventArgs e) {
+        private void OutputPathTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (OutputPathTextBox.Text == "Output Folder (base path)") {
+            if (OutputPathTextBox.Text == "Output Folder (base path)")
+            {
                 OutputPathTextBox.Text = "";
                 OutputPathTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void OutputPathTextBox_Leave(object sender, EventArgs e) {
+        private void OutputPathTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (OutputPathTextBox.Text == "") {
+            if (OutputPathTextBox.Text == "")
+            {
                 OutputPathTextBox.Text = "Output Folder (base path)";
                 OutputPathTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void OutputExplorerButton_Click(object sender, EventArgs e) {
+        private void OutputExplorerButton_Click(object sender, EventArgs e)
+        {
             // Checks if path is valid before opening
-            if (Directory.Exists(OutputPathTextBox.Text)) {
+            if (Directory.Exists(OutputPathTextBox.Text))
+            {
                 // Opens path in explorer
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
                     FileName = OutputPathTextBox.Text,
                     UseShellExecute = true,
                     Verb = "open"
@@ -2104,47 +2410,60 @@ namespace MusicImportKit {
             }
         }
 
-        private void OutputPathButton_Click(object sender, EventArgs e) {
+        private void OutputPathButton_Click(object sender, EventArgs e)
+        {
             // Folder picker
             CommonOpenFileDialog fbd = new CommonOpenFileDialog();
 
-            if (OutputPathTextBox.Text != "Output Folder (base path)" && OutputPathTextBox.Text != "" && Directory.Exists(OutputPathTextBox.Text)) {
+            if (OutputPathTextBox.Text != "Output Folder (base path)" && OutputPathTextBox.Text != "" && Directory.Exists(OutputPathTextBox.Text))
+            {
                 fbd.InitialDirectory = OutputPathTextBox.Text;
             }
-            else {
+            else
+            {
                 fbd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
             }
 
             fbd.IsFolderPicker = true;
-            if (fbd.ShowDialog() == CommonFileDialogResult.Ok) {
+            if (fbd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
                 OutputPathTextBox.Text = fbd.FileName;
                 OutputPathTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void ConvertBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+        private void ConvertBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            // Set button back to default to denote process completion
+            ConvertButton.Text = "Convert";
+            ConvertButton.Enabled = true;
+
+            // If the conversion process was cancelled
+            if (e.Cancelled)
+            {
+                return;
+            }
+
             // Arguments passed into the completed event
             List<object> inputArguments = e.Result as List<object>;
             string inputPath = (string)inputArguments[0];
             string tempPath = (string)inputArguments[1];
             bool sourceFolderDeleted = (bool)inputArguments[2];
 
-            // Set button back to default to denote process completion
-            ConvertButton.Text = "Convert";
-            ConvertButton.Enabled = true;
-
-
             DirectoryInfo parentFolder;
 
             // Move temppath up one folder if the original folder was deleted, but doesn't move if the user has changed the folder since starting the conversion
-            if (sourceFolderDeleted == true) {
+            if (sourceFolderDeleted == true)
+            {
                 parentFolder = Directory.GetParent(Directory.GetParent(tempPath).FullName);
-                if (parentFolder != null && Directory.Exists(parentFolder.FullName) && NormalizePath(TempPathBox.Text) == NormalizePath(tempPath)) {
+                if (parentFolder != null && Directory.Exists(parentFolder.FullName) && NormalizePath(TempPathBox.Text) == NormalizePath(tempPath))
+                {
                     TempPathBox.Text = Directory.GetParent(Directory.GetParent(tempPath).FullName).FullName;
                 }
 
                 // Move input path up one folder, but doesn't move if the user has changed the folder since starting the conversion
-                if (NormalizePath(InputPathBox.Text) == NormalizePath(inputPath)) {
+                if (NormalizePath(InputPathBox.Text) == NormalizePath(inputPath))
+                {
                     InputPathBox.Text = Settings.Default.DefaultInput;
                 }
 
@@ -2162,25 +2481,31 @@ namespace MusicImportKit {
             ExcelNotesTextBox.ForeColor = SystemColors.GrayText;
         }
 
-        private void CopyFileTypesTextBox_Enter(object sender, EventArgs e) {
+        private void CopyFileTypesTextBox_Enter(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (CopyFileTypesTextBox.Text == "e.g. *.jpg; *.log; *.cue; *.pdf") {
+            if (CopyFileTypesTextBox.Text == "e.g. *.jpg; *.log; *.cue; *.pdf")
+            {
                 CopyFileTypesTextBox.Text = "";
                 CopyFileTypesTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void CopyFileTypesTextBox_Leave(object sender, EventArgs e) {
+        private void CopyFileTypesTextBox_Leave(object sender, EventArgs e)
+        {
             // Text watermarking
-            if (CopyFileTypesTextBox.Text == "") {
+            if (CopyFileTypesTextBox.Text == "")
+            {
                 CopyFileTypesTextBox.Text = "e.g. *.jpg; *.log; *.cue; *.pdf";
                 CopyFileTypesTextBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void SpectrogramsButton_Click(object sender, EventArgs e) {
+        private void SpectrogramsButton_Click(object sender, EventArgs e)
+        {
             // Input validation
-            if (!Directory.Exists(TempPathBox.Text)) {
+            if (!Directory.Exists(TempPathBox.Text))
+            {
                 return;
             }
 
@@ -2189,7 +2514,8 @@ namespace MusicImportKit {
             inputFLACs.AddRange(GetRecursiveFilesSafe(TempPathBox.Text, "*.flac"));
 
             // If no flacs are found, return
-            if (inputFLACs.Count() == 0) {
+            if (inputFLACs.Count() == 0)
+            {
                 return;
             }
 
@@ -2199,7 +2525,8 @@ namespace MusicImportKit {
             spekProcess.StartInfo.UseShellExecute = false;
 
             // Opens each .flac file in spek, one at a time and in order
-            foreach (string currentFLAC in inputFLACs) {
+            foreach (string currentFLAC in inputFLACs)
+            {
                 spekProcess.StartInfo.Arguments = "\"" + currentFLAC + "\"";
                 spekProcess.Start();
                 spekProcess.WaitForExit();
@@ -2220,9 +2547,11 @@ namespace MusicImportKit {
         }
 
         // Guesses the artist and album from the first flac file
-        private void GuessButton_Click(object sender, EventArgs e) {
+        private void GuessButton_Click(object sender, EventArgs e)
+        {
             // Input validation
-            if (!Directory.Exists(TempPathBox.Text)) {
+            if (!Directory.Exists(TempPathBox.Text))
+            {
                 return;
             }
 
@@ -2233,7 +2562,8 @@ namespace MusicImportKit {
             inputFLACs.AddRange(GetRecursiveFilesSafe(TempPathBox.Text, "*.flac"));
 
             // If no flacs are found, return
-            if (inputFLACs.Count() == 0) {
+            if (inputFLACs.Count() == 0)
+            {
                 return;
             }
 
@@ -2242,35 +2572,43 @@ namespace MusicImportKit {
             TagLib.Ogg.XiphComment tagMap = (TagLib.Ogg.XiphComment)tagFile.GetTag(TagLib.TagTypes.Xiph);
 
             // Parse the tags for artist and album (preferred albumartist, then album artist, then artist)
-            if (tagMap.GetFirstField("albumartist") != null) {
+            if (tagMap.GetFirstField("albumartist") != null)
+            {
                 ArtistTextBox.Text = tagMap.GetFirstField("albumartist");
                 ArtistTextBox.ForeColor = Color.Black;
             }
-            else if (tagMap.GetFirstField("album artist") != null) {
+            else if (tagMap.GetFirstField("album artist") != null)
+            {
                 ArtistTextBox.Text = tagMap.GetFirstField("album artist");
                 ArtistTextBox.ForeColor = Color.Black;
             }
-            else if (tagMap.GetFirstField("artist") != null) {
+            else if (tagMap.GetFirstField("artist") != null)
+            {
                 ArtistTextBox.Text = tagMap.GetFirstField("artist");
                 ArtistTextBox.ForeColor = Color.Black;
             }
 
-            if (tagMap.GetFirstField("album") != null) {
+            if (tagMap.GetFirstField("album") != null)
+            {
                 AlbumTextBox.Text = tagMap.GetFirstField("album");
                 AlbumTextBox.ForeColor = Color.Black;
             }
         }
 
-        private void CopyButton_Click(object sender, EventArgs e) {
+        private void CopyButton_Click(object sender, EventArgs e)
+        {
             // if the fromPath or toPath doesn't exist, return
-            if (!Directory.Exists(InputPathBox.Text) || !Directory.Exists(TempPathBox.Text)) {
+            if (!Directory.Exists(InputPathBox.Text) || !Directory.Exists(TempPathBox.Text))
+            {
                 return;
             }
 
             // Make sure the user actually wants to use default input, and didn't just misclick
-            if (InputPathBox.Text == Settings.Default.DefaultInput) {
+            if (InputPathBox.Text == Settings.Default.DefaultInput)
+            {
                 DialogResult result = MessageBox.Show("Are you sure you want to copy the default input folder?", "Warning", MessageBoxButtons.YesNo);
-                if (result == DialogResult.No) {
+                if (result == DialogResult.No)
+                {
                     return;
                 }
             }
@@ -2285,16 +2623,19 @@ namespace MusicImportKit {
             outputArguments.Add(NormalizePath(TempPathBox.Text));
             outputArguments.Add(AutoWavConvertCheckbox.Checked);
 
-            if (!CopyBackgroundWorker.IsBusy) {
+            if (!CopyBackgroundWorker.IsBusy)
+            {
                 // Run background worker
                 CopyBackgroundWorker.RunWorkerAsync(outputArguments);
             }
-            else {
+            else
+            {
                 MessageBox.Show("Already running a copy operation.");
             }
         }
 
-        private void CopyBackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        private void CopyBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             // Arguments passed into the worker
             List<object> inputArguments = e.Argument as List<object>;
             string inputPath = (string)inputArguments[0];
@@ -2311,7 +2652,8 @@ namespace MusicImportKit {
             RecursiveFolderCopy(inputPath, outputPath);
 
             // Convert .wavs to .flacs after copy
-            if (convertWAVs == true) {
+            if (convertWAVs == true)
+            {
                 // List of input wavs that can be converted
                 List<string> inputWAVs = new List<string>();
                 inputWAVs.AddRange(GetRecursiveFilesSafe(outputPath, "*.wav"));
@@ -2331,7 +2673,8 @@ namespace MusicImportKit {
                     flacProcess.WaitForExit();
 
                     // Remove input .wav files
-                    if (File.Exists(currentWAV)) {
+                    if (File.Exists(currentWAV))
+                    {
                         File.Delete(currentWAV);
                     }
                 });
@@ -2346,7 +2689,8 @@ namespace MusicImportKit {
             CopyBackgroundWorker.ReportProgress(100, e.Result);
         }
 
-        private void CopyBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+        private void CopyBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             // Arguments passed into the completed event
             List<object> inputArguments = e.Result as List<object>;
             string outputPath = (string)inputArguments[0];
@@ -2362,25 +2706,30 @@ namespace MusicImportKit {
             GuessButton.PerformClick();
         }
 
-        private void SettingsButton_Click(object sender, EventArgs e) {
+        private void SettingsButton_Click(object sender, EventArgs e)
+        {
             SettingsForm SettingsFormWindow = new SettingsForm();
 
             // Open settings form and apply settings if the user accepts it
-            if (SettingsFormWindow.ShowDialog() == DialogResult.OK) {
+            if (SettingsFormWindow.ShowDialog() == DialogResult.OK)
+            {
                 ApplyUserSettings();
             }
         }
 
-        private void CopyContentsCheckbox_CheckedChanged(object sender, EventArgs e) {
+        private void CopyContentsCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
             // Enable or disable the file types textbox depending on check-state
-            if (CopyContentsCheckbox.Checked == true) {
+            if (CopyContentsCheckbox.Checked == true)
+            {
                 CopyFileTypesTextBox.Enabled = true;
                 RenameLogCueCheckbox.Enabled = true;
                 RenameLogCueCheckbox.Checked = Settings.Default.DefaultRenameLogCue;
                 StripImageMetadataCheckbox.Enabled = true;
                 StripImageMetadataCheckbox.Checked = Settings.Default.DefaultStripImageMetadata;
             }
-            else {
+            else
+            {
                 CopyFileTypesTextBox.Enabled = false;
                 RenameLogCueCheckbox.Enabled = false;
                 RenameLogCueCheckbox.Checked = false;
@@ -2389,14 +2738,17 @@ namespace MusicImportKit {
             }
         }
 
-        private void ConvertToComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+        private void ConvertToComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
             // Clear presets
             PresetComboBox.Items.Clear();
 
-            if (ConvertToComboBox.Text == "FLAC") {
+            if (ConvertToComboBox.Text == "FLAC")
+            {
                 PresetComboBox.Items.Add("Standard");
                 // SoX is required for proper downsampling and dithering
-                if (Settings.Default.SoXLocation != "") {
+                if (Settings.Default.SoXLocation != "")
+                {
                     PresetComboBox.Items.Add("Force 16-bit");
                     PresetComboBox.Items.Add("Force 44.1kHz/48kHz");
                     PresetComboBox.Items.Add("Force 16-bit and 44.1/48kHz");
@@ -2405,7 +2757,8 @@ namespace MusicImportKit {
                 // Set to "Standard" by default
                 PresetComboBox.Text = "Standard";
             }
-            else if (ConvertToComboBox.Text == "MP3") {
+            else if (ConvertToComboBox.Text == "MP3")
+            {
                 PresetComboBox.Items.Add("245kbps VBR (V0)");
                 PresetComboBox.Items.Add("225kbps VBR (V1)");
                 PresetComboBox.Items.Add("190kbps VBR (V2)");
@@ -2425,7 +2778,8 @@ namespace MusicImportKit {
                 // Set to "245kbps VBR (V0)" by default
                 PresetComboBox.Text = "245kbps VBR (V0)";
             }
-            else if (ConvertToComboBox.Text == "Opus") {
+            else if (ConvertToComboBox.Text == "Opus")
+            {
                 PresetComboBox.Items.Add("192kbps VBR");
                 PresetComboBox.Items.Add("160kbps VBR");
                 PresetComboBox.Items.Add("128kbps VBR");
@@ -2438,65 +2792,81 @@ namespace MusicImportKit {
             }
         }
 
-        private void ResetPathsButton_Click(object sender, EventArgs e) {
+        private void ResetPathsButton_Click(object sender, EventArgs e)
+        {
             // Reset the input and temp paths back to default settings
-            if (Settings.Default.DefaultInput != "") {
+            if (Settings.Default.DefaultInput != "")
+            {
                 InputPathBox.Text = Settings.Default.DefaultInput;
                 InputPathBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 InputPathBox.Text = "Input Folder";
                 InputPathBox.ForeColor = SystemColors.GrayText;
             }
-            if (Settings.Default.DefaultTemp != "") {
+            if (Settings.Default.DefaultTemp != "")
+            {
                 TempPathBox.Text = Settings.Default.DefaultTemp;
                 TempPathBox.ForeColor = Color.Black;
             }
-            else {
+            else
+            {
                 TempPathBox.Text = "Temp Folder";
                 TempPathBox.ForeColor = SystemColors.GrayText;
             }
         }
 
-        private void InputPathUpOneButton_Click(object sender, EventArgs e) {
-            if (InputPathBox.Text == "Input Folder" || InputPathBox.Text == "") {
+        private void InputPathUpOneButton_Click(object sender, EventArgs e)
+        {
+            if (InputPathBox.Text == "Input Folder" || InputPathBox.Text == "")
+            {
                 return;
             }
 
             // Move up one folder if valid
             DirectoryInfo parentFolder = Directory.GetParent(Directory.GetParent(NormalizePath(InputPathBox.Text)).FullName);
-            if (parentFolder != null && Directory.Exists(parentFolder.FullName)) {
+            if (parentFolder != null && Directory.Exists(parentFolder.FullName))
+            {
                 InputPathBox.Text = Directory.GetParent(Directory.GetParent(NormalizePath(InputPathBox.Text)).FullName).FullName;
             }
         }
 
-        private void TempPathUpOneButton_Click(object sender, EventArgs e) {
-            if (TempPathBox.Text == "Temp Folder" || TempPathBox.Text == "") {
+        private void TempPathUpOneButton_Click(object sender, EventArgs e)
+        {
+            if (TempPathBox.Text == "Temp Folder" || TempPathBox.Text == "")
+            {
                 return;
             }
 
             // Move up one folder if valid
             DirectoryInfo parentFolder = Directory.GetParent(Directory.GetParent(NormalizePath(TempPathBox.Text)).FullName);
-            if (parentFolder != null && Directory.Exists(parentFolder.FullName)) {
+            if (parentFolder != null && Directory.Exists(parentFolder.FullName))
+            {
                 TempPathBox.Text = Directory.GetParent(Directory.GetParent(NormalizePath(TempPathBox.Text)).FullName).FullName;
             }
         }
 
-        private void OutputPathUpOneButton_Click(object sender, EventArgs e) {
-            if (OutputPathTextBox.Text == "Output Folder (base path)" || OutputPathTextBox.Text == "") {
+        private void OutputPathUpOneButton_Click(object sender, EventArgs e)
+        {
+            if (OutputPathTextBox.Text == "Output Folder (base path)" || OutputPathTextBox.Text == "")
+            {
                 return;
             }
 
             // Move up one folder if valid
             DirectoryInfo parentFolder = Directory.GetParent(Directory.GetParent(NormalizePath(OutputPathTextBox.Text)).FullName);
-            if (parentFolder != null && Directory.Exists(parentFolder.FullName)) {
+            if (parentFolder != null && Directory.Exists(parentFolder.FullName))
+            {
                 OutputPathTextBox.Text = Directory.GetParent(Directory.GetParent(NormalizePath(OutputPathTextBox.Text)).FullName).FullName;
             }
         }
 
-        private void TempPathBox_KeyDown(object sender, KeyEventArgs e) {
+        private void TempPathBox_KeyDown(object sender, KeyEventArgs e)
+        {
             // If user presses Enter in the tempbox, perform a metadata guess
-            if (e.KeyCode == Keys.Return) {
+            if (e.KeyCode == Keys.Return)
+            {
                 e.SuppressKeyPress = true;
                 GuessButton.PerformClick();
             }
