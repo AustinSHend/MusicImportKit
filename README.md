@@ -1,3 +1,5 @@
+# !!! - MusicImportKit has been superseded by [qMusicImportKit](https://github.com/AustinSHend/qMusicImportKit).
+
 ![Main window](https://i.imgur.com/bhURi7t.png)
 
 # MusicImportKit
@@ -8,7 +10,7 @@ Designed for power users who take lineage and data integrity seriously. Integrat
 
 * Parallel conversion to FLAC (-V8 re-FLACing), MP3, and Opus.
 
-* Proper downsampling (e.g. 96kHz -> 48kHz) and bit-depth reduction (e.g. 24-bit -> 16-bit) using SoX (with a VHQ triangular dither filter, guarding, and 44.1/48 sample-rate detection).
+* Proper downsampling (e.g. 96kHz -> 48kHz) and bit-depth reduction (e.g. 24-bit -> 16-bit) using SoX (with a VHQ triangular dither filter, guarding, and 44.1/48 sample-rate detection)A.
 
 * Genuine LAME header info is preserved by exporting all tags from a .flac, decoding to .wav (destroying all tags in the process), encoding the .wav to .mp3 through LAME, and reapplying original tags to the .mp3 (including preserving unlimited custom tags through TXXX frame manipulation).
 
